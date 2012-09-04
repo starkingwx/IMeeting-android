@@ -1,7 +1,7 @@
 <resources>
 
     <!-- iMeeting project -->
-    <string name="app_name">IMeeting</string>
+    <string name="app_name">Wetalking</string>
 
     <!-- iMeeting application activity -->
     <string name="splash_content_description">iMeeting application splash image</string>

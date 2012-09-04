@@ -16,7 +16,7 @@
         android:paddingRight="6dp" >
 
         <TextView
-            android:id="@+id/talkingGroupId_textView"
+            android:id="@+id/talkingGroupTitle_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -28,8 +28,8 @@
             android:id="@+id/talkingGroup_createdTime_textView"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@id/talkingGroupId_textView"
-            android:layout_toRightOf="@id/talkingGroupId_textView"
+            android:layout_alignBaseline="@+id/talkingGroupTitle_textView"
+            android:layout_toRightOf="@+id/talkingGroupTitle_textView"
             android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/goldenrod" />

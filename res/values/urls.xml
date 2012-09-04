@@ -4,6 +4,17 @@
     <!-- iMeeting server url -->
     <string name="server_url">http://www.wetalking.net/imeeting</string>
 
+    <string name="login_url">/user/login</string>
+    <string name="conf_list_url">/conference/list</string>
+    <string name="join_conf_url">/conference/join</string>
+    <string name="create_conf_url">/conference/create</string>
+    <string name="get_attendee_list_url">/conference/attendeeList</string>
+    <string name="unjoin_conf_url">/conference/unjoin</string>
+    <string name="call_url">/conference/call</string>
+    <string name="hangup_url">/conference/hangup</string>
+    <string name="kickout_url">/conference/kickout</string>
+    <string name="notify_url">http://msg.wetalking.net</string>
+    
     <!-- support url -->
     <string name="support_url">/help</string>
 

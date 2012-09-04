@@ -1,28 +1,53 @@
 package com.richitec.imeeting.talkinggroup;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.richitec.commontoolkit.activityextension.NavigationActivity;
 import com.richitec.commontoolkit.customui.BarButtonItem;
+import com.richitec.commontoolkit.user.UserManager;
+import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.HttpUtils.ResponseListener;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.assistant.SettingActivity;
+import com.richitec.imeeting.constants.SystemConstants;
+import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.contactselect.ContactSelectActivity;
 
 public class TalkingGroupHistoryListActivity extends NavigationActivity {
+	private PullToRefreshListView listView;
+	private TalkingGroupListAdapter listAdapter;
+	private Handler handler;
+	private ProgressDialog progressDialog;
+
+	private JSONObject selectedGroupInfo;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		handler = new Handler(Looper.myLooper());
 
 		// set content view
 		setContentView(R.layout.talking_group_history_list_activity_layout);
@@ -39,45 +64,26 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 		// item
 		setLeftBarButtonItem(_settingBarBtnItem);
 
-		// test by ares
-		// test attendees phone numbers
-		String[][] _testGroupPhones = new String[][] {
-				{ "13770662051", "18001582338" },
-				{ "18652096792", "18652970325", "13813005146", "14751800329",
-						"13382794516" },
-				{ "13412345432", "18976541234", "14752435262" },
-				{ "13212321345", "18976541234", "14752435262", "13312345678" },
-				{ "13111111111" } };
-
-		// list view data list
-		List<Map<String, Object>> _dataList = new ArrayList<Map<String, Object>>();
-		// generate data
-		for (int i = 0; i < 5; i++) {
-			HashMap<String, Object> _dataMap = new HashMap<String, Object>();
-
-			// set data
-			_dataMap.put("group_id", "-" + i);
-			_dataMap.put("group_createdTime", "+" + i);
-			_dataMap.put("group_attendees_phone", _testGroupPhones[i]);
-
-			// add to data list
-			_dataList.add(_dataMap);
-		}
-
 		// set my group history listView adapter
-		((ListView) findViewById(R.id.myGroup_history_listView))
-				.setAdapter(new TalkingGroupHistoryListItemAdapter(this,
-						_dataList,
-						R.layout.talking_group_history_list_item_layout,
-						new String[] { "group_id", "group_createdTime",
-								"group_attendees_phone" }, new int[] {
-								R.id.talkingGroupId_textView,
-								R.id.talkingGroup_createdTime_textView,
-								R.id.talkingGroup_attendees_tableRow }));
+		listView = (PullToRefreshListView) findViewById(R.id.myGroup_history_listView);
+		listAdapter = new TalkingGroupListAdapter(this);
+		listView.getRefreshableView().setAdapter(listAdapter);
+		listView.getRefreshableView().setOnItemClickListener(selectedListener);
+		listView.setOnRefreshListener(new OnRefreshListener<ListView>() {
+
+			@Override
+			public void onRefresh(PullToRefreshBase<ListView> refreshView) {
+				loadData();
+			}
+		});
+		
+		listView.setOnLastItemVisibleListener(lastItemVisibleListener);
 
 		// bind new talking group button on click listener
 		((Button) findViewById(R.id.newTalkingGroup_btn))
 				.setOnClickListener(new NewTalkingGroupBtnOnClickListener());
+
+		loadData();
 	}
 
 	@Override
@@ -87,7 +93,7 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 		return true;
 	}
 
-	// inner class
+	
 	// setting button on click listener
 	class SettingBtnOnClickListener implements OnClickListener {
 
@@ -108,6 +114,208 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 			pushActivity(ContactSelectActivity.class);
 		}
 
+	}
+
+	private OnLastItemVisibleListener lastItemVisibleListener = new OnLastItemVisibleListener() {
+
+		@Override
+		public void onLastItemVisible() {
+			Log.d(SystemConstants.TAG, "last item reached");
+		}
+	};
+	
+	public void loadData() {
+		Log.d(SystemConstants.TAG, "load group list");
+		String getGroupListUrl = getString(R.string.server_url)
+				+ getString(R.string.conf_list_url);
+		HttpUtils.startHttpPostRequestWithSignature(getGroupListUrl, null,
+				onFinishedGetGroupList, null);
+	}
+
+	private ResponseListener onFinishedGetGroupList = new ResponseListener() {
+
+		@Override
+		public void onComplete(int status, String responseText) {
+			handler.post(new Runnable() {
+
+				@Override
+				public void run() {
+					listView.onRefreshComplete();
+
+				}
+			});
+			switch (status) {
+			case 200:
+				try {
+					JSONObject data = new JSONObject(responseText);
+					final JSONArray groups = data.getJSONArray("list");
+					Log.d(SystemConstants.TAG,
+							"group list size: " + groups.length());
+					handler.post(new Runnable() {
+
+						@Override
+						public void run() {
+							listAdapter.setGroupList(groups);
+						}
+					});
+
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				break;
+
+			default:
+				break;
+			}
+
+		}
+	};
+
+	private OnItemClickListener selectedListener = new OnItemClickListener() {
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position,
+				long id) {
+			selectedGroupInfo = (JSONObject) listAdapter.getItem(position - 1);
+			try {
+				String groupId = selectedGroupInfo
+						.getString(TalkGroup.conferenceId.name());
+				Log.d(SystemConstants.TAG, "current groupid: " + groupId);
+				joinGroupTalk(groupId);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+
+	};
+
+	private void joinGroupTalk(String groupId) {
+		progressDialog = ProgressDialog.show(this, null,
+				getString(R.string.sending_request));
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put(TalkGroup.conferenceId.name(), groupId);
+		HttpUtils.startHttpPostRequestWithSignature(getString(R.string.server_url)
+				+ getString(R.string.join_conf_url), params, onFinishedJoin,
+				null);
+	}
+
+	private ResponseListener onFinishedJoin = new ResponseListener() {
+
+		@Override
+		public void onComplete(int status, String responseText) {
+			switch (status) {
+			case 200:
+				Log.d(SystemConstants.TAG, "join ok");
+				try {
+					String groupId = selectedGroupInfo
+							.getString(TalkGroup.conferenceId.name());
+					JSONObject data = new JSONObject(responseText);
+
+//					Intent intent = new Intent(TalkingGroupHistoryListActivity.this,
+//							TalkingGroupActivity.class);
+//					intent.putExtra(TalkGroup.conferenceId.name(), groupId);
+//					intent.putExtra(TalkGroup.owner.name(),
+//							data.getString(TalkGroup.owner.name()));
+//					startActivityForResult(intent, REQ_OPEN_GROUP_TALK);
+				} catch (JSONException e1) {
+					e1.printStackTrace();
+					Toast.makeText(TalkingGroupHistoryListActivity.this,
+							R.string.error_in_join_group, Toast.LENGTH_SHORT)
+							.show();
+				}
+				break;
+			case 403:
+				Toast.makeText(TalkingGroupHistoryListActivity.this,
+						R.string.join_conf_forbidden, Toast.LENGTH_SHORT)
+						.show();
+				break;
+			case 404:
+				Log.d(SystemConstants.TAG, "conf doesn't exist, create a new one");
+				String accountName = UserManager.getInstance().getUser()
+						.getName();
+				String attendeesJsonString = null;
+				if (selectedGroupInfo != null) {
+					try {
+						JSONArray attendees = selectedGroupInfo
+								.getJSONArray(TalkGroup.attendees.name());
+						JSONArray attendeesToInvite = new JSONArray();
+						for (int i = 0; i < attendees.length(); i++) {
+							String name = attendees.getString(i);
+							if (!accountName.equals(name)) {
+								attendeesToInvite.put(name);
+							}
+						}
+						attendeesJsonString = attendeesToInvite.toString();
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+					selectedGroupInfo = null;
+				}
+				HashMap<String, String> params = new HashMap<String, String>();
+				params.put(TalkGroup.attendees.name(), attendeesJsonString);
+				HttpUtils.startHttpPostRequestWithSignature(
+						getString(R.string.server_url)
+								+ getString(R.string.create_conf_url), params,
+						onFinishedCreateGroupTalk, null);
+				return;
+			default:
+				Toast.makeText(TalkingGroupHistoryListActivity.this,
+						R.string.error_in_join_group, Toast.LENGTH_SHORT)
+						.show();
+				break;
+			}
+			selectedGroupInfo = null;
+			if (progressDialog != null) {
+				progressDialog.dismiss();
+			}
+		}
+	};
+
+	private ResponseListener onFinishedCreateGroupTalk = new ResponseListener() {
+
+		@Override
+		public void onComplete(int status, String responseText) {
+			if (progressDialog != null) {
+				progressDialog.dismiss();
+			}
+			switch (status) {
+			case 201:
+				// create and invite ok
+				try {
+					JSONObject data = new JSONObject(responseText);
+					String groupId = data.getString(TalkGroup.conferenceId
+							.name());
+					String owner = data.getString(TalkGroup.owner.name());
+
+//					Intent intent = new Intent(TalkingGroupHistoryListActivity.this,
+//							TalkingGroupActivity.class);
+//					intent.putExtra(TalkGroup.conferenceId.name(), groupId);
+//					intent.putExtra(TalkGroup.owner.name(), owner);
+//					startActivityForResult(intent, REQ_OPEN_GROUP_TALK);
+				} catch (JSONException e) {
+					e.printStackTrace();
+					Toast.makeText(TalkingGroupHistoryListActivity.this,
+							R.string.error_in_create_group, Toast.LENGTH_SHORT)
+							.show();
+				}
+
+				break;
+
+			default:
+				Toast.makeText(TalkingGroupHistoryListActivity.this,
+						R.string.error_in_create_group, Toast.LENGTH_SHORT)
+						.show();
+				break;
+			}
+		}
+	};
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		loadData();
 	}
 
 }

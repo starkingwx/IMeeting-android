@@ -1,4 +1,4 @@
-package com.richitec.imeeting.talkinggroup;
+package com.richitec.imeeting.talkinggroup.adapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +46,20 @@ public class TalkingGroupListAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 
+	public void appendGroupList(JSONArray groupArray) {
+		if (groupArray != null) {
+			for (int i = 0; i < groupArray.length(); i++) {
+				try {
+					JSONObject obj = groupArray.getJSONObject(i);
+					groups.add(obj);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		notifyDataSetChanged();
+	}
+	
 	public void clear() {
 		groups.clear();
 		notifyDataSetChanged();
@@ -98,7 +112,7 @@ public class TalkingGroupListAdapter extends BaseAdapter {
 			for (int i = 0; i < viewHolder.memberRow.getVirtualChildCount(); i++) {
 				// get table row item
 				View _tableRowItem = viewHolder.memberRow.getVirtualChildAt(i);
-
+				_tableRowItem.setVisibility(View.VISIBLE);
 				// check visible view
 				if (i < attendees.length()) {
 					// check table row item type

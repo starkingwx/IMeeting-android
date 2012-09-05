@@ -14,7 +14,7 @@ import android.widget.ListView;
 import com.richitec.commontoolkit.activityextension.NavigationActivity;
 import com.richitec.commontoolkit.customui.BarButtonItem;
 import com.richitec.imeeting.R;
-import com.richitec.imeeting.talkinggroup.TalkingGroupDetailInfoActivity;
+import com.richitec.imeeting.talkinggroup.TalkingGroupActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupStatus;
 
 public class ContactSelectActivity extends NavigationActivity {
@@ -165,7 +165,7 @@ public class ContactSelectActivity extends NavigationActivity {
 		@Override
 		public void onClick(View v) {
 			// go to talking group detail info activity
-			pushActivity(TalkingGroupDetailInfoActivity.class);
+			pushActivity(TalkingGroupActivity.class);
 		}
 
 	}

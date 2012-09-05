@@ -58,8 +58,9 @@
         <activity
             android:name=".assistant.AboutActivity"
             android:label="@string/title_activity_about"
-            android:theme="@style/WithBgImg7NoTitleActivityTheme" >
+            android:theme="@style/WithBgImg7NoTitleActivityTheme" android:screenOrientation="portrait">
         </activity>
+        <activity android:name=".talkinggroup.TalkingGroupActivity" android:screenOrientation="portrait" android:theme="@android:style/Theme.Light.NoTitleBar"></activity>
     </application>
 
 </manifest>

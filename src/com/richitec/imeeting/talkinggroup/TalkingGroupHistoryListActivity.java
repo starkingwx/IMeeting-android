@@ -6,7 +6,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -77,6 +80,8 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 		listAdapter = new TalkingGroupListAdapter(this);
 		listView.getRefreshableView().setAdapter(listAdapter);
 		listView.getRefreshableView().setOnItemClickListener(selectedListener);
+		listView.getRefreshableView().setOnItemLongClickListener(
+				longPressedListener);
 		listView.setOnRefreshListener(new OnRefreshListener<ListView>() {
 
 			@Override
@@ -274,6 +279,44 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 
 	};
 
+	private OnItemLongClickListener longPressedListener = new OnItemLongClickListener() {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view,
+				int position, long id) {
+			if (position <= listAdapter.getCount() && position > 0) {
+				selectedGroupInfo = (JSONObject) listAdapter
+						.getItem(position - 1);
+				new AlertDialog.Builder(TalkingGroupHistoryListActivity.this)
+						.setTitle(R.string.select_operation)
+						.setItems(R.array.group_long_press_menu,
+								new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										switch (which) {
+										case 0:
+											try {
+												String groupId = selectedGroupInfo
+														.getString(TalkGroup.conferenceId
+																.name());
+												deleteGroupTalk(groupId);
+											} catch (JSONException e) {
+												e.printStackTrace();
+											}
+											break;
+
+										default:
+											break;
+										}
+									}
+								}).show();
+			}
+			return true;
+		}
+	};
+
 	private void joinGroupTalk(String groupId) {
 		progressDialog = ProgressDialog.show(this, null,
 				getString(R.string.sending_request));
@@ -394,6 +437,50 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 				Toast.makeText(TalkingGroupHistoryListActivity.this,
 						R.string.error_in_create_group, Toast.LENGTH_SHORT)
 						.show();
+				break;
+			}
+		}
+	};
+
+	private void deleteGroupTalk(String groupId) {
+		progressDialog = ProgressDialog.show(this, null,
+				getString(R.string.sending_request));
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put(TalkGroup.conferenceId.name(), groupId);
+		HttpUtils.startHttpPostRequestWithSignature(
+				getString(R.string.server_url)
+						+ getString(R.string.hide_group_url), params,
+				onFinishedDeleteGroup, null);
+	}
+
+	private ResponseListener onFinishedDeleteGroup = new ResponseListener() {
+
+		@Override
+		public void onComplete(int status, String responseText) {
+			if (progressDialog != null) {
+				progressDialog.dismiss();
+			}
+			switch (status) {
+			case 200:
+				handler.post(new Runnable() {
+
+					@Override
+					public void run() {
+						listAdapter.removeItem(selectedGroupInfo);
+					}
+				});
+				break;
+			default:
+				handler.post(new Runnable() {
+
+					@Override
+					public void run() {
+						Toast.makeText(TalkingGroupHistoryListActivity.this,
+								R.string.error_in_del_group, Toast.LENGTH_SHORT)
+								.show();
+					}
+
+				});
 				break;
 			}
 		}

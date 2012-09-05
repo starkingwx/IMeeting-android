@@ -60,6 +60,13 @@ public class TalkingGroupListAdapter extends BaseAdapter {
 		notifyDataSetChanged();
 	}
 	
+	public void removeItem(Object item) {
+		boolean result =groups.remove(item);
+		if (result) {
+			notifyDataSetChanged();
+		}
+	}
+	
 	public void clear() {
 		groups.clear();
 		notifyDataSetChanged();

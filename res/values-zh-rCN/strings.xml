@@ -49,7 +49,10 @@
     <string name="error_in_join_group">无法进入当前群聊, 请稍后重试！</string>
     <string name="error_in_create_group">创建群聊失败</string>
     <string name="join_conf_forbidden">当前您无法进入群聊，可能已被发起人移除。</string>
-
+	<string name="delete_group">删除群聊</string>
+	<string name="select_operation">选择操作</string>
+	<string name="error_in_del_group">删除群聊失败</string>
+	
     <!-- talking group -->
     <string name="group_talk_title">群聊号：</string>
     <string name="add_member">添加成员</string>

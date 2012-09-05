@@ -4,7 +4,7 @@
     <style name="AppTheme" parent="android:Theme.Light.NoTitleBar" />
 
     <!-- application activity theme -->
-    <style name="AppActivityTheme" parent="android:Theme.Black.NoTitleBar.Fullscreen" />
+    <style name="AppActivityTheme" parent="android:Theme.Light.NoTitleBar.Fullscreen" />
 
     <!-- with background image and no title activity theme -->
     <style name="WithBgImg7NoTitleActivityTheme">

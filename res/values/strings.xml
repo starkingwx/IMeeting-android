@@ -56,7 +56,10 @@
     <string name="error_in_join_group">Cannot join the group talk, please try later!</string>
     <string name="error_in_create_group">Fail to create group talk</string>
     <string name="join_conf_forbidden">You cannot join current group talk, may be removed by creater.</string>
-
+	<string name="delete_group">Delete</string>
+	<string name="select_operation">Select Operation</string>
+	<string name="error_in_del_group">Fail to delete group talk</string>
+	
     <!-- talking group history list item -->
     <string name="groupId_textView_textHeader">Group ID:</string>
 

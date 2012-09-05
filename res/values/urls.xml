@@ -13,6 +13,8 @@
     <string name="call_url">/conference/call</string>
     <string name="hangup_url">/conference/hangup</string>
     <string name="kickout_url">/conference/kickout</string>
+    <string name="hide_group_url">/conference/hide</string>
+    
     <string name="notify_url">http://msg.wetalking.net</string>
     
     <!-- support url -->

@@ -28,6 +28,6 @@
         android:footerDividersEnabled="false"
         android:headerDividersEnabled="false"
         android:listSelector="@color/clear"
-        android:scrollbars="none" />
+        android:scrollbars="vertical" />
 
 </RelativeLayout>

@@ -21,54 +21,6 @@
     <string name="login_error">登录出错，请稍后重试！</string>
     <string name="login_failed">用户名或密码错误！</string>
 
-    <!-- talking group list -->
-    <string name="error_in_join_group">无法进入当前群聊, 请稍后重试！</string>
-    <string name="error_in_create_group">创建群聊失败</string>
-    <string name="join_conf_forbidden">当前您无法进入群聊，可能已被发起人移除。</string>
-
-    <!-- talking group -->
-    <string name="group_talk_title">群聊号：</string>
-    <string name="add_member">添加成员</string>
-    <string name="sms_invite">短信邀请</string>
-    <string name="dial">电话呼入</string>
-    <string name="calling_in">正在接入</string>
-    <string name="call_in">接入</string>
-    <string name="hangup_talking">结束语音</string>
-    <string name="leave">离开群聊</string>
-    <string name="calling">正在呼叫</string>
-    <string name="talking">正在通话</string>
-    <string name="call_failed">呼叫失败</string>
-    <string name="hanged_up">通话已断</string>
-    <string name="loading">加载中…</string>
-    <string name="join_conf_forbidden">当前您无法进入群聊，可能已被发起人移除。</string>
-    <string name="error_in_join_group">无法进入当前群聊, 请稍后重试！</string>
-    <string name="error_in_create_group">创建群聊失败</string>
-    <string name="sending_request">正在发送请求…</string>
-    <string name="sb_is_kicked_out">%s已被移出群聊</string>
-    <string name="you_have_been_kicked_out">您被发起人移出群聊！</string>
-    <string name="ok">确定</string>
-    <string name="cancel">取消</string>
-    <string name="do_you_want_to_leave_group">您要离开群聊吗？</string>
-    <string name="call">呼叫</string>
-    <string name="hang_up">挂断</string>
-    <string name="kick_out">移出群聊</string>
-    <string name="send_sms">发送短信</string>
-    <string name="operation_on_sb">选择对%s的操作</string>
-    <string name="call_is_forbidden_for_sb">不允许呼叫%s</string>
-    <string name="hangup_is_forbidden_for_sb">不允许挂断%s</string>
-    <string name="kickout_is_forbidden_for_sb">不允许移出%s</string>
-    <string name="hangup_failed">挂断失败</string>
-    <string name="kickout_failed">移出失败</string>
-    <string name="invite_sms_body">请拨打0551–2379997加入多方通话，会议号：%s</string>
-    <string name="no_one_to_invite">没有需要邀请的成员！</string>
-    <string name="call_is_forbidden_for_you">您的语音接入操作不被允许</string>
-    <string name="call_in_failed">语音接入失败！</string>
-    <string name="hangup_is_forbidden_for_you">您的结束操作不被允许！</string>
-    <string name="hangup_talking_failed">结束操作失败！</string>
-    <string name="do_you_want_to_call_into_group_talking">需要接入语音群聊吗？</string>
-    <string name="do_you_wanna_end_group_talking">要结束当前语音群聊吗？</string>
-    <string name="end_group_talking">结束语音</string>
-
     <!-- account register activity -->
     <string name="account_register_nav_title_text">账户注册</string>
     <!-- step 1 -->
@@ -94,9 +46,48 @@
     <string name="myTalkingGroup_history_list_nav_title_text">我的群聊</string>
     <string name="setting_nav_btn_title">设置</string>
     <string name="newTalkingGroup_btn_title">新建群聊</string>
+    <string name="error_in_join_group">无法进入当前群聊, 请稍后重试！</string>
+    <string name="error_in_create_group">创建群聊失败</string>
+    <string name="join_conf_forbidden">当前您无法进入群聊，可能已被发起人移除。</string>
 
-    <!-- talking group history list item -->
-    <string name="groupId_textView_textHeader">群聊号：</string>
+    <!-- talking group -->
+    <string name="group_talk_title">群聊号：</string>
+    <string name="add_member">添加成员</string>
+    <string name="sms_invite">短信邀请</string>
+    <string name="dial">电话呼入</string>
+    <string name="calling_in">正在接入</string>
+    <string name="call_in">接入</string>
+    <string name="hangup_talking">结束语音</string>
+    <string name="leave">离开群聊</string>
+    <string name="calling">正在呼叫</string>
+    <string name="talking">正在通话</string>
+    <string name="call_failed">呼叫失败</string>
+    <string name="hanged_up">通话已断</string>
+    <string name="loading">加载中…</string>
+    <string name="sb_is_kicked_out">%s已被移出群聊</string>
+    <string name="you_have_been_kicked_out">您被发起人移出群聊！</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="do_you_want_to_leave_group">您要离开群聊吗？</string>
+    <string name="call">呼叫</string>
+    <string name="hang_up">挂断</string>
+    <string name="kick_out">移出群聊</string>
+    <string name="send_sms">发送短信</string>
+    <string name="operation_on_sb">选择对%s的操作</string>
+    <string name="call_is_forbidden_for_sb">不允许呼叫%s</string>
+    <string name="hangup_is_forbidden_for_sb">不允许挂断%s</string>
+    <string name="kickout_is_forbidden_for_sb">不允许移出%s</string>
+    <string name="hangup_failed">挂断失败</string>
+    <string name="kickout_failed">移出失败</string>
+    <string name="invite_sms_body">请拨打0551–2379997加入多方通话，会议号：%s</string>
+    <string name="no_one_to_invite">没有需要邀请的成员！</string>
+    <string name="call_is_forbidden_for_you">您的语音接入操作不被允许</string>
+    <string name="call_in_failed">语音接入失败！</string>
+    <string name="hangup_is_forbidden_for_you">您的结束操作不被允许！</string>
+    <string name="hangup_talking_failed">结束操作失败！</string>
+    <string name="do_you_want_to_call_into_group_talking">需要接入语音群聊吗？</string>
+    <string name="do_you_wanna_end_group_talking">要结束当前语音群聊吗？</string>
+    <string name="end_group_talking">结束语音</string>
 
     <!-- setting activity -->
     <string name="setting_nav_title_text">设置</string>
@@ -112,16 +103,6 @@
     <string name="addressBook_textView_text">通讯录</string>
     <string name="in7preinTalkingGroup_textView_text">已添加成员</string>
     <string name="contact_search_editText_hint">搜索联系人</string>
-
-    <!-- talking group detail info activity -->
-    <string name="menu_audio7video_operation">语音视频操作</string>
-    <string name="menu_voice_callIn">语音呼入</string>
-    <string name="menu_voice_hangup">关闭语音</string>
-    <string name="menu_open_camera">打开镜头</string>
-    <string name="menu_close_camera">关闭镜头</string>
-    <string name="menu_leave_talkingGroup">离开群聊</string>
-    <string name="menu_add_attendee">添加成员</string>
-    <string name="menu_sms_invitation">短信邀请</string>
 
     <!-- support activity -->
     <string name="support_nav_title_text">帮助</string>

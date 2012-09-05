@@ -2,6 +2,9 @@
 
     <!-- iMeeting project -->
     <string name="app_name">Wetalking</string>
+    <string name="sending_request">Sending Request…</string>
+    <string name="loading">Loading…</string>
+    <string name="no_more_item">No More</string>
 
     <!-- iMeeting application activity -->
     <string name="splash_content_description">iMeeting application splash image</string>
@@ -17,6 +20,11 @@
     <string name="remeber_pwd_toggleBtn_on">On</string>
     <string name="remeber_pwd_toggleBtn_off">Off</string>
     <string name="login_confirm_btn_title">Login</string>
+    <string name="number_cannot_be_null">Please input your phone number</string>
+    <string name="password_cannot_be_null">Please input your password</string>
+    <string name="logining">Logining</string>
+    <string name="login_error">Login error, please try again!</string>
+    <string name="login_failed">Incorrect phone number or password!</string>
 
     <!-- account register activity -->
     <string name="title_activity_account_register">AccountRegisterActivity</string>
@@ -45,12 +53,54 @@
     <string name="myTalkingGroup_history_list_nav_title_text">My Talking Group</string>
     <string name="setting_nav_btn_title">Setting</string>
     <string name="newTalkingGroup_btn_title">Creating New Talking Group</string>
+    <string name="error_in_join_group">Cannot join the group talk, please try later!</string>
+    <string name="error_in_create_group">Fail to create group talk</string>
+    <string name="join_conf_forbidden">You cannot join current group talk, may be removed by creater.</string>
 
     <!-- talking group history list item -->
     <string name="groupId_textView_textHeader">Group ID:</string>
 
     <!-- talking group attendee -->
     <string name="attendee_avatar_content_description">talking group attendee avatar</string>
+
+    <!-- talking group -->
+    <string name="group_talk_title">Group ID: </string>
+    <string name="add_member">Add Attendee</string>
+    <string name="sms_invite">Invite</string>
+    <string name="dial">Dial</string>
+    <string name="calling_in">Calling</string>
+    <string name="call_in">Call In</string>
+    <string name="hangup_talking">Hang Up</string>
+    <string name="leave">Leave</string>
+    <string name="calling">Calling</string>
+    <string name="talking">Talking</string>
+    <string name="call_failed">Call Failed</string>
+    <string name="hanged_up">Hanged Up</string>
+    <string name="loading">Loading…</string>
+    <string name="sb_is_kicked_out">%s is removed from talking group</string>
+    <string name="you_have_been_kicked_out">You have been removed from the group by host!</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="do_you_want_to_leave_group">Are you sure to leave talking group?</string>
+    <string name="call">Call</string>
+    <string name="hang_up">Hnag Up</string>
+    <string name="kick_out">Kick Out</string>
+    <string name="send_sms">Send SMS</string>
+    <string name="operation_on_sb">Operation on %s</string>
+    <string name="call_is_forbidden_for_sb">Call is forbidden for %s</string>
+    <string name="hangup_is_forbidden_for_sb">Hangup is forbidden for %s</string>
+    <string name="kickout_is_forbidden_for_sb">Kick out is forbidden for %s</string>
+    <string name="hangup_failed">Hang up failed</string>
+    <string name="kickout_failed">Kickout Failed</string>
+    <string name="invite_sms_body">Please call 0551–2379997 to join group talk, group id: %s</string>
+    <string name="no_one_to_invite">No new member to invite!</string>
+    <string name="call_is_forbidden_for_you">Call is forbidden for you</string>
+    <string name="call_in_failed">Call In Failed!</string>
+    <string name="hangup_is_forbidden_for_you">Hang up is forbidden!</string>
+    <string name="hangup_talking_failed">Hang up failed</string>
+    <string name="do_you_want_to_call_into_group_talking">Call into the talking group?</string>
+    <string name="do_you_wanna_end_group_talking">Hangup current talking?</string>
+    <string name="end_group_talking">Hang Up</string>
 
     <!-- setting activity -->
     <string name="title_activity_setting">SettingActivity</string>
@@ -72,19 +122,6 @@
     <string name="contactSelect_addressbookContact_unsel6sel_imageView_content_description">contact select address book contact unselected or selected image view</string>
     <string name="contactSelect_in7preinTalkingGroupContact_sel_imageView_content_description">contact select in and prein talking group contact selected image view</string>
 
-    <!-- talking group detail info activity -->
-    <string name="menu_audio7video_operation">Audio&amp;Video Operation</string>
-    <string name="menu_voice_callIn">Voice CallIn</string>
-    <string name="menu_voice_hangup">Voice Hangup</string>
-    <string name="menu_open_camera">Open Camera</string>
-    <string name="menu_close_camera">Close Camera</string>
-    <string name="menu_leave_talkingGroup">Leave Talking Group</string>
-    <string name="menu_add_attendee">Add Attendee</string>
-    <string name="menu_sms_invitation">SMS Invitation</string>
-    <string name="title_activity_talking_group_detail_info">TalkingGroupDetailInfoActivity</string>
-    <string name="talkingGroup_bottomToolbarItem_icon_content_description">talking group bottom toolbar item icon</string>
-    <string name="talkingGroup_fullScreenVideo_imageView_content_description">talking group fullScreen video image view</string>
-    <string name="talkingGroup_smallVideo_imageView_content_description">talking group small video image view</string>
 
     <!-- support activity -->
     <string name="title_activity_support">SupportActivity</string>

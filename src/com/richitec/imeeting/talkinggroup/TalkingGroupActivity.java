@@ -34,8 +34,8 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.user.UserManager;
-import com.richitec.commontoolkit.utils.HttpUtils;
-import com.richitec.commontoolkit.utils.HttpUtils.ResponseListener;
+import com.richitec.commontoolkit.utils.HttpUtil;
+import com.richitec.commontoolkit.utils.HttpUtil.ResponseListener;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.Notify;
@@ -240,7 +240,7 @@ public class TalkingGroupActivity extends Activity {
 		notifier.disconnect();
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(getString(R.string.server_url)
+		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
 				+ getString(R.string.unjoin_conf_url), params, null, null);
 		TalkingGroupActivity.this.finish();
 	}
@@ -248,7 +248,7 @@ public class TalkingGroupActivity extends Activity {
 	private void refreshMemberList() {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(getString(R.string.server_url)
+		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
 				+ getString(R.string.get_attendee_list_url), params,
 				onFinishedGetMemberList, null);
 	}
@@ -366,7 +366,7 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(getString(R.string.server_url)
+		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
 				+ getString(R.string.call_url), params, onFinishedCall, null);
 	}
 
@@ -433,7 +433,7 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(getString(R.string.server_url)
+		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
 				+ getString(R.string.hangup_url), params, onFinishedHangup,
 				null);
 	}
@@ -500,7 +500,7 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(getString(R.string.server_url)
+		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
 				+ getString(R.string.kickout_url), params, onFinishedKickout,
 				null);
 	}
@@ -705,7 +705,7 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", accountName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(getString(R.string.server_url)
+		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
 				+ getString(R.string.call_url), params, onFinishedCallMeIn,
 				null);
 	}
@@ -771,7 +771,7 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", accountName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(getString(R.string.server_url)
+		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
 				+ getString(R.string.hangup_url), params, onFinishedHangMeUp,
 				null);
 	}

@@ -36,8 +36,8 @@ public class ApplicationActivity extends Activity {
 				UserBean user = UserManager.getInstance().getUser();
 				if (user.getPassword() != null
 						&& !user.getPassword().equals("")
-						&& user.getUserkey() != null
-						&& !user.getUserkey().equals("")) {
+						&& user.getUserKey() != null
+						&& !user.getUserKey().equals("")) {
 					Intent intent = new Intent(ApplicationActivity.this,
 							TalkingGroupHistoryListActivity.class);
 					startActivity(intent);
@@ -59,7 +59,7 @@ public class ApplicationActivity extends Activity {
 		String password = userInfoSettings.getString(User.password.name(), "");
 		UserBean userBean = new UserBean();
 		userBean.setName(userName);
-		userBean.setUserkey(userkey);
+		userBean.setUserKey(userkey);
 		userBean.setPassword(password);
 	}
 }

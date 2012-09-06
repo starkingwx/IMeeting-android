@@ -5,7 +5,6 @@ import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -25,8 +24,8 @@ import com.richitec.commontoolkit.customui.BarButtonItem;
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
-import com.richitec.commontoolkit.utils.HttpUtils;
-import com.richitec.commontoolkit.utils.HttpUtils.ResponseListener;
+import com.richitec.commontoolkit.utils.HttpUtil;
+import com.richitec.commontoolkit.utils.HttpUtil.ResponseListener;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
@@ -161,7 +160,7 @@ public class AccountSettingActivity extends NavigationActivity {
 		HashMap<String, String> paramMap = new HashMap<String, String>();
 		paramMap.put("loginName", user.getName());
 		paramMap.put("loginPwd", user.getPassword());
-		HttpUtils.startHttpPostRequest(loginUrl, paramMap, onFinsihedLogin,
+		HttpUtil.startHttpPostRequest(loginUrl, paramMap, onFinsihedLogin,
 				null);
 
 	}
@@ -267,7 +266,7 @@ public class AccountSettingActivity extends NavigationActivity {
 		if (user.isRememberPwd()) {
 			userInfoSettings.edit()
 					.putString(User.password.name(), user.getPassword())
-					.putString(User.userkey.name(), user.getUserkey());
+					.putString(User.userkey.name(), user.getUserKey());
 		} else {
 			userInfoSettings.edit().putString(User.password.name(), "")
 					.putString(User.userkey.name(), "");

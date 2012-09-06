@@ -26,14 +26,14 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.activityextension.NavigationActivity;
 import com.richitec.commontoolkit.customui.BarButtonItem;
 import com.richitec.commontoolkit.user.UserManager;
-import com.richitec.commontoolkit.utils.HttpUtils;
-import com.richitec.commontoolkit.utils.HttpUtils.ResponseListener;
+import com.richitec.commontoolkit.utils.HttpUtil;
+import com.richitec.commontoolkit.utils.HttpUtil.ResponseListener;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.assistant.SettingActivity;
 import com.richitec.imeeting.constants.SystemConstants;
@@ -159,7 +159,7 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 		Log.d(SystemConstants.TAG, "load group list");
 		String getGroupListUrl = getString(R.string.server_url)
 				+ getString(R.string.conf_list_url);
-		HttpUtils.startHttpPostRequestWithSignature(getGroupListUrl, null,
+		HttpUtil.startHttpPostRequestWithSignature(getGroupListUrl, null,
 				onFinishedGetGroupList, null);
 	}
 
@@ -214,7 +214,7 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		Integer nextOffset = offset + 1;
 		params.put("offset", nextOffset.toString());
-		HttpUtils.startHttpPostRequestWithSignature(getGroupListUrl, params,
+		HttpUtil.startHttpPostRequestWithSignature(getGroupListUrl, params,
 				onFinishedLoadMoreGroupList, null);
 	}
 
@@ -322,7 +322,7 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 				getString(R.string.sending_request));
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(
+		HttpUtil.startHttpPostRequestWithSignature(
 				getString(R.string.server_url)
 						+ getString(R.string.join_conf_url), params,
 				onFinishedJoin, null);
@@ -384,7 +384,7 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 				}
 				HashMap<String, String> params = new HashMap<String, String>();
 				params.put(TalkGroup.attendees.name(), attendeesJsonString);
-				HttpUtils.startHttpPostRequestWithSignature(
+				HttpUtil.startHttpPostRequestWithSignature(
 						getString(R.string.server_url)
 								+ getString(R.string.create_conf_url), params,
 						onFinishedCreateGroupTalk, null);
@@ -447,7 +447,7 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 				getString(R.string.sending_request));
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.startHttpPostRequestWithSignature(
+		HttpUtil.startHttpPostRequestWithSignature(
 				getString(R.string.server_url)
 						+ getString(R.string.hide_group_url), params,
 				onFinishedDeleteGroup, null);

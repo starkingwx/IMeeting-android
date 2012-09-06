@@ -48,6 +48,7 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:text="@string/get_verificationCode_btn_title"
+        android:onClick="onGetAuthCodeAction"
         android:textColor="@color/white" />
 
     <TextView

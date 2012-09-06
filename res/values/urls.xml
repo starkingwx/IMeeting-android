@@ -5,6 +5,10 @@
     <string name="server_url">http://www.wetalking.net/imeeting</string>
 
     <string name="login_url">/user/login</string>
+    <string name="retrieve_auth_code_url">/user/getPhoneCode</string>
+    <string name="check_auth_code_url">/user/checkPhoneCode</string>
+    <string name="user_register_url">/user/regUser</string>
+    
     <string name="conf_list_url">/conference/list</string>
     <string name="join_conf_url">/conference/join</string>
     <string name="create_conf_url">/conference/create</string>

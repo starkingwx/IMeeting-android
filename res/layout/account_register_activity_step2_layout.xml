@@ -47,6 +47,7 @@
         android:layout_height="46dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
+        android:onClick="onVerifyAuthCodeAction"
         android:text="@string/verify_verificationCode_btn_title"
         android:textColor="@color/white" />
 

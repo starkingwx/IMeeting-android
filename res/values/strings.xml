@@ -2,6 +2,7 @@
 
     <!-- iMeeting project -->
     <string name="app_name">Wetalking</string>
+     <string name="alert_title">Wetalking Info</string>
     <string name="sending_request">Sending Request…</string>
     <string name="loading">Loading…</string>
     <string name="no_more_item">No More</string>
@@ -35,18 +36,35 @@
     <string name="verificationCode_editText_hint">Input register phone number</string>
     <string name="get_verificationCode_btn_title">Get Verification Code</string>
     <string name="register_step1_comment">(Your phone number is used for authentication only, we assure that we won\'t send junk message to you.)</string>
+    <string name="invalid_phone_number">Invalid Phone Number!</string>
+    <string name="existed_phone_number">Existed Phone Number!</string>
+    <string name="error_in_retrieve_auth_code">Error in retrieving validation code, please retry.</string>
+
     <!-- step 2 -->
     <string name="register_step2_textView_text">Step2</string>
     <string name="register_step2_description">Input verification code and press \'Next\' to verify</string>
     <string name="verificationCode_verify_editText_hint">Input verification code</string>
     <string name="verify_verificationCode_btn_title">Next</string>
+    <string name="pls_input_auth_code">Please input validation code</string>
+    <string name="verifying_auth_code">Checking Validation Code…</string>
+    <string name="wrong_auth_code">Wrong Validation Code!</string>
+    <string name="auth_code_timeout">Code timeout, please try again</string>
+    <string name="auth_error">Error in checking validation code, please retry.</string>
+
     <!-- step3 -->
     <string name="register_step3_textView_text">Step3</string>
     <string name="register_step3_description">Input password and confirmation to finish the register</string>
     <string name="pwd_editText_hint">Input password</string>
     <string name="confirmationPwd_editText_hint">Input confirmation password</string>
     <string name="register_finish_btn_title">Finish Register</string>
-
+    <string name="pls_input_pwd">Please input password</string>
+    <string name="pls_input_confirm_pwd">Please input confirmation password!</string>
+    <string name="pwd1_is_different_from_pwd2">Two passwords are different!</string>
+    <string name="register_ok">Register OK, please login in account setting page.</string>
+    <string name="register_timeout">Register Timeout, please try again</string>
+    <string name="error_in_regsiter">Error in finishing register, please retry!</string>
+	<string name="finishing_register">Finishing Register…</string>
+	
     <!-- talking group history list activity -->
     <string name="title_activity_talking_group_history_list">TalkingGroupHistoryListActivity</string>
     <string name="menu_refresh_myTalkingGroupList">Refresh</string>
@@ -56,10 +74,10 @@
     <string name="error_in_join_group">Cannot join the group talk, please try later!</string>
     <string name="error_in_create_group">Fail to create group talk</string>
     <string name="join_conf_forbidden">You cannot join current group talk, may be removed by creater.</string>
-	<string name="delete_group">Delete</string>
-	<string name="select_operation">Select Operation</string>
-	<string name="error_in_del_group">Fail to delete group talk</string>
-	
+    <string name="delete_group">Delete</string>
+    <string name="select_operation">Select Operation</string>
+    <string name="error_in_del_group">Fail to delete group talk</string>
+
     <!-- talking group history list item -->
     <string name="groupId_textView_textHeader">Group ID:</string>
 
@@ -124,7 +142,6 @@
     <string name="contact_search_editText_hint">Search contacts</string>
     <string name="contactSelect_addressbookContact_unsel6sel_imageView_content_description">contact select address book contact unselected or selected image view</string>
     <string name="contactSelect_in7preinTalkingGroupContact_sel_imageView_content_description">contact select in and prein talking group contact selected image view</string>
-
 
     <!-- support activity -->
     <string name="title_activity_support">SupportActivity</string>

@@ -55,6 +55,7 @@
         android:layout_width="fill_parent"
         android:layout_height="46dp"
         android:layout_marginTop="10dp"
+        android:onClick="onRegisterWithPwdAction"
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:text="@string/register_finish_btn_title"
         android:textColor="@color/white" />

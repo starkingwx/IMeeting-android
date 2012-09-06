@@ -2,5 +2,6 @@
 <resources>
     <string-array name="group_long_press_menu">
         <item >@string/delete_group</item>
+        <item >@string/cancel</item>
     </string-array>
 </resources>

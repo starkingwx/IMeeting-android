@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -83,9 +84,6 @@ public class AccountSettingActivity extends NavigationActivity {
 			remeberPwdToggle.setChecked(false);
 		}
 		
-	//	remeberPwdToggle.setChecked(user.getPassword() == null
-		//		|| user.getPassword().equals("") ? false : true);
-
 		useSavedPwd = remeberPwdToggle.isChecked();
 	}
 
@@ -169,6 +167,7 @@ public class AccountSettingActivity extends NavigationActivity {
 
 		@Override
 		public void onComplete(int status, String responseText) {
+			Log.d(SystemConstants.TAG, "onFinsihedLogin status: " + status);
 			switch (status) {
 			case 200:
 				try {

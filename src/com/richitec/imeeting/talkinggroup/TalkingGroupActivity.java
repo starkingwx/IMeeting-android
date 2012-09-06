@@ -5,7 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +42,10 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtil;
 import com.richitec.commontoolkit.utils.HttpUtil.ResponseListener;
+import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
+import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.Notify;
@@ -59,6 +69,7 @@ public class TalkingGroupActivity extends Activity {
 	private String owner;
 
 	private Map<String, String> selectedMember;
+	private Timer timer;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -82,6 +93,9 @@ public class TalkingGroupActivity extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		timer = new Timer();
+		timer.schedule(new HeartBeatTimerTask(), 10000, 10000);
 	}
 
 	private void initUI() {
@@ -237,54 +251,47 @@ public class TalkingGroupActivity extends Activity {
 	}
 
 	private void leaveGroupTalk() {
+		timer.cancel();
 		notifier.disconnect();
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
-				+ getString(R.string.unjoin_conf_url), params, null, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.unjoin_conf_url),
+				PostRequestFormat.URLENCODED, params, null,
+				HttpRequestType.ASYNCHRONOUS, null);
 		TalkingGroupActivity.this.finish();
 	}
 
 	private void refreshMemberList() {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
-				+ getString(R.string.get_attendee_list_url), params,
-				onFinishedGetMemberList, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.get_attendee_list_url),
+				PostRequestFormat.URLENCODED, params, null,
+				HttpRequestType.ASYNCHRONOUS, onFinishedGetMemberList);
+
 	}
 
-	private ResponseListener onFinishedGetMemberList = new ResponseListener() {
+	private OnHttpRequestListener onFinishedGetMemberList = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			handler.post(new Runnable() {
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			memberListView.onRefreshComplete();
 
-				@Override
-				public void run() {
-					memberListView.onRefreshComplete();
-				}
-			});
-
-			switch (status) {
-			case 200:
-				try {
-					final JSONArray attendees = new JSONArray(responseText);
-					handler.post(new Runnable() {
-
-						@Override
-						public void run() {
-							memberListAdatper.setData(attendees);
-						}
-					});
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
-				break;
-
-			default:
-				break;
+			try {
+				String responseText = EntityUtils.toString(
+						response.getEntity(), HTTP.UTF_8);
+				JSONArray attendees = new JSONArray(responseText);
+				memberListAdatper.setData(attendees);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+		}
+
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			memberListView.onRefreshComplete();
+
 		}
 	};
 
@@ -310,9 +317,10 @@ public class TalkingGroupActivity extends Activity {
 		String phoneStatus = member.get(Attendee.telephone_status.name());
 
 		String accountName = UserManager.getInstance().getUser().getName();
-		
+
 		List<String> actionList = new ArrayList<String>();
-		if (!Attendee.OnlineStatus.online.name().equals(onlineStatus) || accountName.equals(userName)) {
+		if (!Attendee.OnlineStatus.online.name().equals(onlineStatus)
+				|| accountName.equals(userName)) {
 			if (Attendee.PhoneStatus.Terminated.name().equals(phoneStatus)
 					|| Attendee.PhoneStatus.Failed.name().equals(phoneStatus)
 					|| Attendee.PhoneStatus.TermWait.name().equals(phoneStatus)) {
@@ -366,66 +374,44 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
-				+ getString(R.string.call_url), params, onFinishedCall, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url) + getString(R.string.call_url), PostRequestFormat.URLENCODED, params, null, HttpRequestType.ASYNCHRONOUS, onFinishedCall);
 	}
 
-	private ResponseListener onFinishedCall = new ResponseListener() {
-
+	private OnHttpRequestListener onFinishedCall = new OnHttpRequestListener() {
+		
 		@Override
-		public void onComplete(int status, String responseText) {
-			if (progressDlg != null) {
-				progressDlg.dismiss();
-			}
-			final String userName = selectedMember
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			String userName = selectedMember
 					.get(Attendee.username.name());
-			switch (status) {
-			case 200:
-				// call command is accepted by server, update UI
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Map<String, String> attendee = new HashMap<String, String>();
-						attendee.put(Attendee.username.name(), userName);
-						attendee.put(Attendee.telephone_status.name(),
-								Attendee.PhoneStatus.CallWait.name());
-						memberListAdatper.updateMember(attendee);
-					}
-				});
-				break;
-			case 403:
-				// call is forbidden
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						String toastMsg = String.format(
-								getString(R.string.call_is_forbidden_for_sb),
-								userName);
-						Toast.makeText(TalkingGroupActivity.this, toastMsg,
-								Toast.LENGTH_SHORT).show();
-					}
-
-				});
-				break;
-			default:
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Log.d(SystemConstants.TAG, "call failed");
-						Toast.makeText(TalkingGroupActivity.this,
-								R.string.call_failed, Toast.LENGTH_SHORT)
-								.show();
-					}
-
-				});
-				break;
-			}
-
+			Map<String, String> attendee = new HashMap<String, String>();
+			attendee.put(Attendee.username.name(), userName);
+			attendee.put(Attendee.telephone_status.name(),
+					Attendee.PhoneStatus.CallWait.name());
+			memberListAdatper.updateMember(attendee);
+		}
+		
+		@Override
+		public void onForbidden(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			String userName = selectedMember
+					.get(Attendee.username.name());
+			String toastMsg = String.format(
+					getString(R.string.call_is_forbidden_for_sb),
+					userName);
+			Toast.makeText(TalkingGroupActivity.this, toastMsg,
+					Toast.LENGTH_SHORT).show();
+		}
+		
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupActivity.this,
+					R.string.call_failed, Toast.LENGTH_SHORT)
+					.show();
 		}
 	};
+	
 
 	private void hangup(String targetUserName) {
 		progressDlg = ProgressDialog.show(this, null,
@@ -433,66 +419,111 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
-				+ getString(R.string.hangup_url), params, onFinishedHangup,
-				null);
+//		HttpUtil.startHttpPostRequestWithSignature(
+//				getString(R.string.server_url) + getString(R.string.hangup_url),
+//				params, onFinishedHangup, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url) + getString(R.string.hangup_url), PostRequestFormat.URLENCODED, params, null, HttpRequestType.ASYNCHRONOUS, onFinishedHangup);
 	}
 
-	private ResponseListener onFinishedHangup = new ResponseListener() {
-
+	private OnHttpRequestListener onFinishedHangup = new OnHttpRequestListener() {
+		
 		@Override
-		public void onComplete(int status, String responseText) {
-			if (progressDlg != null) {
-				progressDlg.dismiss();
-			}
-
-			final String userName = selectedMember
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			String userName = selectedMember
 					.get(Attendee.username.name());
+			Map<String, String> attendee = new HashMap<String, String>();
+			attendee.put(Attendee.username.name(), userName);
+			attendee.put(Attendee.telephone_status.name(),
+					Attendee.PhoneStatus.Terminated.name());
+			memberListAdatper.updateMember(attendee);
+		}
+		
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			String userName = selectedMember
+					.get(Attendee.username.name());
+			int status = response != null ? response.getStatusLine().getStatusCode() : -1;
 			switch (status) {
 			case 409:
-			case 200:
-				// hangup command is accepted by server, update UI
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Map<String, String> attendee = new HashMap<String, String>();
-						attendee.put(Attendee.username.name(), userName);
-						attendee.put(Attendee.telephone_status.name(),
-								Attendee.PhoneStatus.Terminated.name());
-						memberListAdatper.updateMember(attendee);
-					}
-				});
+				Map<String, String> attendee = new HashMap<String, String>();
+				attendee.put(Attendee.username.name(), userName);
+				attendee.put(Attendee.telephone_status.name(),
+						Attendee.PhoneStatus.Terminated.name());
+				memberListAdatper.updateMember(attendee);
 				break;
 			case 403:
-				// hangup is forbidden
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						String toastMsg = String.format(
-								getString(R.string.hangup_is_forbidden_for_sb),
-								userName);
-						Toast.makeText(TalkingGroupActivity.this, toastMsg,
-								Toast.LENGTH_SHORT).show();
-					}
-
-				});
+				String toastMsg = String.format(
+						getString(R.string.hangup_is_forbidden_for_sb),
+						userName);
+				Toast.makeText(TalkingGroupActivity.this, toastMsg,
+						Toast.LENGTH_SHORT).show();
 				break;
 			default:
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Toast.makeText(TalkingGroupActivity.this,
-								R.string.hangup_failed, Toast.LENGTH_SHORT)
-								.show();
-					}
-				});
+				Toast.makeText(TalkingGroupActivity.this,
+						R.string.hangup_failed, Toast.LENGTH_SHORT)
+						.show();
 				break;
 			}
 		}
 	};
+	
+//	private ResponseListener onFinishedHangup = new ResponseListener() {
+//
+//		@Override
+//		public void onComplete(int status, String responseText) {
+//			if (progressDlg != null) {
+//				progressDlg.dismiss();
+//			}
+//
+//			final String userName = selectedMember
+//					.get(Attendee.username.name());
+//			switch (status) {
+//			case 409:
+//			case 200:
+//				// hangup command is accepted by server, update UI
+//				handler.post(new Runnable() {
+//
+//					@Override
+//					public void run() {
+//						Map<String, String> attendee = new HashMap<String, String>();
+//						attendee.put(Attendee.username.name(), userName);
+//						attendee.put(Attendee.telephone_status.name(),
+//								Attendee.PhoneStatus.Terminated.name());
+//						memberListAdatper.updateMember(attendee);
+//					}
+//				});
+//				break;
+//			case 403:
+//				// hangup is forbidden
+//				handler.post(new Runnable() {
+//
+//					@Override
+//					public void run() {
+//						String toastMsg = String.format(
+//								getString(R.string.hangup_is_forbidden_for_sb),
+//								userName);
+//						Toast.makeText(TalkingGroupActivity.this, toastMsg,
+//								Toast.LENGTH_SHORT).show();
+//					}
+//
+//				});
+//				break;
+//			default:
+//				handler.post(new Runnable() {
+//
+//					@Override
+//					public void run() {
+//						Toast.makeText(TalkingGroupActivity.this,
+//								R.string.hangup_failed, Toast.LENGTH_SHORT)
+//								.show();
+//					}
+//				});
+//				break;
+//			}
+//		}
+//	};
 
 	private void kickout(String targetUserName) {
 		progressDlg = ProgressDialog.show(this, null,
@@ -500,9 +531,10 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
-				+ getString(R.string.kickout_url), params, onFinishedKickout,
-				null);
+		HttpUtil.startHttpPostRequestWithSignature(
+				getString(R.string.server_url)
+						+ getString(R.string.kickout_url), params,
+				onFinishedKickout, null);
 	}
 
 	private ResponseListener onFinishedKickout = new ResponseListener() {
@@ -674,7 +706,8 @@ public class TalkingGroupActivity extends Activity {
 				} else if (Attendee.PhoneStatus.Established.name().equals(
 						phoneStatus)) {
 					setDialButtonAsHangupTalking();
-				} else if (Attendee.PhoneStatus.CallWait.name().equals(phoneStatus)) {
+				} else if (Attendee.PhoneStatus.CallWait.name().equals(
+						phoneStatus)) {
 					setDialButtonAsCalling();
 				}
 			}
@@ -705,9 +738,9 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", accountName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
-				+ getString(R.string.call_url), params, onFinishedCallMeIn,
-				null);
+		HttpUtil.startHttpPostRequestWithSignature(
+				getString(R.string.server_url) + getString(R.string.call_url),
+				params, onFinishedCallMeIn, null);
 	}
 
 	private ResponseListener onFinishedCallMeIn = new ResponseListener() {
@@ -771,9 +804,9 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", accountName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(getString(R.string.server_url)
-				+ getString(R.string.hangup_url), params, onFinishedHangMeUp,
-				null);
+		HttpUtil.startHttpPostRequestWithSignature(
+				getString(R.string.server_url) + getString(R.string.hangup_url),
+				params, onFinishedHangMeUp, null);
 	}
 
 	private ResponseListener onFinishedHangMeUp = new ResponseListener() {
@@ -830,4 +863,25 @@ public class TalkingGroupActivity extends Activity {
 			}
 		}
 	};
+
+	private void dismissProgressDlg() {
+		if (progressDlg != null) {
+			progressDlg.dismiss();
+		}
+	}
+	
+	class HeartBeatTimerTask extends TimerTask {
+
+		@Override
+		public void run() {
+			// send heart beat to server
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put(TalkGroup.conferenceId.name(), groupId);
+			HttpUtils.postSignatureRequest(getString(R.string.server_url)
+					+ getString(R.string.heart_beat_url),
+					PostRequestFormat.URLENCODED, params, null,
+					HttpRequestType.ASYNCHRONOUS, null);
+		}
+
+	}
 }

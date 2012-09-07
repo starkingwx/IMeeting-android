@@ -2,6 +2,10 @@ package com.richitec.imeeting.talkinggroup;
 
 import java.util.HashMap;
 
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,8 +15,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,8 +34,10 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.activityextension.NavigationActivity;
 import com.richitec.commontoolkit.customui.BarButtonItem;
 import com.richitec.commontoolkit.user.UserManager;
-import com.richitec.commontoolkit.utils.HttpUtil;
-import com.richitec.commontoolkit.utils.HttpUtil.ResponseListener;
+import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
+import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.assistant.SettingActivity;
 import com.richitec.imeeting.constants.SystemConstants;
@@ -46,7 +50,6 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 
 	private PullToRefreshListView listView;
 	private TalkingGroupListAdapter listAdapter;
-	private Handler handler;
 	private ProgressDialog progressDialog;
 
 	private JSONObject selectedGroupInfo;
@@ -58,7 +61,6 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		handler = new Handler(Looper.myLooper());
 
 		// set content view
 		setContentView(R.layout.talking_group_history_list_activity_layout);
@@ -159,50 +161,38 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 		Log.d(SystemConstants.TAG, "load group list");
 		String getGroupListUrl = getString(R.string.server_url)
 				+ getString(R.string.conf_list_url);
-		HttpUtil.startHttpPostRequestWithSignature(getGroupListUrl, null,
-				onFinishedGetGroupList, null);
+		HttpUtils.postSignatureRequest(getGroupListUrl,
+				PostRequestFormat.URLENCODED, null, null,
+				HttpRequestType.ASYNCHRONOUS, onFinishedGetGroupList);
 	}
 
-	private ResponseListener onFinishedGetGroupList = new ResponseListener() {
+	private OnHttpRequestListener onFinishedGetGroupList = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			handler.post(new Runnable() {
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			listView.onRefreshComplete();
+			try {
+				String responseText = EntityUtils.toString(
+						response.getEntity(), HTTP.UTF_8);
+				JSONObject data = new JSONObject(responseText);
+				JSONObject pager = data.getJSONObject("pager");
+				hasNext = pager.getBoolean("hasNext");
+				offset = pager.getInt("offset");
 
-				@Override
-				public void run() {
-					listView.onRefreshComplete();
+				JSONArray groups = data.getJSONArray("list");
+				Log.d(SystemConstants.TAG,
+						"group list size: " + groups.length());
+				listAdapter.setGroupList(groups);
 
-				}
-			});
-			switch (status) {
-			case 200:
-				try {
-					JSONObject data = new JSONObject(responseText);
-					JSONObject pager = data.getJSONObject("pager");
-					hasNext = pager.getBoolean("hasNext");
-					offset = pager.getInt("offset");
-
-					final JSONArray groups = data.getJSONArray("list");
-					Log.d(SystemConstants.TAG,
-							"group list size: " + groups.length());
-					handler.post(new Runnable() {
-
-						@Override
-						public void run() {
-							listAdapter.setGroupList(groups);
-						}
-					});
-
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
-				break;
-
-			default:
-				break;
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
+
+		}
+
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			listView.onRefreshComplete();
 
 		}
 	};
@@ -214,45 +204,41 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		Integer nextOffset = offset + 1;
 		params.put("offset", nextOffset.toString());
-		HttpUtil.startHttpPostRequestWithSignature(getGroupListUrl, params,
-				onFinishedLoadMoreGroupList, null);
+		HttpUtils.postSignatureRequest(getGroupListUrl,
+				PostRequestFormat.URLENCODED, params, null,
+				HttpRequestType.ASYNCHRONOUS, onFinishedLoadMoreGroupList1);
 	}
 
-	private ResponseListener onFinishedLoadMoreGroupList = new ResponseListener() {
+	private OnHttpRequestListener onFinishedLoadMoreGroupList1 = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			switch (status) {
-			case 200:
-				try {
-					JSONObject data = new JSONObject(responseText);
-					JSONObject pager = data.getJSONObject("pager");
-					hasNext = pager.getBoolean("hasNext");
-					offset = pager.getInt("offset");
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			try {
+				String responseText = EntityUtils.toString(
+						response.getEntity(), HTTP.UTF_8);
+				JSONObject data = new JSONObject(responseText);
+				JSONObject pager = data.getJSONObject("pager");
+				hasNext = pager.getBoolean("hasNext");
+				offset = pager.getInt("offset");
 
-					final JSONArray groups = data.getJSONArray("list");
-					Log.d(SystemConstants.TAG,
-							"group list size: " + groups.length());
-					handler.post(new Runnable() {
+				JSONArray groups = data.getJSONArray("list");
+				Log.d(SystemConstants.TAG,
+						"group list size: " + groups.length());
+				listView.getRefreshableView().removeFooterView(footerView);
+				footerView = null;
+				listAdapter.appendGroupList(groups);
 
-						@Override
-						public void run() {
-							listView.getRefreshableView().removeFooterView(
-									footerView);
-							footerView = null;
-							listAdapter.appendGroupList(groups);
-						}
-					});
-
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-
-				break;
-
-			default:
-				break;
+			} catch (Exception e) {
+				e.printStackTrace();
+				listView.getRefreshableView().removeFooterView(footerView);
+				footerView = null;
 			}
+		}
+
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			listView.getRefreshableView().removeFooterView(footerView);
+			footerView = null;
 
 		}
 	};
@@ -322,123 +308,117 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 				getString(R.string.sending_request));
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(
-				getString(R.string.server_url)
-						+ getString(R.string.join_conf_url), params,
-				onFinishedJoin, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.join_conf_url),
+				PostRequestFormat.URLENCODED, params, null,
+				HttpRequestType.ASYNCHRONOUS, onFinishedJoin);
 	}
 
-	private ResponseListener onFinishedJoin = new ResponseListener() {
+	private OnHttpRequestListener onFinishedJoin = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			switch (status) {
-			case 200:
-				Log.d(SystemConstants.TAG, "join ok");
-				try {
-					String groupId = selectedGroupInfo
-							.getString(TalkGroup.conferenceId.name());
-					JSONObject data = new JSONObject(responseText);
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Log.d(SystemConstants.TAG, "join ok");
+			try {
+				String responseText = EntityUtils.toString(
+						response.getEntity(), HTTP.UTF_8);
+				String groupId = selectedGroupInfo
+						.getString(TalkGroup.conferenceId.name());
+				JSONObject data = new JSONObject(responseText);
 
-					Intent intent = new Intent(
-							TalkingGroupHistoryListActivity.this,
-							TalkingGroupActivity.class);
-					intent.putExtra(TalkGroup.conferenceId.name(), groupId);
-					intent.putExtra(TalkGroup.owner.name(),
-							data.getString(TalkGroup.owner.name()));
-					startActivityForResult(intent, REQ_OPEN_GROUP_TALK);
-				} catch (JSONException e1) {
-					e1.printStackTrace();
-					Toast.makeText(TalkingGroupHistoryListActivity.this,
-							R.string.error_in_join_group, Toast.LENGTH_SHORT)
-							.show();
-				}
-				break;
-			case 403:
-				Toast.makeText(TalkingGroupHistoryListActivity.this,
-						R.string.join_conf_forbidden, Toast.LENGTH_SHORT)
-						.show();
-				break;
-			case 404:
-				Log.d(SystemConstants.TAG,
-						"conf doesn't exist, create a new one");
-				String accountName = UserManager.getInstance().getUser()
-						.getName();
-				String attendeesJsonString = null;
-				if (selectedGroupInfo != null) {
-					try {
-						JSONArray attendees = selectedGroupInfo
-								.getJSONArray(TalkGroup.attendees.name());
-						JSONArray attendeesToInvite = new JSONArray();
-						for (int i = 0; i < attendees.length(); i++) {
-							String name = attendees.getString(i);
-							if (!accountName.equals(name)) {
-								attendeesToInvite.put(name);
-							}
-						}
-						attendeesJsonString = attendeesToInvite.toString();
-					} catch (JSONException e) {
-						e.printStackTrace();
-					}
-					selectedGroupInfo = null;
-				}
-				HashMap<String, String> params = new HashMap<String, String>();
-				params.put(TalkGroup.attendees.name(), attendeesJsonString);
-				HttpUtil.startHttpPostRequestWithSignature(
-						getString(R.string.server_url)
-								+ getString(R.string.create_conf_url), params,
-						onFinishedCreateGroupTalk, null);
-				return;
-			default:
+				Intent intent = new Intent(
+						TalkingGroupHistoryListActivity.this,
+						TalkingGroupActivity.class);
+				intent.putExtra(TalkGroup.conferenceId.name(), groupId);
+				intent.putExtra(TalkGroup.owner.name(),
+						data.getString(TalkGroup.owner.name()));
+				startActivityForResult(intent, REQ_OPEN_GROUP_TALK);
+			} catch (Exception e1) {
+				e1.printStackTrace();
 				Toast.makeText(TalkingGroupHistoryListActivity.this,
 						R.string.error_in_join_group, Toast.LENGTH_SHORT)
 						.show();
-				break;
-			}
-			selectedGroupInfo = null;
-			if (progressDialog != null) {
-				progressDialog.dismiss();
 			}
 		}
-	};
-
-	private ResponseListener onFinishedCreateGroupTalk = new ResponseListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			if (progressDialog != null) {
-				progressDialog.dismiss();
-			}
-			switch (status) {
-			case 201:
-				// create and invite ok
-				try {
-					JSONObject data = new JSONObject(responseText);
-					String groupId = data.getString(TalkGroup.conferenceId
-							.name());
-					String owner = data.getString(TalkGroup.owner.name());
+		public void onForbidden(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupHistoryListActivity.this,
+					R.string.join_conf_forbidden, Toast.LENGTH_SHORT).show();
+		}
 
-					Intent intent = new Intent(
-							TalkingGroupHistoryListActivity.this,
-							TalkingGroupActivity.class);
-					intent.putExtra(TalkGroup.conferenceId.name(), groupId);
-					intent.putExtra(TalkGroup.owner.name(), owner);
-					startActivityForResult(intent, REQ_OPEN_GROUP_TALK);
+		@Override
+		public void onNotFound(HttpRequest request, HttpResponse response) {
+			Log.d(SystemConstants.TAG, "conf doesn't exist, create a new one");
+			String accountName = UserManager.getInstance().getUser().getName();
+			String attendeesJsonString = null;
+			if (selectedGroupInfo != null) {
+				try {
+					JSONArray attendees = selectedGroupInfo
+							.getJSONArray(TalkGroup.attendees.name());
+					JSONArray attendeesToInvite = new JSONArray();
+					for (int i = 0; i < attendees.length(); i++) {
+						String name = attendees.getString(i);
+						if (!accountName.equals(name)) {
+							attendeesToInvite.put(name);
+						}
+					}
+					attendeesJsonString = attendeesToInvite.toString();
 				} catch (JSONException e) {
 					e.printStackTrace();
-					Toast.makeText(TalkingGroupHistoryListActivity.this,
-							R.string.error_in_create_group, Toast.LENGTH_SHORT)
-							.show();
 				}
+				selectedGroupInfo = null;
+			}
+			HashMap<String, String> params = new HashMap<String, String>();
+			params.put(TalkGroup.attendees.name(), attendeesJsonString);
+			HttpUtils.postSignatureRequest(getString(R.string.server_url)
+					+ getString(R.string.create_conf_url),
+					PostRequestFormat.URLENCODED, params, null,
+					HttpRequestType.ASYNCHRONOUS, onFinishedCreateGroupTalk);
+		}
 
-				break;
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupHistoryListActivity.this,
+					R.string.error_in_join_group, Toast.LENGTH_SHORT).show();
+		}
 
-			default:
+	};
+
+	private OnHttpRequestListener onFinishedCreateGroupTalk = new OnHttpRequestListener() {
+
+		@Override
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			try {
+				String responseText = EntityUtils.toString(
+						response.getEntity(), HTTP.UTF_8);
+				JSONObject data = new JSONObject(responseText);
+				String groupId = data.getString(TalkGroup.conferenceId.name());
+				String owner = data.getString(TalkGroup.owner.name());
+
+				Intent intent = new Intent(
+						TalkingGroupHistoryListActivity.this,
+						TalkingGroupActivity.class);
+				intent.putExtra(TalkGroup.conferenceId.name(), groupId);
+				intent.putExtra(TalkGroup.owner.name(), owner);
+				startActivityForResult(intent, REQ_OPEN_GROUP_TALK);
+			} catch (Exception e) {
+				e.printStackTrace();
 				Toast.makeText(TalkingGroupHistoryListActivity.this,
 						R.string.error_in_create_group, Toast.LENGTH_SHORT)
 						.show();
-				break;
 			}
+		}
+
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupHistoryListActivity.this,
+					R.string.error_in_create_group, Toast.LENGTH_SHORT).show();
 		}
 	};
 
@@ -447,44 +427,33 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 				getString(R.string.sending_request));
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(
-				getString(R.string.server_url)
-						+ getString(R.string.hide_group_url), params,
-				onFinishedDeleteGroup, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.hide_group_url),
+				PostRequestFormat.URLENCODED, params, null,
+				HttpRequestType.ASYNCHRONOUS, onFinishedDeleteGroup1);
 	}
 
-	private ResponseListener onFinishedDeleteGroup = new ResponseListener() {
+	private OnHttpRequestListener onFinishedDeleteGroup1 = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			if (progressDialog != null) {
-				progressDialog.dismiss();
-			}
-			switch (status) {
-			case 200:
-				handler.post(new Runnable() {
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			listAdapter.removeItem(selectedGroupInfo);
+		}
 
-					@Override
-					public void run() {
-						listAdapter.removeItem(selectedGroupInfo);
-					}
-				});
-				break;
-			default:
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Toast.makeText(TalkingGroupHistoryListActivity.this,
-								R.string.error_in_del_group, Toast.LENGTH_SHORT)
-								.show();
-					}
-
-				});
-				break;
-			}
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupHistoryListActivity.this,
+					R.string.error_in_del_group, Toast.LENGTH_SHORT).show();
 		}
 	};
+
+	private void dismissProgressDlg() {
+		if (progressDialog != null) {
+			progressDialog.dismiss();
+		}
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

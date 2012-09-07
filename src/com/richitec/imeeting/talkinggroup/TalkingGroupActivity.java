@@ -25,7 +25,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -40,8 +39,6 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.user.UserManager;
-import com.richitec.commontoolkit.utils.HttpUtil;
-import com.richitec.commontoolkit.utils.HttpUtil.ResponseListener;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
@@ -49,7 +46,6 @@ import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.Notify;
-import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.talkinggroup.adapter.MemberListAdapter;
 import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
@@ -374,44 +370,41 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.postSignatureRequest(getString(R.string.server_url) + getString(R.string.call_url), PostRequestFormat.URLENCODED, params, null, HttpRequestType.ASYNCHRONOUS, onFinishedCall);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.call_url), PostRequestFormat.URLENCODED,
+				params, null, HttpRequestType.ASYNCHRONOUS, onFinishedCall);
 	}
 
 	private OnHttpRequestListener onFinishedCall = new OnHttpRequestListener() {
-		
+
 		@Override
 		public void onFinished(HttpRequest request, HttpResponse response) {
 			dismissProgressDlg();
-			String userName = selectedMember
-					.get(Attendee.username.name());
+			String userName = selectedMember.get(Attendee.username.name());
 			Map<String, String> attendee = new HashMap<String, String>();
 			attendee.put(Attendee.username.name(), userName);
 			attendee.put(Attendee.telephone_status.name(),
 					Attendee.PhoneStatus.CallWait.name());
 			memberListAdatper.updateMember(attendee);
 		}
-		
+
 		@Override
 		public void onForbidden(HttpRequest request, HttpResponse response) {
 			dismissProgressDlg();
-			String userName = selectedMember
-					.get(Attendee.username.name());
+			String userName = selectedMember.get(Attendee.username.name());
 			String toastMsg = String.format(
-					getString(R.string.call_is_forbidden_for_sb),
-					userName);
+					getString(R.string.call_is_forbidden_for_sb), userName);
 			Toast.makeText(TalkingGroupActivity.this, toastMsg,
 					Toast.LENGTH_SHORT).show();
 		}
-		
+
 		@Override
 		public void onFailed(HttpRequest request, HttpResponse response) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupActivity.this,
-					R.string.call_failed, Toast.LENGTH_SHORT)
-					.show();
+			Toast.makeText(TalkingGroupActivity.this, R.string.call_failed,
+					Toast.LENGTH_SHORT).show();
 		}
 	};
-	
 
 	private void hangup(String targetUserName) {
 		progressDlg = ProgressDialog.show(this, null,
@@ -419,41 +412,31 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-//		HttpUtil.startHttpPostRequestWithSignature(
-//				getString(R.string.server_url) + getString(R.string.hangup_url),
-//				params, onFinishedHangup, null);
-		HttpUtils.postSignatureRequest(getString(R.string.server_url) + getString(R.string.hangup_url), PostRequestFormat.URLENCODED, params, null, HttpRequestType.ASYNCHRONOUS, onFinishedHangup);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.hangup_url), PostRequestFormat.URLENCODED,
+				params, null, HttpRequestType.ASYNCHRONOUS, onFinishedHangup);
 	}
 
 	private OnHttpRequestListener onFinishedHangup = new OnHttpRequestListener() {
-		
+
 		@Override
 		public void onFinished(HttpRequest request, HttpResponse response) {
 			dismissProgressDlg();
-			String userName = selectedMember
-					.get(Attendee.username.name());
-			Map<String, String> attendee = new HashMap<String, String>();
-			attendee.put(Attendee.username.name(), userName);
-			attendee.put(Attendee.telephone_status.name(),
-					Attendee.PhoneStatus.Terminated.name());
-			memberListAdatper.updateMember(attendee);
+			updateHangUpUI();
 		}
-		
+
 		@Override
 		public void onFailed(HttpRequest request, HttpResponse response) {
 			dismissProgressDlg();
-			String userName = selectedMember
-					.get(Attendee.username.name());
-			int status = response != null ? response.getStatusLine().getStatusCode() : -1;
+
+			int status = response != null ? response.getStatusLine()
+					.getStatusCode() : -1;
 			switch (status) {
 			case 409:
-				Map<String, String> attendee = new HashMap<String, String>();
-				attendee.put(Attendee.username.name(), userName);
-				attendee.put(Attendee.telephone_status.name(),
-						Attendee.PhoneStatus.Terminated.name());
-				memberListAdatper.updateMember(attendee);
+				updateHangUpUI();
 				break;
 			case 403:
+				String userName = selectedMember.get(Attendee.username.name());
 				String toastMsg = String.format(
 						getString(R.string.hangup_is_forbidden_for_sb),
 						userName);
@@ -462,68 +445,20 @@ public class TalkingGroupActivity extends Activity {
 				break;
 			default:
 				Toast.makeText(TalkingGroupActivity.this,
-						R.string.hangup_failed, Toast.LENGTH_SHORT)
-						.show();
+						R.string.hangup_failed, Toast.LENGTH_SHORT).show();
 				break;
 			}
 		}
+
+		private void updateHangUpUI() {
+			String userName = selectedMember.get(Attendee.username.name());
+			Map<String, String> attendee = new HashMap<String, String>();
+			attendee.put(Attendee.username.name(), userName);
+			attendee.put(Attendee.telephone_status.name(),
+					Attendee.PhoneStatus.Terminated.name());
+			memberListAdatper.updateMember(attendee);
+		}
 	};
-	
-//	private ResponseListener onFinishedHangup = new ResponseListener() {
-//
-//		@Override
-//		public void onComplete(int status, String responseText) {
-//			if (progressDlg != null) {
-//				progressDlg.dismiss();
-//			}
-//
-//			final String userName = selectedMember
-//					.get(Attendee.username.name());
-//			switch (status) {
-//			case 409:
-//			case 200:
-//				// hangup command is accepted by server, update UI
-//				handler.post(new Runnable() {
-//
-//					@Override
-//					public void run() {
-//						Map<String, String> attendee = new HashMap<String, String>();
-//						attendee.put(Attendee.username.name(), userName);
-//						attendee.put(Attendee.telephone_status.name(),
-//								Attendee.PhoneStatus.Terminated.name());
-//						memberListAdatper.updateMember(attendee);
-//					}
-//				});
-//				break;
-//			case 403:
-//				// hangup is forbidden
-//				handler.post(new Runnable() {
-//
-//					@Override
-//					public void run() {
-//						String toastMsg = String.format(
-//								getString(R.string.hangup_is_forbidden_for_sb),
-//								userName);
-//						Toast.makeText(TalkingGroupActivity.this, toastMsg,
-//								Toast.LENGTH_SHORT).show();
-//					}
-//
-//				});
-//				break;
-//			default:
-//				handler.post(new Runnable() {
-//
-//					@Override
-//					public void run() {
-//						Toast.makeText(TalkingGroupActivity.this,
-//								R.string.hangup_failed, Toast.LENGTH_SHORT)
-//								.show();
-//					}
-//				});
-//				break;
-//			}
-//		}
-//	};
 
 	private void kickout(String targetUserName) {
 		progressDlg = ProgressDialog.show(this, null,
@@ -531,59 +466,37 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", targetUserName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(
-				getString(R.string.server_url)
-						+ getString(R.string.kickout_url), params,
-				onFinishedKickout, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.kickout_url),
+				PostRequestFormat.URLENCODED, params, null,
+				HttpRequestType.ASYNCHRONOUS, onFinishedKickout);
 	}
 
-	private ResponseListener onFinishedKickout = new ResponseListener() {
+	private OnHttpRequestListener onFinishedKickout = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			if (progressDlg != null) {
-				progressDlg.dismiss();
-			}
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			String userName = selectedMember.get(Attendee.username.name());
+			memberListAdatper.removeMember(userName);
+		}
 
-			final String userName = selectedMember
-					.get(Attendee.username.name());
-			switch (status) {
-			case 200:
-				// remove kicked out attendee
-				handler.post(new Runnable() {
+		@Override
+		public void onForbidden(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			String userName = selectedMember.get(Attendee.username.name());
 
-					@Override
-					public void run() {
-						memberListAdatper.removeMember(userName);
-					}
-				});
-				break;
-			case 403:
-				handler.post(new Runnable() {
+			String toastMsg = String.format(
+					getString(R.string.kickout_is_forbidden_for_sb), userName);
+			Toast.makeText(TalkingGroupActivity.this, toastMsg,
+					Toast.LENGTH_SHORT).show();
+		}
 
-					@Override
-					public void run() {
-						String toastMsg = String
-								.format(getString(R.string.kickout_is_forbidden_for_sb),
-										userName);
-						Toast.makeText(TalkingGroupActivity.this, toastMsg,
-								Toast.LENGTH_SHORT).show();
-					}
-				});
-				break;
-
-			default:
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Toast.makeText(TalkingGroupActivity.this,
-								R.string.kickout_failed, Toast.LENGTH_SHORT)
-								.show();
-					}
-				});
-				break;
-			}
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupActivity.this, R.string.kickout_failed,
+					Toast.LENGTH_SHORT).show();
 		}
 	};
 
@@ -652,7 +565,7 @@ public class TalkingGroupActivity extends Activity {
 			} else if (Notify.Action.update_attendee_list.name().equals(action)) {
 				refreshMemberList();
 			} else if (Notify.Action.kickout.name().equals(action)) {
-				String accountName = UserManager.getInstance().toString();
+				String accountName = UserManager.getInstance().getUser().getName();
 				String attendeeName = notice
 						.getString(Attendee.username.name());
 				if (accountName.equals(attendeeName)) {
@@ -738,62 +651,38 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", accountName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(
-				getString(R.string.server_url) + getString(R.string.call_url),
-				params, onFinishedCallMeIn, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.call_url), PostRequestFormat.URLENCODED,
+				params, null, HttpRequestType.ASYNCHRONOUS, onFinishedCallMeIn);
 	}
 
-	private ResponseListener onFinishedCallMeIn = new ResponseListener() {
+	private OnHttpRequestListener onFinishedCallMeIn = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			if (progressDlg != null) {
-				progressDlg.dismiss();
-			}
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			String accountName = UserManager.getInstance().getUser().getName();
+			Map<String, String> attendee = new HashMap<String, String>();
+			attendee.put(Attendee.username.name(), accountName);
+			attendee.put(Attendee.telephone_status.name(),
+					Attendee.PhoneStatus.CallWait.name());
+			memberListAdatper.updateMember(attendee);
+			setDialButtonAsCalling();
+		}
 
-			switch (status) {
-			case 200:
-				// call command is accepted by server, update UI
-				handler.post(new Runnable() {
+		@Override
+		public void onForbidden(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupActivity.this,
+					R.string.call_is_forbidden_for_you, Toast.LENGTH_SHORT)
+					.show();
+		}
 
-					@Override
-					public void run() {
-						String accountName = UserManager.getInstance()
-								.getUser().getName();
-						Map<String, String> attendee = new HashMap<String, String>();
-						attendee.put(Attendee.username.name(), accountName);
-						attendee.put(Attendee.telephone_status.name(),
-								Attendee.PhoneStatus.CallWait.name());
-						memberListAdatper.updateMember(attendee);
-						setDialButtonAsCalling();
-					}
-				});
-				break;
-			case 403:
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Toast.makeText(TalkingGroupActivity.this,
-								R.string.call_is_forbidden_for_you,
-								Toast.LENGTH_SHORT).show();
-					}
-				});
-				break;
-			default:
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Toast.makeText(TalkingGroupActivity.this,
-								R.string.call_in_failed, Toast.LENGTH_SHORT)
-								.show();
-					}
-
-				});
-				break;
-			}
-
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupActivity.this, R.string.call_in_failed,
+					Toast.LENGTH_SHORT).show();
 		}
 	};
 
@@ -804,63 +693,54 @@ public class TalkingGroupActivity extends Activity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("dstUserName", accountName);
 		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtil.startHttpPostRequestWithSignature(
-				getString(R.string.server_url) + getString(R.string.hangup_url),
-				params, onFinishedHangMeUp, null);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.hangup_url), PostRequestFormat.URLENCODED,
+				params, null, HttpRequestType.ASYNCHRONOUS, onFinishedHangMeUp);
 	}
 
-	private ResponseListener onFinishedHangMeUp = new ResponseListener() {
+	private OnHttpRequestListener onFinishedHangMeUp = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			if (progressDlg != null) {
-				progressDlg.dismiss();
-			}
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			updateUI();
+		}
 
+		@Override
+		public void onForbidden(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupActivity.this,
+					R.string.hangup_is_forbidden_for_you, Toast.LENGTH_SHORT)
+					.show();
+		}
+
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			dismissProgressDlg();
+
+			int status = response != null ? response.getStatusLine()
+					.getStatusCode() : -1;
 			switch (status) {
 			case 409:
-			case 200:
-				// hangup command is accepted by server, update UI
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						String accountName = UserManager.getInstance()
-								.getUser().getName();
-						Map<String, String> attendee = new HashMap<String, String>();
-						attendee.put(Attendee.username.name(), accountName);
-						attendee.put(Attendee.telephone_status.name(),
-								Attendee.PhoneStatus.Terminated.name());
-						memberListAdatper.updateMember(attendee);
-						setDialButtonAsDial();
-					}
-				});
+				updateUI();
 				break;
-			case 403:
-				handler.post(new Runnable() {
 
-					@Override
-					public void run() {
-						Toast.makeText(TalkingGroupActivity.this,
-								R.string.hangup_is_forbidden_for_you,
-								Toast.LENGTH_SHORT).show();
-					}
-
-				});
-				break;
 			default:
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						Toast.makeText(TalkingGroupActivity.this,
-								R.string.hangup_talking_failed,
-								Toast.LENGTH_SHORT).show();
-					}
-
-				});
+				Toast.makeText(TalkingGroupActivity.this,
+						R.string.hangup_talking_failed, Toast.LENGTH_SHORT)
+						.show();
 				break;
 			}
+		}
+
+		private void updateUI() {
+			String accountName = UserManager.getInstance().getUser().getName();
+			Map<String, String> attendee = new HashMap<String, String>();
+			attendee.put(Attendee.username.name(), accountName);
+			attendee.put(Attendee.telephone_status.name(),
+					Attendee.PhoneStatus.Terminated.name());
+			memberListAdatper.updateMember(attendee);
+			setDialButtonAsDial();
 		}
 	};
 
@@ -869,7 +749,7 @@ public class TalkingGroupActivity extends Activity {
 			progressDlg.dismiss();
 		}
 	}
-	
+
 	class HeartBeatTimerTask extends TimerTask {
 
 		@Override

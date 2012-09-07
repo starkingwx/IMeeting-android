@@ -2,17 +2,18 @@ package com.richitec.imeeting.account;
 
 import java.util.HashMap;
 
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,14 +26,15 @@ import com.richitec.commontoolkit.customui.BarButtonItem;
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
-import com.richitec.commontoolkit.utils.HttpUtil;
-import com.richitec.commontoolkit.utils.HttpUtil.ResponseListener;
+import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
+import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
 
 public class AccountSettingActivity extends NavigationActivity {
-	private Handler handler;
 	private ProgressDialog progressDialog;
 	private String loginUrl;
 	private SharedPreferences userInfoSettings;
@@ -60,8 +62,6 @@ public class AccountSettingActivity extends NavigationActivity {
 		// item
 		setRightBarButtonItem(_registerBarBtnItem);
 
-		handler = new Handler(Looper.myLooper());
-
 		userInfoSettings = getSharedPreferences(SystemConstants.USER_INFO, 0);
 
 		loginUrl = getString(R.string.server_url)
@@ -83,7 +83,7 @@ public class AccountSettingActivity extends NavigationActivity {
 		} else {
 			remeberPwdToggle.setChecked(false);
 		}
-		
+
 		useSavedPwd = remeberPwdToggle.isChecked();
 	}
 
@@ -158,72 +158,38 @@ public class AccountSettingActivity extends NavigationActivity {
 		HashMap<String, String> paramMap = new HashMap<String, String>();
 		paramMap.put("loginName", user.getName());
 		paramMap.put("loginPwd", user.getPassword());
-		HttpUtil.startHttpPostRequest(loginUrl, paramMap, onFinsihedLogin,
-				null);
-
+		HttpUtils.postRequest(loginUrl, PostRequestFormat.URLENCODED, paramMap,
+				null, HttpRequestType.ASYNCHRONOUS, onFinishedLogin1);
 	}
 
-	private ResponseListener onFinsihedLogin = new ResponseListener() {
+	private OnHttpRequestListener onFinishedLogin1 = new OnHttpRequestListener() {
 
 		@Override
-		public void onComplete(int status, String responseText) {
-			Log.d(SystemConstants.TAG, "onFinsihedLogin status: " + status);
-			switch (status) {
-			case 200:
-				try {
-					final JSONObject data = new JSONObject(responseText);
-					String result = data.getString("result");
-					if (result.equals("0")) {
-						// login success
-						handler.post(new Runnable() {
-
-							@Override
-							public void run() {
-								loginSuccess(data);
-							}
-						});
-					} else if (result.equals("1") || result.equals("2")) {
-						handler.post(new Runnable() {
-
-							@Override
-							public void run() {
-								loginFailed();
-							}
-						});
-					} else {
-						handler.post(new Runnable() {
-
-							@Override
-							public void run() {
-								loginError();
-							}
-						});
-					}
-
-				} catch (JSONException e) {
-					e.printStackTrace();
-					handler.post(new Runnable() {
-
-						@Override
-						public void run() {
-							loginError();
-						}
-					});
+		public void onFinished(HttpRequest request, HttpResponse response) {
+			try {
+				String responseText = EntityUtils.toString(
+						response.getEntity(), HTTP.UTF_8);
+				JSONObject data = new JSONObject(responseText);
+				String result = data.getString("result");
+				if (result.equals("0")) {
+					// login success
+					loginSuccess(data);
+				} else if (result.equals("1") || result.equals("2")) {
+					loginFailed();
+				} else {
+					loginError();
 				}
 
-				break;
-
-			default:
-				handler.post(new Runnable() {
-
-					@Override
-					public void run() {
-						loginError();
-					}
-				});
-				break;
+			} catch (Exception e) {
+				e.printStackTrace();
+				loginError();
 			}
 
+		}
+
+		@Override
+		public void onFailed(HttpRequest request, HttpResponse response) {
+			loginError();
 		}
 	};
 
@@ -252,7 +218,7 @@ public class AccountSettingActivity extends NavigationActivity {
 
 			pushActivity(TalkingGroupHistoryListActivity.class);
 			finish();
-			
+
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

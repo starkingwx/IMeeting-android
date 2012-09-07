@@ -1,11 +1,9 @@
 package com.richitec.imeeting.account;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
@@ -116,7 +114,7 @@ public class AccountRegisterActivity extends NavigationActivity {
 	private void setBody(int resID) {
 		LinearLayout body = (LinearLayout) getBody();
 		body.removeAllViewsInLayout();
-		View view = LayoutInflater.from(this).inflate(resID, body);
+		LayoutInflater.from(this).inflate(resID, body);
 	}
 
 	public void onVerifyAuthCodeAction(View v) {

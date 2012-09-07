@@ -74,7 +74,7 @@
     <string name="group_talk_title">群聊号：</string>
     <string name="add_member">添加成员</string>
     <string name="sms_invite">短信邀请</string>
-    <string name="dial">电话呼入</string>
+    <string name="dial">开始语音</string>
     <string name="calling_in">正在接入</string>
     <string name="call_in">接入</string>
     <string name="hangup_talking">结束语音</string>

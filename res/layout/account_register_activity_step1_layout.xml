@@ -49,7 +49,7 @@
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:text="@string/get_verificationCode_btn_title"
         android:onClick="onGetAuthCodeAction"
-        android:textColor="@color/white" />
+        android:textColor="@android:color/white" />
 
     <TextView
         android:layout_width="wrap_content"

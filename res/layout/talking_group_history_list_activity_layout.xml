@@ -15,19 +15,19 @@
         android:layout_marginTop="4dp"
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:text="@string/newTalkingGroup_btn_title"
-        android:textColor="@color/white" />
+        android:textColor="@android:color/white" />
 
     <com.handmark.pulltorefresh.library.PullToRefreshListView
         android:id="@+id/myGroup_history_listView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@id/newTalkingGroup_btn"
-        android:cacheColorHint="@color/clear"
-        android:divider="@color/clear"
+        android:cacheColorHint="@android:color/transparent"
+        android:divider="@android:color/transparent"
         android:fadingEdge="none"
         android:footerDividersEnabled="false"
         android:headerDividersEnabled="false"
-        android:listSelector="@color/clear"
+        android:listSelector="@android:color/transparent"
         android:scrollbars="vertical" />
 
 </RelativeLayout>

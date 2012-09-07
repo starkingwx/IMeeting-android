@@ -4,6 +4,6 @@
     <!-- pressed -->
     <item android:drawable="@drawable/img_groupdetailinfo_bottomtoolbaritem_bg" android:state_pressed="true"/>
     <!-- default -->
-    <item android:drawable="@color/clear"/>
+    <item android:drawable="@android:color/transparent"/>
 
 </selector>

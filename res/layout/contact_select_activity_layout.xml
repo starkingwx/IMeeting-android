@@ -21,7 +21,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="16dp"
             android:text="@string/addressBook_textView_text"
-            android:textColor="@color/white" />
+            android:textColor="@android:color/white" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -30,7 +30,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
             android:text="@string/in7preinTalkingGroup_textView_text"
-            android:textColor="@color/white" />
+            android:textColor="@android:color/white" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -45,11 +45,11 @@
             android:layout_alignParentRight="true"
             android:layout_marginLeft="-6dp"
             android:background="@drawable/img_in7prein_talkinggroup_listview_bg"
-            android:cacheColorHint="@color/clear"
+            android:cacheColorHint="@android:color/transparent"
             android:divider="@drawable/img_in7preintalkinggroup_contact_listview_divider_bg"
             android:fadingEdge="none"
             android:headerDividersEnabled="false"
-            android:listSelector="@color/clear"
+            android:listSelector="@android:color/transparent"
             android:scrollbars="none" >
         </ListView>
 
@@ -96,11 +96,11 @@
                 android:id="@+id/contactInAB_listView"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:cacheColorHint="@color/clear"
+                android:cacheColorHint="@android:color/transparent"
                 android:divider="@drawable/img_addressbook_contact_listview_divider_bg"
                 android:fadingEdge="none"
                 android:headerDividersEnabled="false"
-                android:listSelector="@color/clear"
+                android:listSelector="@android:color/transparent"
                 android:scrollbars="none" >
             </ListView>
         </LinearLayout>

@@ -58,6 +58,6 @@
         android:onClick="onRegisterWithPwdAction"
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:text="@string/register_finish_btn_title"
-        android:textColor="@color/white" />
+        android:textColor="@android:color/white" />
 
 </LinearLayout>

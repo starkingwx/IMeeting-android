@@ -49,6 +49,6 @@
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:onClick="onVerifyAuthCodeAction"
         android:text="@string/verify_verificationCode_btn_title"
-        android:textColor="@color/white" />
+        android:textColor="@android:color/white" />
 
 </LinearLayout>

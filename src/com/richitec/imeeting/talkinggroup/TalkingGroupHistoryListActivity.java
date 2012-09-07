@@ -31,8 +31,8 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleListener;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
-import com.richitec.commontoolkit.activityextension.NavigationActivity;
 import com.richitec.commontoolkit.customui.BarButtonItem;
+import com.richitec.commontoolkit.customui.BarButtonItem.BarButtonItemStyle;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
@@ -43,9 +43,11 @@ import com.richitec.imeeting.assistant.SettingActivity;
 import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.contactselect.ContactSelectActivity;
+import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
+import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.adapter.TalkingGroupListAdapter;
 
-public class TalkingGroupHistoryListActivity extends NavigationActivity {
+public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity {
 	private static final int REQ_OPEN_GROUP_TALK = 0;
 
 	private PullToRefreshListView listView;
@@ -69,13 +71,9 @@ public class TalkingGroupHistoryListActivity extends NavigationActivity {
 		setTitle(R.string.myTalkingGroup_history_list_nav_title_text);
 
 		// init setting bar button item
-		BarButtonItem _settingBarBtnItem = new BarButtonItem(this);
-		// set attributes
-		_settingBarBtnItem.setText(R.string.setting_nav_btn_title);
-		_settingBarBtnItem.setOnClickListener(new SettingBtnOnClickListener());
-		// set setting bar button item as self activity left bar button
-		// item
-		setLeftBarButtonItem(_settingBarBtnItem);
+		setLeftBarButtonItem(new IMeetingBarButtonItem(this,
+				BarButtonItemStyle.RIGHT_GO, R.string.setting_nav_btn_title,
+				new SettingBtnOnClickListener()));
 
 		// set my group history listView adapter
 		listView = (PullToRefreshListView) findViewById(R.id.myGroup_history_listView);

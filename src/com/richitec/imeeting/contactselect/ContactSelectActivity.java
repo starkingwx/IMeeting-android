@@ -11,13 +11,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
 
-import com.richitec.commontoolkit.activityextension.NavigationActivity;
 import com.richitec.commontoolkit.customui.BarButtonItem;
 import com.richitec.imeeting.R;
+import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupStatus;
 
-public class ContactSelectActivity extends NavigationActivity {
+public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 	// current talking group status, default value is establishing
 	private TalkingGroupStatus _mCurrentTalkingGroupStatus = TalkingGroupStatus.ESTABLISHING;

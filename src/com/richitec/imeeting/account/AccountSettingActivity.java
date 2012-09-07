@@ -21,8 +21,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.richitec.commontoolkit.activityextension.NavigationActivity;
 import com.richitec.commontoolkit.customui.BarButtonItem;
+import com.richitec.commontoolkit.customui.BarButtonItem.BarButtonItemStyle;
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
@@ -32,9 +32,11 @@ import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.SystemConstants;
+import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
+import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
 
-public class AccountSettingActivity extends NavigationActivity {
+public class AccountSettingActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDialog;
 	private String loginUrl;
 	private SharedPreferences userInfoSettings;
@@ -53,15 +55,10 @@ public class AccountSettingActivity extends NavigationActivity {
 		setTitle(R.string.account_setting_nav_title_text);
 
 		// init user register bar button item
-		BarButtonItem _registerBarBtnItem = new BarButtonItem(this);
-		// set attributes
-		_registerBarBtnItem.setText(R.string.register_nav_btn_title);
-		_registerBarBtnItem
-				.setOnClickListener(new RigisterBtnOnClickListener());
-		// set user register bar button item as self activity right bar button
-		// item
-		setRightBarButtonItem(_registerBarBtnItem);
-
+		setRightBarButtonItem(new IMeetingBarButtonItem(this,
+				BarButtonItemStyle.RIGHT_GO, R.string.register_nav_btn_title,
+				new RigisterBtnOnClickListener()));
+		
 		userInfoSettings = getSharedPreferences(SystemConstants.USER_INFO, 0);
 
 		loginUrl = getString(R.string.server_url)

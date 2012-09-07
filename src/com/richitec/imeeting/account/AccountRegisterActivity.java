@@ -18,14 +18,14 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.richitec.commontoolkit.activityextension.NavigationActivity;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
+import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 
-public class AccountRegisterActivity extends NavigationActivity {
+public class AccountRegisterActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDlg;
 
 	@Override

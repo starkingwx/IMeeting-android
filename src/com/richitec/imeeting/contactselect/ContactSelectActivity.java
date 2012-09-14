@@ -11,11 +11,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ListView;
 
-import com.richitec.commontoolkit.customui.BarButtonItem;
+import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemStyle;
 import com.richitec.imeeting.R;
+import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupActivity;
-import com.richitec.imeeting.talkinggroup.TalkingGroupStatus;
 
 public class ContactSelectActivity extends IMeetingNavigationActivity {
 
@@ -35,48 +35,32 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 		// check current talking group status
 		// establishing
 		if (TalkingGroupStatus.ESTABLISHING == _mCurrentTalkingGroupStatus) {
-			// init nav back bar button item
-			BarButtonItem _navBackBarBtnItem = new BarButtonItem(this);
-			// set attributes
-			_navBackBarBtnItem.setText(R.string.back_nav_btn_title);
-			_navBackBarBtnItem
-					.setOnClickListener(new NavBackBtnOnClickListener());
 			// set nav back bar button item as self activity left bar button
 			// item
-			setLeftBarButtonItem(_navBackBarBtnItem);
+			setLeftBarButtonItem(new IMeetingBarButtonItem(this,
+					BarButtonItemStyle.LEFT_BACK, R.string.back_nav_btn_title,
+					new NavBackBtnOnClickListener()));
 
-			// init open talking group bar button item
-			BarButtonItem _openTalkingGroupBarBtnItem = new BarButtonItem(this);
-			// set attributes
-			_openTalkingGroupBarBtnItem
-					.setText(R.string.openTalkingGroup_nav_btn_title);
-			_openTalkingGroupBarBtnItem
-					.setOnClickListener(new OpenTalkingGroupBtnOnClickListener());
 			// set open talking group bar button item as self activity right bar
 			// button item
-			setRightBarButtonItem(_openTalkingGroupBarBtnItem);
+			setRightBarButtonItem(new IMeetingBarButtonItem(this,
+					BarButtonItemStyle.RIGHT_GO,
+					R.string.openTalkingGroup_nav_btn_title,
+					new OpenTalkingGroupBtnOnClickListener()));
 		}
 		// going
 		else {
-			// init back bar button item
-			BarButtonItem _BackBarBtnItem = new BarButtonItem(this);
-			// set attributes
-			_BackBarBtnItem.setText(R.string.back_nav_btn_title);
-			_BackBarBtnItem.setOnClickListener(new BackBtnOnClickListener());
 			// set back bar button item as self activity left bar button item
-			setLeftBarButtonItem(_BackBarBtnItem);
+			setLeftBarButtonItem(new IMeetingBarButtonItem(this,
+					BarButtonItemStyle.LEFT_BACK, R.string.back_nav_btn_title,
+					new BackBtnOnClickListener()));
 
-			// init confirm add attendee bar button item
-			BarButtonItem _confirmAddAttendeeBarBtnItem = new BarButtonItem(
-					this);
-			// set attributes
-			_confirmAddAttendeeBarBtnItem
-					.setText(R.string.confirmAdd_nav_btn_title);
-			_confirmAddAttendeeBarBtnItem
-					.setOnClickListener(new confirmAddAttendeeBtnOnClickListener());
 			// set confirm add attendee bar button item as self activity right
 			// bar button item
-			setRightBarButtonItem(_confirmAddAttendeeBarBtnItem);
+			setRightBarButtonItem(new IMeetingBarButtonItem(this,
+					BarButtonItemStyle.RIGHT_GO,
+					R.string.confirmAdd_nav_btn_title,
+					new ConfirmAddAttendeeBtnOnClickListener()));
 		}
 
 		// test by ares
@@ -142,12 +126,12 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 						new int[] { R.id.in7preinTalkingGroup_contact_displayName_textView }));
 	}
 
-	public void setCurrentTalkingGroupStatus(
-			TalkingGroupStatus _talkingGroupStatus) {
-		_mCurrentTalkingGroupStatus = _talkingGroupStatus;
+	// inner class
+	// talking group status
+	public static enum TalkingGroupStatus {
+		ESTABLISHING, GOING
 	}
 
-	// inner class
 	// nav back button on click listener
 	class NavBackBtnOnClickListener implements OnClickListener {
 
@@ -182,7 +166,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	}
 
 	// confirm add attendee button on click listener
-	class confirmAddAttendeeBtnOnClickListener implements OnClickListener {
+	class ConfirmAddAttendeeBtnOnClickListener implements OnClickListener {
 
 		@Override
 		public void onClick(View v) {

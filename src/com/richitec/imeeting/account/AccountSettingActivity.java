@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,11 +22,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.richitec.commontoolkit.customui.BarButtonItem;
-import com.richitec.commontoolkit.customui.BarButtonItem.BarButtonItemStyle;
+import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemStyle;
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
+import com.richitec.commontoolkit.utils.DataStorageUtils;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
@@ -39,7 +40,7 @@ import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
 public class AccountSettingActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDialog;
 	private String loginUrl;
-	private SharedPreferences userInfoSettings;
+//	private SharedPreferences userInfoSettings;
 
 	private boolean useSavedPwd;
 	private String PWD_MASK = "#@1d~`*)";
@@ -59,7 +60,7 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 				BarButtonItemStyle.RIGHT_GO, R.string.register_nav_btn_title,
 				new RigisterBtnOnClickListener()));
 		
-		userInfoSettings = getSharedPreferences(SystemConstants.USER_INFO, 0);
+//		userInfoSettings = getSharedPreferences(SystemConstants.user_info.name(), 0);
 
 		loginUrl = getString(R.string.server_url)
 				+ getString(R.string.login_url);
@@ -156,10 +157,10 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		paramMap.put("loginName", user.getName());
 		paramMap.put("loginPwd", user.getPassword());
 		HttpUtils.postRequest(loginUrl, PostRequestFormat.URLENCODED, paramMap,
-				null, HttpRequestType.ASYNCHRONOUS, onFinishedLogin1);
+				null, HttpRequestType.ASYNCHRONOUS, onFinishedLogin);
 	}
 
-	private OnHttpRequestListener onFinishedLogin1 = new OnHttpRequestListener() {
+	private OnHttpRequestListener onFinishedLogin = new OnHttpRequestListener() {
 
 		@Override
 		public void onFinished(HttpRequest request, HttpResponse response) {
@@ -212,7 +213,6 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 			String userKey = data.getString("userkey");
 			UserManager.getInstance().setUserKey(userKey);
 			saveUserAccount();
-
 			pushActivity(TalkingGroupHistoryListActivity.class);
 			finish();
 
@@ -223,18 +223,29 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 	}
 
 	private void saveUserAccount() {
+		Log.d(SystemConstants.TAG, "save user account");
 		UserBean user = UserManager.getInstance().getUser();
-		userInfoSettings.edit().putString(User.username.name(), user.getName());
+		Log.d(SystemConstants.TAG, "user: " + user.toString());
+//		userInfoSettings.edit().putString(User.username.name(), user.getName());
+		DataStorageUtils.putObject(User.username.name(), user.getName());
 		if (user.isRememberPwd()) {
-			userInfoSettings.edit()
-					.putString(User.password.name(), user.getPassword())
-					.putString(User.userkey.name(), user.getUserKey());
+//			userInfoSettings.edit()
+//					.putString(User.password.name(), user.getPassword())
+//					.putString(User.userkey.name(), user.getUserKey());
+			DataStorageUtils.putObject(User.password.name(), user.getPassword());
+			DataStorageUtils.putObject(User.userkey.name(), user.getUserKey());
 		} else {
-			userInfoSettings.edit().putString(User.password.name(), "")
-					.putString(User.userkey.name(), "");
+//			userInfoSettings.edit().putString(User.password.name(), "")
+//					.putString(User.userkey.name(), "");
+			DataStorageUtils.putObject(User.password.name(), "");
 			user.setPassword("");
 		}
-		userInfoSettings.edit().commit();
+//		boolean result = userInfoSettings.edit().commit();
+		//Log.d(SystemConstants.TAG, "save result: " + result);
+		
+		
+		
+		
+		
 	}
-
 }

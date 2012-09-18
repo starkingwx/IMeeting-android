@@ -27,7 +27,8 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:hint="@string/login_name_editText_hint"
-            android:inputType="phone" >
+            android:inputType="phone"
+            android:textColor="@android:color/black" >
 
             <requestFocus />
         </EditText>
@@ -39,7 +40,8 @@
             android:layout_marginTop="10dp"
             android:ellipsize="end"
             android:hint="@string/login_pwd_editText_hint"
-            android:inputType="textPassword" />
+            android:inputType="textPassword"
+            android:textColor="@android:color/black" />
 
         <LinearLayout
             android:layout_width="fill_parent"

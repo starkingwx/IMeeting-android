@@ -1,7 +1,7 @@
 package com.richitec.imeeting.constants;
 
 public enum Attendee {
-	attendee, username, online_status, video_status, telephone_status;
+	attendee, username, nickname, online_status, video_status, telephone_status;
 
 	public enum OnlineStatus {
 		online, offline

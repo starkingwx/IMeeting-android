@@ -75,5 +75,9 @@ public class SettingActivity extends IMeetingNavigationActivity {
 		}
 
 	}
+	
+	public void onAccountChargeButtonClick(View v) {
+		pushActivity(AccountChargeActivity.class);
+	}
 
 }

@@ -112,6 +112,7 @@
     <!-- setting activity -->
     <string name="setting_nav_title_text">设置</string>
     <string name="accountSetting_btn_title">账户设置</string>
+    <string name="accountCharge_btn_title">账户充值</string>
     <string name="support_btn_title">帮助</string>
     <string name="about_btn_title">关于</string>
 
@@ -146,4 +147,19 @@
     <string name="acknowledgement">鸣谢</string>
     <string name="acknowledgement_organizations">南京富拓网络科技有限公司</string>
 
+    <!-- account charge -->
+    <string name="account_charge">账户充值</string>
+    <string name="your_account_balance_is">账户余额(元)：</string>
+    <string name="no_enough_money_do_charge">余额不足？快来充值吧！</string>
+    <string name="card_charge">智会卡充值</string>
+    <string name="input_card_number">请输入智会卡卡号</string>
+    <string name="input_card_pwd">请输入智会卡密码</string>
+    <string name="charge">充值</string>
+    <string name="get_balance_failed">获取账户余额失败！</string>
+    <string name="getting_balance">正在获取账户余额…</string>
+    <string name="charging">正在充值…</string>
+	<string name="charge_successfully">充值成功！</string>
+	<string name="charge_failed_no_account_exist">充值失败，账户不存在！</string>
+	<string name="charge_failed_invalid_card_number">充值失败，卡号不正确！</string>
+	<string name="charge_failed">充值失败，请重试！</string>
 </resources>

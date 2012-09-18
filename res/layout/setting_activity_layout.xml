@@ -23,6 +23,16 @@
             android:background="@drawable/setting_item_btn_bg"
             android:text="@string/accountSetting_btn_title"
             android:textColor="@color/dim_gray" />
+        
+        <Button
+            android:id="@+id/accountCharge_btn"
+            android:layout_width="fill_parent"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:background="@drawable/setting_item_btn_bg"
+            android:onClick="onAccountChargeButtonClick"
+            android:text="@string/accountCharge_btn_title"
+            android:textColor="@color/dim_gray" />
 
         <Button
             android:id="@+id/help_btn"

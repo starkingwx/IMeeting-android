@@ -36,7 +36,8 @@
         android:layout_marginTop="10dp"
         android:ellipsize="end"
         android:hint="@string/verificationCode_verify_editText_hint"
-        android:inputType="number" >
+        android:inputType="number"
+        android:textColor="@android:color/black" >
 
         <requestFocus />
     </EditText>

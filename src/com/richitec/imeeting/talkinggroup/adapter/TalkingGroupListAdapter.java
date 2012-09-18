@@ -18,7 +18,9 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.richitec.imeeting.R;
+import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.TalkGroup;
+import com.richitec.imeeting.util.AppUtil;
 
 public class TalkingGroupListAdapter extends BaseAdapter {
 	private LayoutInflater inflater;
@@ -122,12 +124,12 @@ public class TalkingGroupListAdapter extends BaseAdapter {
 				if (i < attendees.length()) {
 					// check table row item type
 					// linearLayout
-					String attendeePhoneNumber = attendees.getString(i);
+					JSONObject attendee = attendees.getJSONObject(i);
 					if (_tableRowItem instanceof RelativeLayout) {
 						// set attendee name
 						((TextView) ((RelativeLayout) _tableRowItem)
 								.findViewById(R.id.attendee_name_textView))
-								.setText(attendeePhoneNumber);
+								.setText(AppUtil.getDisplayNameFromAttendee(attendee));
 					}
 				} else {
 					_tableRowItem.setVisibility(View.GONE);

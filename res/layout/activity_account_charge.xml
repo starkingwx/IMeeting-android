@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dip"
+        android:layout_marginLeft="10dip"
+        android:layout_marginTop="50dip"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/your_account_balance_is"
+            android:textColor="@color/gray"
+            android:textSize="20dip" />
+
+        <TextView
+            android:id="@+id/account_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="30dip" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dip"
+        android:text="@string/no_enough_money_do_charge"
+        android:textColor="#8B475D"
+        android:textSize="18dip" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dip"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="10dip"
+        android:layout_marginTop="10dip"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dip"
+            android:text="@string/card_charge"
+            android:textColor="#63B8FF"
+            android:textSize="20dip" />
+
+        <EditText
+            android:id="@+id/card_number_et"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/input_card_number"
+            android:inputType="number"
+            android:singleLine="true"
+            android:textColor="@android:color/black" />
+
+        <EditText
+            android:id="@+id/card_pwd_et"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/input_card_pwd"
+            android:singleLine="true"
+            android:textColor="@android:color/black" />
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="46dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
+            android:text="@string/charge"
+            android:onClick="onChargeClick"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -39,6 +39,7 @@ import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.assistant.SettingActivity;
+import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.contactselect.ContactSelectActivity;
@@ -357,9 +358,10 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 							.getJSONArray(TalkGroup.attendees.name());
 					JSONArray attendeesToInvite = new JSONArray();
 					for (int i = 0; i < attendees.length(); i++) {
-						String name = attendees.getString(i);
-						if (!accountName.equals(name)) {
-							attendeesToInvite.put(name);
+						JSONObject attendee = attendees.getJSONObject(i);
+						String userName = attendee.getString(Attendee.username.name());
+						if (!accountName.equals(userName)) {
+							attendeesToInvite.put(userName);
 						}
 					}
 					attendeesJsonString = attendeesToInvite.toString();

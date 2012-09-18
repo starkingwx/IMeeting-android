@@ -21,6 +21,7 @@ import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.talkinggroup.statusfilter.IStatusFilter;
+import com.richitec.imeeting.util.AppUtil;
 
 public class MemberListAdapter extends BaseAdapter {
 	private LayoutInflater inflater;
@@ -48,6 +49,12 @@ public class MemberListAdapter extends BaseAdapter {
 		} catch (JSONException e) {
 		}
 
+		try {
+			String nickname = attendee.getString(Attendee.nickname.name());
+			attendeeMap.put(Attendee.nickname.name(), nickname);
+		} catch (JSONException e) {
+		}
+		
 		try {
 			String onlineStatus = attendee.getString(Attendee.online_status
 					.name());
@@ -177,11 +184,11 @@ public class MemberListAdapter extends BaseAdapter {
 		@SuppressWarnings("unchecked")
 		Map<String, String> member = (Map<String, String>) getItem(position);
 
-		String name = member.get(Attendee.username.name());
+		String displayName = AppUtil.getDisplayNameFromAttendee(member);
 		String onlineStatus = member.get(Attendee.online_status.name());
 		String telephoneStatus = member.get(Attendee.telephone_status.name());
 
-		viewHolder.nameView.setText(name);
+		viewHolder.nameView.setText(displayName);
 
 		if (Attendee.OnlineStatus.online.name().equals(onlineStatus)) {
 			viewHolder.onlineStatusView

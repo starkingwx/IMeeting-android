@@ -2,7 +2,7 @@
 
     <!-- iMeeting project -->
     <string name="app_name">Wetalking</string>
-     <string name="alert_title">Wetalking Info</string>
+    <string name="alert_title">Wetalking Info</string>
     <string name="sending_request">Sending Request…</string>
     <string name="loading">Loading…</string>
     <string name="no_more_item">No More</string>
@@ -63,8 +63,8 @@
     <string name="register_ok">Register OK, please login in account setting page.</string>
     <string name="register_timeout">Register Timeout, please try again</string>
     <string name="error_in_regsiter">Error in finishing register, please retry!</string>
-	<string name="finishing_register">Finishing Register…</string>
-	
+    <string name="finishing_register">Finishing Register…</string>
+
     <!-- talking group history list activity -->
     <string name="title_activity_talking_group_history_list">TalkingGroupHistoryListActivity</string>
     <string name="menu_refresh_myTalkingGroupList">Refresh</string>
@@ -127,6 +127,7 @@
     <string name="title_activity_setting">SettingActivity</string>
     <string name="setting_nav_title_text">Setting</string>
     <string name="accountSetting_btn_title">Account Setting</string>
+    <string name="accountCharge_btn_title">Account Charge</string>
     <string name="support_btn_title">Support</string>
     <string name="about_btn_title">About</string>
 
@@ -170,4 +171,19 @@
     <string name="acknowledgement">Acknowledgement</string>
     <string name="acknowledgement_organizations">Nanjing Futuo Network Tech Ltd.</string>
 
+    <!-- account charge -->
+    <string name="account_charge">Account Charge</string>
+    <string name="your_account_balance_is">Account Balance(RMB): </string>
+    <string name="no_enough_money_do_charge">No enough money? Come to charge now!</string>
+    <string name="card_charge">Wetalking Card Charge</string>
+    <string name="input_card_number">Please input card number</string>
+    <string name="input_card_pwd">Please input card password</string>
+    <string name="charge">Charge</string>
+    <string name="get_balance_failed">Fail to get account balance!</string>
+	<string name="getting_balance">Getting Account Balance…</string>
+	 <string name="charging">Charging…</string>
+	 <string name="charge_successfully">Charge Successfully!</string>
+	 <string name="charge_failed_no_account_exist">Charge failed. Account does not exist!</string>
+	 <string name="charge_failed_invalid_card_number">Charge failed. Card number is invalid.</string>
+	 <string name="charge_failed">Charge failed, please try again!</string>
 </resources>

@@ -53,10 +53,12 @@
 
     <!-- step3 -->
     <string name="register_step3_textView_text">Step3</string>
-    <string name="register_step3_description">Input password and confirmation to finish the register</string>
-    <string name="pwd_editText_hint">Input password</string>
-    <string name="confirmationPwd_editText_hint">Input confirmation password</string>
+    <string name="register_step3_description">Finish the register</string>
+    <string name="nickname_edittext_hint">Input Nickname</string>
+    <string name="pwd_editText_hint">Input Password</string>
+    <string name="confirmationPwd_editText_hint">Input Confirmation Password</string>
     <string name="register_finish_btn_title">Finish Register</string>
+    <string name="pls_input_nickname">Please input nickname</string>
     <string name="pls_input_pwd">Please input password</string>
     <string name="pls_input_confirm_pwd">Please input confirmation password!</string>
     <string name="pwd1_is_different_from_pwd2">Two passwords are different!</string>
@@ -180,10 +182,11 @@
     <string name="input_card_pwd">Please input card password</string>
     <string name="charge">Charge</string>
     <string name="get_balance_failed">Fail to get account balance!</string>
-	<string name="getting_balance">Getting Account Balance…</string>
-	 <string name="charging">Charging…</string>
-	 <string name="charge_successfully">Charge Successfully!</string>
-	 <string name="charge_failed_no_account_exist">Charge failed. Account does not exist!</string>
-	 <string name="charge_failed_invalid_card_number">Charge failed. Card number is invalid.</string>
-	 <string name="charge_failed">Charge failed, please try again!</string>
+    <string name="getting_balance">Getting Account Balance…</string>
+    <string name="charging">Charging…</string>
+    <string name="charge_successfully">Charge Successfully!</string>
+    <string name="charge_failed_no_account_exist">Charge failed. Account does not exist!</string>
+    <string name="charge_failed_invalid_card_number">Charge failed. Card number is invalid.</string>
+    <string name="charge_failed">Charge failed, please try again!</string>
+
 </resources>

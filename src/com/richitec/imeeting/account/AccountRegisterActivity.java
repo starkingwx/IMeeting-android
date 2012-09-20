@@ -178,11 +178,18 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 	};
 
 	public void onRegisterWithPwdAction(View v) {
+		EditText nicknameET = (EditText) findViewById(R.id.nickname_editText);
 		EditText pwd1ET = (EditText) findViewById(R.id.pwd_editText);
 		EditText pwd2ET = (EditText) findViewById(R.id.confirmationPwd_editText);
+		String nickname = nicknameET.getText().toString().trim();
 		String pwd1 = pwd1ET.getText().toString().trim();
 		String pwd2 = pwd2ET.getText().toString().trim();
 
+		if (nickname == null || nickname.equals("")) {
+			Toast.makeText(this, R.string.pls_input_nickname, Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
 		if (pwd1 == null || pwd1.equals("")) {
 			Toast.makeText(this, R.string.pls_input_pwd, Toast.LENGTH_SHORT)
 					.show();
@@ -206,6 +213,7 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		HashMap<String, String> params = new HashMap<String, String>();
 		params.put("password", pwd1);
 		params.put("password1", pwd2);
+		params.put("nickname", nickname);
 
 		HttpUtils.postRequest(getString(R.string.server_url)
 				+ getString(R.string.user_register_url),

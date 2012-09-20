@@ -46,10 +46,12 @@
     <string name="auth_error">验证出错，请重试！</string>
     <!-- step3 -->
     <string name="register_step3_textView_text">第三步</string>
-    <string name="register_step3_description">输入密码和确认密码，完成注册</string>
+    <string name="register_step3_description">完成注册</string>
+    <string name="nickname_edittext_hint">输入名称</string>
     <string name="pwd_editText_hint">输入密码</string>
     <string name="confirmationPwd_editText_hint">输入确认密码</string>
     <string name="register_finish_btn_title">完成注册</string>
+    <string name="pls_input_nickname">请输入名称</string>
     <string name="pls_input_pwd">请输入密码</string>
     <string name="pls_input_confirm_pwd">请输入确认密码</string>
     <string name="pwd1_is_different_from_pwd2">两次密码不一致</string>

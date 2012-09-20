@@ -30,6 +30,19 @@
     </RelativeLayout>
 
     <EditText
+        android:id="@+id/nickname_editText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:ellipsize="end"
+        android:hint="@string/nickname_edittext_hint"
+        android:inputType="text"
+        android:textColor="@android:color/black" >
+
+        <requestFocus />
+    </EditText>
+    
+    <EditText
         android:id="@+id/pwd_editText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -38,8 +51,6 @@
         android:hint="@string/pwd_editText_hint"
         android:inputType="textPassword"
         android:textColor="@android:color/black" >
-
-        <requestFocus />
     </EditText>
 
     <EditText

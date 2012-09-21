@@ -112,7 +112,7 @@ public class TalkingGroupListAdapter extends BaseAdapter {
 					.name()));
 			
 			long createdTime = groupItem.getLong(TalkGroup.created_time.name());
-			CharSequence date = DateFormat.format("yyyy-MM-dd hh:mm", createdTime * 1000);
+			CharSequence date = DateFormat.format("yyyy-MM-dd hh:mmaa", createdTime * 1000);
 			viewHolder.createdTimeTV.setText(date);
 			
 			JSONArray attendees = groupItem.getJSONArray(TalkGroup.attendees.name());

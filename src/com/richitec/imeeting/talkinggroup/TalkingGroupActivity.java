@@ -47,6 +47,8 @@ import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.Notify;
 import com.richitec.imeeting.constants.TalkGroup;
+import com.richitec.imeeting.contactselect.ContactSelectActivity;
+import com.richitec.imeeting.contactselect.ContactSelectActivity.TalkingGroupStatus;
 import com.richitec.imeeting.talkinggroup.adapter.MemberListAdapter;
 import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
 import com.richitec.imeeting.talkinggroup.statusfilter.OwnerModeStatusFilter;
@@ -54,6 +56,8 @@ import com.richitec.websocket.notifier.NotifierCallbackListener;
 import com.richitec.websocket.notifier.WebSocketNotifier;
 
 public class TalkingGroupActivity extends Activity {
+	private static final int REQ_CONTACT_SELECT = 0;
+
 	private ProgressDialog progressDlg;
 	private MemberListAdapter memberListAdatper;
 	private Handler handler;
@@ -165,6 +169,30 @@ public class TalkingGroupActivity extends Activity {
 	}
 
 	public void onAddMemberAction(View v) {
+		Intent intent = new Intent(this, ContactSelectActivity.class);
+		Bundle bundle = new Bundle();
+		intent.putExtra(
+				ContactSelectActivity.CONTACT_SELECT_ACTIVITY_PARAM_TALKINGGROUPSTATUS,
+				TalkingGroupStatus.GOING);
+		bundle.putString(
+				ContactSelectActivity.CONTACT_SELECT_ACTIVITY_PARAM_TALKINGGROUPID,
+				groupId);
+
+		ArrayList<String> inAttendees = new ArrayList<String>();
+		String accountName = UserManager.getInstance().getUser().getName();
+		for (int i = 0; i < memberListAdatper.getCount(); i++) {
+			Map<String, String> member = (Map<String, String>) memberListAdatper
+					.getItem(i);
+			String userName = member.get(Attendee.username.name());
+			if (!accountName.equals(userName)) {
+				inAttendees.add(userName);
+			}
+		}
+		bundle.putStringArrayList(
+				ContactSelectActivity.CONTACT_SELECT_ACTIVITY_PARAM_TALKINGGROUPATTENDEESPHONE,
+				inAttendees);
+		intent.putExtras(bundle);
+		startActivityForResult(intent, REQ_CONTACT_SELECT);
 	}
 
 	public void onSmsInviteAction(View v) {
@@ -565,7 +593,8 @@ public class TalkingGroupActivity extends Activity {
 			} else if (Notify.Action.update_attendee_list.name().equals(action)) {
 				refreshMemberList();
 			} else if (Notify.Action.kickout.name().equals(action)) {
-				String accountName = UserManager.getInstance().getUser().getName();
+				String accountName = UserManager.getInstance().getUser()
+						.getName();
 				String attendeeName = notice
 						.getString(Attendee.username.name());
 				if (accountName.equals(attendeeName)) {
@@ -747,6 +776,14 @@ public class TalkingGroupActivity extends Activity {
 	private void dismissProgressDlg() {
 		if (progressDlg != null) {
 			progressDlg.dismiss();
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == RESULT_OK) {
+			refreshMemberList();
 		}
 	}
 

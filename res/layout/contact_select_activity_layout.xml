@@ -12,7 +12,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/img_contact_select_header_bg"
-            android:contentDescription="@string/contactSelect_header_imageView_content_description" />
+            android:contentDescription="" />
 
         <TextView
             android:layout_width="wrap_content"

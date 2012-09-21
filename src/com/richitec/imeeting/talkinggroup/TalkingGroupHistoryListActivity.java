@@ -459,5 +459,13 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		super.onActivityResult(requestCode, resultCode, data);
 		loadData();
 	}
+	
+	public void onBackPressed() { 
+	    //实现Home键效果 
+	    Intent i= new Intent(Intent.ACTION_MAIN); 
+	    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+	    i.addCategory(Intent.CATEGORY_HOME); 
+	    startActivity(i);  
+	}
 
 }

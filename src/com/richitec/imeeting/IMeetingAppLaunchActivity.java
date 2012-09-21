@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 import com.richitec.commontoolkit.activityextension.AppLaunchActivity;
+import com.richitec.commontoolkit.addressbook.AddressBookManager;
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
@@ -39,6 +40,9 @@ public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 
 	@Override
 	public void didFinishLaunching() {
+		// traversal address book
+		AddressBookManager.getInstance().traversalAddressBook();
+
 		loadAccount();
 	}
 

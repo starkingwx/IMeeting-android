@@ -20,7 +20,7 @@
                 android:id="@+id/product_small_icon_imageView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/product_small_icon_content_description"
+                android:contentDescription=""
                 android:src="@drawable/ic_launcher" />
 
             <TextView

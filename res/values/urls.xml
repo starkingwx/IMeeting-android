@@ -21,6 +21,7 @@
     <string name="heart_beat_url">/conference/heartbeat</string>
     <string name="account_balance_url">/accountBalance</string>
 	<string name="card_charge_url">/cardCharge</string>
+	<string name="upload_addressbook_url">/addressbook/upload</string>
     <!-- support url -->
     <string name="support_url">/help</string>
     <!-- other -->

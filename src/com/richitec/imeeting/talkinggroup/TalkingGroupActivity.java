@@ -56,6 +56,9 @@ import com.richitec.websocket.notifier.NotifierCallbackListener;
 import com.richitec.websocket.notifier.WebSocketNotifier;
 
 public class TalkingGroupActivity extends Activity {
+	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID = "talking group id";
+	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUP_ATTENDEESPHONE = "talking group attendees phone";
+
 	private static final int REQ_CONTACT_SELECT = 0;
 
 	private ProgressDialog progressDlg;
@@ -175,7 +178,7 @@ public class TalkingGroupActivity extends Activity {
 				ContactSelectActivity.CONTACT_SELECT_ACTIVITY_PARAM_TALKINGGROUPSTATUS,
 				TalkingGroupStatus.GOING);
 		bundle.putString(
-				ContactSelectActivity.CONTACT_SELECT_ACTIVITY_PARAM_TALKINGGROUPID,
+				TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID,
 				groupId);
 
 		ArrayList<String> inAttendees = new ArrayList<String>();
@@ -189,7 +192,7 @@ public class TalkingGroupActivity extends Activity {
 			}
 		}
 		bundle.putStringArrayList(
-				ContactSelectActivity.CONTACT_SELECT_ACTIVITY_PARAM_TALKINGGROUPATTENDEESPHONE,
+				TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUP_ATTENDEESPHONE,
 				inAttendees);
 		intent.putExtras(bundle);
 		startActivityForResult(intent, REQ_CONTACT_SELECT);

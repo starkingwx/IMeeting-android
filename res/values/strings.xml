@@ -118,6 +118,12 @@
     <string name="setting_nav_title_text">设置</string>
     <string name="accountSetting_btn_title">账户设置</string>
     <string name="accountCharge_btn_title">账户充值</string>
+    <string name="addressbook_upload_btn_title">备份通讯录</string>
+    <string name="need_upload_addressbook">确定备份通讯录到服务器吗？</string>
+    <string name="backup">备份</string>
+    <string name="uploading_address_book">正在备份通讯录…</string>
+    <string name="addressbook_upload_ok">通讯录备份成功！</string>
+    <string name="addressbook_upload_fail">通讯录备份失败，请稍后重试！</string>
     <string name="support_btn_title">帮助</string>
     <string name="about_btn_title">关于</string>
 
@@ -137,8 +143,10 @@
     <string name="contactPhones_selectPopupWindow_cancelBtn_title">取消</string>
     <string name="error_in_invite_member">邀请新成员失败！</string>
     <string name="no_new_member_selected">没有选择新成员！</string>
-    <string name="add_notExistedInABContact_popupWindow_dismiss_btn_title">×</string>
-
+    <string name="add_manualInputContact_popupWindow_dismiss_btn_title">×</string>
+    <string name="add_manualInputContact_editText_hint">请输入手机号码</string>
+	<string name="add_manualInputContact_confirmBtn_title">添加</string>
+	
     <!-- support activity -->
     <string name="support_nav_title_text">帮助</string>
     <string name="support_loading_textView_textHeader">正在加载&#8230;，</string>

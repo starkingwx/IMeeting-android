@@ -26,5 +26,7 @@
     <string name="support_url">/help</string>
     <!-- other -->
     <string name="notify_url">http://msg.wetalking.net</string>
-
+   	<!-- version and app download  -->
+	<string name="app_download_url">/downloadAppClient/android</string>
+	<string name="app_version_url">/appVersion/android</string>
 </resources>

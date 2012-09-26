@@ -61,12 +61,6 @@ public class SettingActivity extends IMeetingNavigationActivity {
 
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.setting_activity_layout, menu);
-		return true;
-	}
-
 	// inner class
 	// account setting button on click listener
 	class AccountSettingBtnOnClickListener implements OnClickListener {

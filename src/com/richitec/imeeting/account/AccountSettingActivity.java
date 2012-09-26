@@ -9,8 +9,12 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,19 +32,22 @@ import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.DataStorageUtils;
 import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
+import com.richitec.imeeting.IMeetingAppLaunchActivity;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
+import com.richitec.imeeting.util.AppUpdateManager;
 
 public class AccountSettingActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDialog;
 	private String loginUrl;
-//	private SharedPreferences userInfoSettings;
+	// private SharedPreferences userInfoSettings;
 
 	private boolean useSavedPwd;
 	private String PWD_MASK = "#@1d~`*)";
@@ -59,8 +66,9 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		setRightBarButtonItem(new IMeetingBarButtonItem(this,
 				BarButtonItemStyle.RIGHT_GO, R.string.register_nav_btn_title,
 				new RigisterBtnOnClickListener()));
-		
-//		userInfoSettings = getSharedPreferences(SystemConstants.user_info.name(), 0);
+
+		// userInfoSettings =
+		// getSharedPreferences(SystemConstants.user_info.name(), 0);
 
 		loginUrl = getString(R.string.server_url)
 				+ getString(R.string.login_url);
@@ -83,6 +91,9 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		}
 
 		useSavedPwd = remeberPwdToggle.isChecked();
+
+		AppUpdateManager aum = new AppUpdateManager(this);
+		aum.checkVersion();
 	}
 
 	private TextWatcher onTextChanged = new TextWatcher() {
@@ -106,12 +117,6 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 
 		}
 	};
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.account_setting_activity_layout, menu);
-		return true;
-	}
 
 	// inner class
 	// user register button on click listener
@@ -226,26 +231,14 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		Log.d(SystemConstants.TAG, "save user account");
 		UserBean user = UserManager.getInstance().getUser();
 		Log.d(SystemConstants.TAG, "user: " + user.toString());
-//		userInfoSettings.edit().putString(User.username.name(), user.getName());
 		DataStorageUtils.putObject(User.username.name(), user.getName());
 		if (user.isRememberPwd()) {
-//			userInfoSettings.edit()
-//					.putString(User.password.name(), user.getPassword())
-//					.putString(User.userkey.name(), user.getUserKey());
-			DataStorageUtils.putObject(User.password.name(), user.getPassword());
+			DataStorageUtils
+					.putObject(User.password.name(), user.getPassword());
 			DataStorageUtils.putObject(User.userkey.name(), user.getUserKey());
 		} else {
-//			userInfoSettings.edit().putString(User.password.name(), "")
-//					.putString(User.userkey.name(), "");
 			DataStorageUtils.putObject(User.password.name(), "");
 			user.setPassword("");
 		}
-//		boolean result = userInfoSettings.edit().commit();
-		//Log.d(SystemConstants.TAG, "save result: " + result);
-		
-		
-		
-		
-		
 	}
 }

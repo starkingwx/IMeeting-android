@@ -14,6 +14,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,10 +35,12 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemStyle;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
+import com.richitec.imeeting.account.AccountSettingActivity;
 import com.richitec.imeeting.assistant.SettingActivity;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.SystemConstants;
@@ -46,6 +49,7 @@ import com.richitec.imeeting.contactselect.ContactSelectActivity;
 import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.adapter.TalkingGroupListAdapter;
+import com.richitec.imeeting.util.AppUpdateManager;
 
 public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity {
 	private static final int REQ_OPEN_GROUP_TALK = 0;
@@ -98,13 +102,9 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 
 		listView.setRefreshing();
 		loadData();
-	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(
-				R.menu.talking_group_history_list_activity_layout, menu);
-		return true;
+		AppUpdateManager aum = new AppUpdateManager(this);
+		aum.checkVersion();
 	}
 
 	// setting button on click listener
@@ -359,7 +359,8 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 					JSONArray attendeesToInvite = new JSONArray();
 					for (int i = 0; i < attendees.length(); i++) {
 						JSONObject attendee = attendees.getJSONObject(i);
-						String userName = attendee.getString(Attendee.username.name());
+						String userName = attendee.getString(Attendee.username
+								.name());
 						if (!accountName.equals(userName)) {
 							attendeesToInvite.put(userName);
 						}
@@ -459,13 +460,20 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		super.onActivityResult(requestCode, resultCode, data);
 		loadData();
 	}
-	
-	public void onBackPressed() { 
-	    //实现Home键效果 
-	    Intent i= new Intent(Intent.ACTION_MAIN); 
-	    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
-	    i.addCategory(Intent.CATEGORY_HOME); 
-	    startActivity(i);  
-	}
 
+	public void onBackPressed() {
+		new AlertDialog.Builder(this)
+				.setTitle(R.string.alert_title)
+				.setMessage(R.string.exit_app)
+				.setNegativeButton(R.string.cancel, null)
+				.setPositiveButton(R.string.exit,
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								System.exit(0);
+							}
+						}).show();
+	}
 }

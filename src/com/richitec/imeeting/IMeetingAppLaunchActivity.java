@@ -24,6 +24,8 @@ public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 
 	@Override
 	public Intent intentActivity() {
+		loadAccount();
+		
 		Intent intent = null;
 		UserBean user = UserManager.getInstance().getUser();
 		if (user.getPassword() != null && !user.getPassword().equals("")
@@ -42,8 +44,6 @@ public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 	public void didFinishLaunching() {
 		// traversal address book
 		AddressBookManager.getInstance().traversalAddressBook();
-
-		loadAccount();
 	}
 
 	private void loadAccount() {
@@ -57,4 +57,6 @@ public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 		UserManager.getInstance().setUser(userBean);
 		Log.d(SystemConstants.TAG, "load account: " + userBean.toString());
 	}
+
+
 }

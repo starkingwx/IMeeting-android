@@ -18,7 +18,6 @@ import android.widget.TableRow;
 import android.widget.TextView;
 
 import com.richitec.imeeting.R;
-import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.util.AppUtil;
 

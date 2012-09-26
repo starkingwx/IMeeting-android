@@ -2,8 +2,8 @@
 <resources>
 
     <!-- iMeeting server url -->
-     <string name="server_url">http://www.wetalking.net/imeeting</string>
-    <!-- <string name="server_url">http://192.168.1.136:8080/imeeting</string>-->
+    <string name="server_url">http://www.wetalking.net/imeeting</string>
+    <!-- <string name="server_url">http://192.168.1.142:8080/imeeting</string> -->
     <string name="login_url">/user/login</string>
     <string name="retrieve_auth_code_url">/user/getPhoneCode</string>
     <string name="check_auth_code_url">/user/checkPhoneCode</string>
@@ -20,13 +20,14 @@
     <string name="hide_group_url">/conference/hide</string>
     <string name="heart_beat_url">/conference/heartbeat</string>
     <string name="account_balance_url">/accountBalance</string>
-	<string name="card_charge_url">/cardCharge</string>
-	<string name="upload_addressbook_url">/addressbook/upload</string>
+    <string name="card_charge_url">/cardCharge</string>
+    <string name="upload_addressbook_url">/addressbook/upload</string>
     <!-- support url -->
     <string name="support_url">/help</string>
+    <!-- version and app download -->
+    <string name="app_download_url">/downloadAppClient/android</string>
+    <string name="app_version_url">/appVersion/android</string>
     <!-- other -->
     <string name="notify_url">http://msg.wetalking.net</string>
-   	<!-- version and app download  -->
-	<string name="app_download_url">/downloadAppClient/android</string>
-	<string name="app_version_url">/appVersion/android</string>
+
 </resources>

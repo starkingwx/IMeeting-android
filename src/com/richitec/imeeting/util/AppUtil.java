@@ -17,9 +17,15 @@ public class AppUtil {
 		String displayName = "";
 		if (attendee != null) {
 			try {
-				displayName = attendee.getString(Attendee.nickname.name());
-				if (displayName.equals("")) {
-					displayName = attendee.getString(Attendee.username.name());
+				String userName = attendee.getString(Attendee.username.name());
+				String nickname = attendee.getString(Attendee.nickname.name());
+				
+				List<String> contactDisplayNames = AddressBookManager.getInstance().getContactsDisplayNamesByPhone(userName);
+				if (contactDisplayNames.size() > 0) {
+					displayName = contactDisplayNames.get(0);
+				}
+				if (userName.equals(displayName) && nickname != null && !nickname.equals("")) {
+					displayName = nickname;
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();

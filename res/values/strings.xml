@@ -175,7 +175,7 @@
     <!-- account charge -->
     <string name="account_charge">账户充值</string>
     <string name="your_account_balance_is">账户余额(元)：</string>
-    <string name="no_enough_money_do_charge">余额不足？快来充值吧！</string>
+    <string name="no_enough_money_do_charge">充值请向下看</string>
     <string name="card_charge">智会卡充值</string>
     <string name="input_card_number">请输入智会卡卡号</string>
     <string name="input_card_pwd">请输入智会卡密码</string>

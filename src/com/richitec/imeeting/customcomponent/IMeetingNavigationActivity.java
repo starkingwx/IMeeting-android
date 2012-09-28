@@ -16,15 +16,15 @@ public class IMeetingNavigationActivity extends NavigationActivity {
 	}
 
 	@Override
-	public Drawable backBarBtnItemNormalDrawable() {
+	protected Drawable backBarBtnItemNormalDrawable() {
 		return getResources().getDrawable(
 				R.drawable.img_imeeting_leftbarbtnitem_normal_bg);
 	}
 
 	@Override
-	public Drawable backBarBtnItemPressedDrawable() {
+	protected Drawable backBarBtnItemPressedDrawable() {
 		return getResources().getDrawable(
-				R.drawable.img_imeeting_leftbarbtnitem_normal_bg);
+				R.drawable.img_imeeting_leftbarbtnitem_touchdown_bg);
 	}
 
 }

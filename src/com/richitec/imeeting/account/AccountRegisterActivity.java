@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
@@ -61,13 +62,11 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 	private OnHttpRequestListener onFinishedGetAuthCode = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONObject data = new JSONObject(responseText);
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				String result = data.getString("result");
 
 				if (result.equals("0")) {
@@ -97,7 +96,7 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(AccountRegisterActivity.this,
 					R.string.error_in_retrieve_auth_code, Toast.LENGTH_SHORT)
@@ -138,13 +137,11 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 	private OnHttpRequestListener onFinishedVerifyAuthCode = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONObject data = new JSONObject(responseText);
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				String result = data.getString("result");
 
 				if (result.equals("0")) {
@@ -170,7 +167,7 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(AccountRegisterActivity.this, R.string.auth_error,
 					Toast.LENGTH_SHORT).show();
@@ -225,12 +222,10 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 	private OnHttpRequestListener onFinishedRegister = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONObject data = new JSONObject(responseText);
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				String result = data.getString("result");
 				if (result.equals("0")) {
 					// register ok, jump to login view
@@ -260,7 +255,7 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(AccountRegisterActivity.this, R.string.error_in_regsiter, Toast.LENGTH_SHORT).show();
 		}

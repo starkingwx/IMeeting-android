@@ -15,6 +15,7 @@ import android.util.Log;
 
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.imeeting.R;
@@ -39,12 +40,10 @@ public class AppUpdateManager {
 	private OnHttpRequestListener onFinishedGetVersion = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				Log.d(SystemConstants.TAG, "response text: " + responseText);
-				JSONObject data = new JSONObject(responseText);
+				Log.d(SystemConstants.TAG, "response text: " + responseResult.getResponseText());
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				VersionUtils.serverVerion = data.getString("version");
 				if (VersionUtils.compareVersion(VersionUtils.serverVerion,
 						VersionUtils.localVersion) > 0
@@ -88,7 +87,7 @@ public class AppUpdateManager {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 
 		}
 	};

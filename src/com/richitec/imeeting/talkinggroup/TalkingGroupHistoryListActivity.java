@@ -37,6 +37,7 @@ import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
@@ -167,12 +168,10 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 	private OnHttpRequestListener onFinishedGetGroupList = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			listView.onRefreshComplete();
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONObject data = new JSONObject(responseText);
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				JSONObject pager = data.getJSONObject("pager");
 				hasNext = pager.getBoolean("hasNext");
 				offset = pager.getInt("offset");
@@ -189,7 +188,7 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			listView.onRefreshComplete();
 
 		}
@@ -210,11 +209,9 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 	private OnHttpRequestListener onFinishedLoadMoreGroupList1 = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONObject data = new JSONObject(responseText);
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				JSONObject pager = data.getJSONObject("pager");
 				hasNext = pager.getBoolean("hasNext");
 				offset = pager.getInt("offset");
@@ -234,7 +231,7 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			listView.getRefreshableView().removeFooterView(footerView);
 			footerView = null;
 
@@ -315,15 +312,13 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 	private OnHttpRequestListener onFinishedJoin = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Log.d(SystemConstants.TAG, "join ok");
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
 				String groupId = selectedGroupInfo
 						.getString(TalkGroup.conferenceId.name());
-				JSONObject data = new JSONObject(responseText);
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 
 				Intent intent = new Intent(
 						TalkingGroupHistoryListActivity.this,
@@ -341,14 +336,14 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		}
 
 		@Override
-		public void onForbidden(HttpRequest request, HttpResponse response) {
+		public void onForbidden(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupHistoryListActivity.this,
 					R.string.join_conf_forbidden, Toast.LENGTH_SHORT).show();
 		}
 
 		@Override
-		public void onNotFound(HttpRequest request, HttpResponse response) {
+		public void onNotFound(HttpResponseResult responseResult) {
 			Log.d(SystemConstants.TAG, "conf doesn't exist, create a new one");
 			String accountName = UserManager.getInstance().getUser().getName();
 			String attendeesJsonString = null;
@@ -380,7 +375,7 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupHistoryListActivity.this,
 					R.string.error_in_join_group, Toast.LENGTH_SHORT).show();
@@ -391,12 +386,10 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 	private OnHttpRequestListener onFinishedCreateGroupTalk = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONObject data = new JSONObject(responseText);
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				String groupId = data.getString(TalkGroup.conferenceId.name());
 				String owner = data.getString(TalkGroup.owner.name());
 
@@ -415,7 +408,7 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupHistoryListActivity.this,
 					R.string.error_in_create_group, Toast.LENGTH_SHORT).show();
@@ -436,13 +429,13 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 	private OnHttpRequestListener onFinishedDeleteGroup1 = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			listAdapter.removeItem(selectedGroupInfo);
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupHistoryListActivity.this,
 					R.string.error_in_del_group, Toast.LENGTH_SHORT).show();

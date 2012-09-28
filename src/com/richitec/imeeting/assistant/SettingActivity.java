@@ -27,6 +27,7 @@ import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
@@ -173,7 +174,7 @@ public class SettingActivity extends IMeetingNavigationActivity {
 	private OnHttpRequestListener onFinishedUploadAddressBook = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			new AlertDialog.Builder(SettingActivity.this)
 					.setTitle(R.string.alert_title)
@@ -182,7 +183,7 @@ public class SettingActivity extends IMeetingNavigationActivity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			new AlertDialog.Builder(SettingActivity.this)
 					.setTitle(R.string.alert_title)

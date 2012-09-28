@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
@@ -41,11 +42,13 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.Notify;
+import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.contactselect.ContactSelectActivity;
 import com.richitec.imeeting.contactselect.ContactSelectActivity.TalkingGroupStatus;
@@ -91,11 +94,11 @@ public class TalkingGroupActivity extends Activity {
 		notifier.setSubscriberID(UserManager.getInstance().getUser().getName());
 		notifier.setTopic(groupId);
 		notifier.setNotifierActionListener(notifyCallbackListener);
-		try {
+//		try {
 			notifier.connect();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		timer = new Timer();
 		timer.schedule(new HeartBeatTimerTask(), 10000, 10000);
@@ -302,13 +305,11 @@ public class TalkingGroupActivity extends Activity {
 	private OnHttpRequestListener onFinishedGetMemberList = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			memberListView.onRefreshComplete();
 
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONArray attendees = new JSONArray(responseText);
+				JSONArray attendees = new JSONArray(responseResult.getResponseText());
 				memberListAdatper.setData(attendees);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -316,7 +317,7 @@ public class TalkingGroupActivity extends Activity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			memberListView.onRefreshComplete();
 
 		}
@@ -409,7 +410,7 @@ public class TalkingGroupActivity extends Activity {
 	private OnHttpRequestListener onFinishedCall = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			String userName = selectedMember.get(Attendee.username.name());
 			Map<String, String> attendee = new HashMap<String, String>();
@@ -420,7 +421,7 @@ public class TalkingGroupActivity extends Activity {
 		}
 
 		@Override
-		public void onForbidden(HttpRequest request, HttpResponse response) {
+		public void onForbidden(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			String userName = selectedMember.get(Attendee.username.name());
 			String toastMsg = String.format(
@@ -430,7 +431,7 @@ public class TalkingGroupActivity extends Activity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupActivity.this, R.string.call_failed,
 					Toast.LENGTH_SHORT).show();
@@ -451,17 +452,16 @@ public class TalkingGroupActivity extends Activity {
 	private OnHttpRequestListener onFinishedHangup = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			updateHangUpUI();
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 
-			int status = response != null ? response.getStatusLine()
-					.getStatusCode() : -1;
+			int status = responseResult.getStatusCode();
 			switch (status) {
 			case 409:
 				updateHangUpUI();
@@ -506,14 +506,14 @@ public class TalkingGroupActivity extends Activity {
 	private OnHttpRequestListener onFinishedKickout = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			String userName = selectedMember.get(Attendee.username.name());
 			memberListAdatper.removeMember(userName);
 		}
 
 		@Override
-		public void onForbidden(HttpRequest request, HttpResponse response) {
+		public void onForbidden(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			String userName = selectedMember.get(Attendee.username.name());
 
@@ -524,7 +524,7 @@ public class TalkingGroupActivity extends Activity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupActivity.this, R.string.kickout_failed,
 					Toast.LENGTH_SHORT).show();
@@ -550,6 +550,7 @@ public class TalkingGroupActivity extends Activity {
 
 		@Override
 		public void doAction(String event, JSONObject data) {
+			Log.d(SystemConstants.TAG, "NotifierCallbackListener - doAction: " + data.toString());
 			if (event.equals(Notify.notice.name())) {
 				// process notice message
 				try {
@@ -691,7 +692,7 @@ public class TalkingGroupActivity extends Activity {
 	private OnHttpRequestListener onFinishedCallMeIn = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			String accountName = UserManager.getInstance().getUser().getName();
 			Map<String, String> attendee = new HashMap<String, String>();
@@ -703,7 +704,7 @@ public class TalkingGroupActivity extends Activity {
 		}
 
 		@Override
-		public void onForbidden(HttpRequest request, HttpResponse response) {
+		public void onForbidden(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupActivity.this,
 					R.string.call_is_forbidden_for_you, Toast.LENGTH_SHORT)
@@ -711,7 +712,7 @@ public class TalkingGroupActivity extends Activity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupActivity.this, R.string.call_in_failed,
 					Toast.LENGTH_SHORT).show();
@@ -733,13 +734,13 @@ public class TalkingGroupActivity extends Activity {
 	private OnHttpRequestListener onFinishedHangMeUp = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			updateUI();
 		}
 
 		@Override
-		public void onForbidden(HttpRequest request, HttpResponse response) {
+		public void onForbidden(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(TalkingGroupActivity.this,
 					R.string.hangup_is_forbidden_for_you, Toast.LENGTH_SHORT)
@@ -747,11 +748,10 @@ public class TalkingGroupActivity extends Activity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 
-			int status = response != null ? response.getStatusLine()
-					.getStatusCode() : -1;
+			int status = responseResult.getStatusCode();
 			switch (status) {
 			case 409:
 				updateUI();

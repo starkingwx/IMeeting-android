@@ -32,6 +32,7 @@ import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.DataStorageUtils;
 import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
@@ -168,11 +169,10 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 	private OnHttpRequestListener onFinishedLogin = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONObject data = new JSONObject(responseText);
+				
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				String result = data.getString("result");
 				if (result.equals("0")) {
 					// login success
@@ -191,7 +191,7 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			loginError();
 		}
 	};

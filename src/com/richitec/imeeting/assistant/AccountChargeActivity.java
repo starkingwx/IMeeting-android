@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.imeeting.R;
@@ -48,12 +49,10 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 	private OnHttpRequestListener onFinishedGetAccountBalance = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			try {
-				String responseText = EntityUtils.toString(
-						response.getEntity(), HTTP.UTF_8);
-				JSONObject data = new JSONObject(responseText);
+				JSONObject data = new JSONObject(responseResult.getResponseText());
 				double balance = data.getDouble("balance");
 				TextView balanceTV = (TextView) findViewById(R.id.account_balance);
 
@@ -64,7 +63,7 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			Toast.makeText(AccountChargeActivity.this,
 					R.string.get_balance_failed, Toast.LENGTH_SHORT).show();
@@ -108,7 +107,7 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 	private OnHttpRequestListener onFinishedCharge = new OnHttpRequestListener() {
 
 		@Override
-		public void onFinished(HttpRequest request, HttpResponse response) {
+		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			EditText numberET = (EditText) findViewById(R.id.card_number_et);
 			EditText pwdET = (EditText) findViewById(R.id.card_pwd_et);
@@ -129,9 +128,9 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 		}
 
 		@Override
-		public void onFailed(HttpRequest request, HttpResponse response) {
+		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			int status = response.getStatusLine().getStatusCode();
+			int status = responseResult.getStatusCode();
 
 			switch (status) {
 			case HttpStatus.SC_NOT_FOUND:

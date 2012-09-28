@@ -10,7 +10,7 @@
     <style name="WithBgImg7NoTitleActivityTheme">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@drawable/img_normal_bg</item>
-        <item name="android:textColor">#ffffffff</item>
+        <item name="android:textColor">#ffCFCFCF</item>
     </style>
 
 </resources>

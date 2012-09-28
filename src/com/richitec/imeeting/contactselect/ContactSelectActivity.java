@@ -47,6 +47,7 @@ import com.richitec.commontoolkit.customcomponent.CommonPopupWindow;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.commontoolkit.utils.StringUtils;
@@ -599,12 +600,10 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 		private OnHttpRequestListener onFinishedCreateGroupTalk = new OnHttpRequestListener() {
 
 			@Override
-			public void onFinished(HttpRequest request, HttpResponse response) {
+			public void onFinished(HttpResponseResult responseResult) {
 				dismissProgressDlg();
 				try {
-					String responseText = EntityUtils.toString(
-							response.getEntity(), HTTP.UTF_8);
-					JSONObject data = new JSONObject(responseText);
+					JSONObject data = new JSONObject(responseResult.getResponseText());
 					String groupId = data.getString(TalkGroup.conferenceId
 							.name());
 					String owner = data.getString(TalkGroup.owner.name());
@@ -625,7 +624,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			}
 
 			@Override
-			public void onFailed(HttpRequest request, HttpResponse response) {
+			public void onFailed(HttpResponseResult responseResult) {
 				dismissProgressDlg();
 				Toast.makeText(ContactSelectActivity.this,
 						R.string.error_in_create_group, Toast.LENGTH_SHORT)
@@ -666,7 +665,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 		private OnHttpRequestListener onFinishedInviteMember = new OnHttpRequestListener() {
 
 			@Override
-			public void onFinished(HttpRequest request, HttpResponse response) {
+			public void onFinished(HttpResponseResult responseResult) {
 				dismissProgressDlg();
 				resetSelectedContacts();
 				setResult(RESULT_OK);
@@ -674,7 +673,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			}
 
 			@Override
-			public void onFailed(HttpRequest request, HttpResponse response) {
+			public void onFailed(HttpResponseResult responseResult) {
 				dismissProgressDlg();
 				Toast.makeText(ContactSelectActivity.this,
 						R.string.error_in_invite_member, Toast.LENGTH_SHORT)

@@ -25,6 +25,7 @@
             android:id="@+id/login_name_editText"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_bg"
             android:ellipsize="end"
             android:hint="@string/login_name_editText_hint"
             android:inputType="phone"
@@ -38,6 +39,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:background="@drawable/edit_text_bg"
             android:ellipsize="end"
             android:hint="@string/login_pwd_editText_hint"
             android:inputType="textPassword"
@@ -71,10 +73,11 @@
             android:layout_width="fill_parent"
             android:layout_height="46dp"
             android:layout_gravity="center"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="15dp"
             android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
             android:onClick="onLogin"
             android:text="@string/login_confirm_btn_title"
+            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/white" />
     </LinearLayout>
 

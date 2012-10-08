@@ -34,6 +34,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_bg"
         android:ellipsize="end"
         android:hint="@string/verificationCode_verify_editText_hint"
         android:inputType="number"
@@ -46,10 +47,11 @@
         android:id="@+id/verify_verificationCode_btn"
         android:layout_width="fill_parent"
         android:layout_height="46dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:onClick="onVerifyAuthCodeAction"
         android:text="@string/verify_verificationCode_btn_title"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white" />
 
 </LinearLayout>

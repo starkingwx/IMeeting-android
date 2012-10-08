@@ -34,6 +34,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_bg"
         android:ellipsize="end"
         android:hint="@string/nickname_edittext_hint"
         android:inputType="text"
@@ -41,12 +42,13 @@
 
         <requestFocus />
     </EditText>
-    
+
     <EditText
         android:id="@+id/pwd_editText"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_bg"
         android:ellipsize="end"
         android:hint="@string/pwd_editText_hint"
         android:inputType="textPassword"
@@ -58,6 +60,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_bg"
         android:ellipsize="end"
         android:hint="@string/confirmationPwd_editText_hint"
         android:inputType="textPassword"
@@ -67,10 +70,11 @@
         android:id="@+id/register_finish_btn"
         android:layout_width="fill_parent"
         android:layout_height="46dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:onClick="onRegisterWithPwdAction"
         android:text="@string/register_finish_btn_title"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@android:color/white" />
 
 </LinearLayout>

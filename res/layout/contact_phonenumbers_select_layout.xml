@@ -44,6 +44,7 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@android:color/black"
                     android:textStyle="bold"
+                    android:background="@drawable/action_sheet_button_bg"
                     android:visibility="gone" />
 
                 <Button
@@ -51,6 +52,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@android:color/black"
+                    android:background="@drawable/action_sheet_button_bg"
                     android:textStyle="bold"
                     android:visibility="gone" />
 
@@ -59,6 +61,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@android:color/black"
+                    android:background="@drawable/action_sheet_button_bg"
                     android:textStyle="bold"
                     android:visibility="gone" />
             </LinearLayout>
@@ -87,7 +90,8 @@
             android:layout_marginTop="14dp"
             android:text="@string/contactPhones_selectPopupWindow_cancelBtn_title"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/white"
+           	android:background="@drawable/action_sheet_button_bg"
+            android:textColor="@android:color/black"
             android:textStyle="bold" />
     </LinearLayout>
 

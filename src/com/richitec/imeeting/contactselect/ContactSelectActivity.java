@@ -20,6 +20,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -205,7 +206,10 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 		// init contacts in address book list view
 		_mIn7PreinTalkingGroupContactsListView = (ListView) findViewById(R.id.contactIn7PreinTalkingGroup_listView);
-
+		LayoutParams params = _mIn7PreinTalkingGroupContactsListView.getLayoutParams();
+		Display display = getWindowManager().getDefaultDisplay();
+		params.width = (int) (display.getWidth() * 0.33);
+		_mIn7PreinTalkingGroupContactsListView.setLayoutParams(params);
 		// generate in and prein talking group contact adapter
 		// process in talking group attendees phone list, then set in and prein
 		// talking group contacts list view present data list

@@ -41,6 +41,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
@@ -211,8 +212,7 @@ public class TalkingGroupActivity extends Activity {
 		if (numbers.size() > 0) {
 			sendSMS(numbers);
 		} else {
-			Toast.makeText(this, R.string.no_one_to_invite, Toast.LENGTH_SHORT)
-					.show();
+			MyToast.show(this, R.string.no_one_to_invite, Toast.LENGTH_SHORT);
 		}
 
 	}
@@ -471,15 +471,15 @@ public class TalkingGroupActivity extends Activity {
 			String userName = selectedMember.get(Attendee.username.name());
 			String toastMsg = String.format(
 					getString(R.string.call_is_forbidden_for_sb), userName);
-			Toast.makeText(TalkingGroupActivity.this, toastMsg,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupActivity.this, toastMsg,
+					Toast.LENGTH_SHORT);
 		}
 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupActivity.this, R.string.call_failed,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupActivity.this, R.string.call_failed,
+					Toast.LENGTH_SHORT);
 		}
 	};
 
@@ -516,12 +516,12 @@ public class TalkingGroupActivity extends Activity {
 				String toastMsg = String.format(
 						getString(R.string.hangup_is_forbidden_for_sb),
 						userName);
-				Toast.makeText(TalkingGroupActivity.this, toastMsg,
-						Toast.LENGTH_SHORT).show();
+				MyToast.show(TalkingGroupActivity.this, toastMsg,
+						Toast.LENGTH_SHORT);
 				break;
 			default:
-				Toast.makeText(TalkingGroupActivity.this,
-						R.string.hangup_failed, Toast.LENGTH_SHORT).show();
+				MyToast.show(TalkingGroupActivity.this, R.string.hangup_failed,
+						Toast.LENGTH_SHORT);
 				break;
 			}
 		}
@@ -564,15 +564,15 @@ public class TalkingGroupActivity extends Activity {
 
 			String toastMsg = String.format(
 					getString(R.string.kickout_is_forbidden_for_sb), userName);
-			Toast.makeText(TalkingGroupActivity.this, toastMsg,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupActivity.this, toastMsg,
+					Toast.LENGTH_SHORT);
 		}
 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupActivity.this, R.string.kickout_failed,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupActivity.this, R.string.kickout_failed,
+					Toast.LENGTH_SHORT);
 		}
 	};
 
@@ -669,8 +669,8 @@ public class TalkingGroupActivity extends Activity {
 					// update attendee list
 					String toastMsg = String.format(
 							getString(R.string.sb_is_kicked_out), attendeeName);
-					Toast.makeText(TalkingGroupActivity.this, toastMsg,
-							Toast.LENGTH_SHORT).show();
+					MyToast.show(TalkingGroupActivity.this, toastMsg,
+							Toast.LENGTH_SHORT);
 					refreshMemberList();
 				}
 			}
@@ -693,15 +693,15 @@ public class TalkingGroupActivity extends Activity {
 		@Override
 		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupActivity.this, R.string.calling_all,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupActivity.this, R.string.calling_all,
+					Toast.LENGTH_SHORT);
 		}
 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupActivity.this, R.string.call_all_failed,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupActivity.this, R.string.call_all_failed,
+					Toast.LENGTH_SHORT);
 		}
 	};
 
@@ -719,8 +719,8 @@ public class TalkingGroupActivity extends Activity {
 						// set dial button as dial when call into talking group
 						// failed
 						setDialButtonAsDial();
-						Toast.makeText(this, R.string.call_in_failed,
-								Toast.LENGTH_SHORT).show();
+						MyToast.show(this, R.string.call_in_failed,
+								Toast.LENGTH_SHORT);
 					}
 				} else if (Attendee.PhoneStatus.Terminated.name().equals(
 						phoneStatus)) {
@@ -782,16 +782,15 @@ public class TalkingGroupActivity extends Activity {
 		@Override
 		public void onForbidden(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupActivity.this,
-					R.string.call_is_forbidden_for_you, Toast.LENGTH_SHORT)
-					.show();
+			MyToast.show(TalkingGroupActivity.this,
+					R.string.call_is_forbidden_for_you, Toast.LENGTH_SHORT);
 		}
 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupActivity.this, R.string.call_in_failed,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupActivity.this, R.string.call_in_failed,
+					Toast.LENGTH_SHORT);
 		}
 	};
 
@@ -818,9 +817,8 @@ public class TalkingGroupActivity extends Activity {
 		@Override
 		public void onForbidden(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupActivity.this,
-					R.string.hangup_is_forbidden_for_you, Toast.LENGTH_SHORT)
-					.show();
+			MyToast.show(TalkingGroupActivity.this,
+					R.string.hangup_is_forbidden_for_you, Toast.LENGTH_SHORT);
 		}
 
 		@Override
@@ -834,9 +832,8 @@ public class TalkingGroupActivity extends Activity {
 				break;
 
 			default:
-				Toast.makeText(TalkingGroupActivity.this,
-						R.string.hangup_talking_failed, Toast.LENGTH_SHORT)
-						.show();
+				MyToast.show(TalkingGroupActivity.this,
+						R.string.hangup_talking_failed, Toast.LENGTH_SHORT);
 				break;
 			}
 		}

@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
@@ -44,8 +45,8 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		EditText numberET = (EditText) findViewById(R.id.verificationCode_editText);
 		String phoneNumber = numberET.getText().toString().trim();
 		if (phoneNumber == null || phoneNumber.equals("")) {
-			Toast.makeText(this, R.string.number_cannot_be_null,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(this, R.string.number_cannot_be_null,
+					Toast.LENGTH_SHORT);
 			return;
 		}
 
@@ -66,31 +67,30 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 			dismissProgressDlg();
 
 			try {
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 				String result = data.getString("result");
 
 				if (result.equals("0")) {
 					// get phone code successfully, jump to step 2
 					setBody(R.layout.account_register_activity_step2_layout);
 				} else if (result.equals("2")) {
-					Toast.makeText(AccountRegisterActivity.this,
-							R.string.invalid_phone_number, Toast.LENGTH_SHORT)
-							.show();
+					MyToast.show(AccountRegisterActivity.this,
+							R.string.invalid_phone_number, Toast.LENGTH_SHORT);
 				} else if (result.equals("3")) {
-					Toast.makeText(AccountRegisterActivity.this,
-							R.string.existed_phone_number, Toast.LENGTH_SHORT)
-							.show();
+					MyToast.show(AccountRegisterActivity.this,
+							R.string.existed_phone_number, Toast.LENGTH_SHORT);
 				} else {
-					Toast.makeText(AccountRegisterActivity.this,
+					MyToast.show(AccountRegisterActivity.this,
 							R.string.error_in_retrieve_auth_code,
-							Toast.LENGTH_SHORT).show();
+							Toast.LENGTH_SHORT);
 				}
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				Toast.makeText(AccountRegisterActivity.this,
+				MyToast.show(AccountRegisterActivity.this,
 						R.string.error_in_retrieve_auth_code,
-						Toast.LENGTH_SHORT).show();
+						Toast.LENGTH_SHORT);
 			}
 
 		}
@@ -98,9 +98,8 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(AccountRegisterActivity.this,
-					R.string.error_in_retrieve_auth_code, Toast.LENGTH_SHORT)
-					.show();
+			MyToast.show(AccountRegisterActivity.this,
+					R.string.error_in_retrieve_auth_code, Toast.LENGTH_SHORT);
 		}
 	};
 
@@ -120,8 +119,7 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		EditText codeET = (EditText) findViewById(R.id.verificationCode_verify_editText);
 		String code = codeET.getText().toString().trim();
 		if (code == null || code.equals("")) {
-			Toast.makeText(this, R.string.pls_input_auth_code,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(this, R.string.pls_input_auth_code, Toast.LENGTH_SHORT);
 			return;
 		}
 		progressDlg = ProgressDialog.show(this, null,
@@ -141,7 +139,8 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 			dismissProgressDlg();
 
 			try {
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 				String result = data.getString("result");
 
 				if (result.equals("0")) {
@@ -149,28 +148,26 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 					// password
 					setBody(R.layout.account_register_activity_step3_layout);
 				} else if (result.equals("2")) {
-					Toast.makeText(AccountRegisterActivity.this,
-							R.string.wrong_auth_code, Toast.LENGTH_SHORT)
-							.show();
+					MyToast.show(AccountRegisterActivity.this,
+							R.string.wrong_auth_code, Toast.LENGTH_SHORT);
 				} else if (result.equals("6")) {
-					Toast.makeText(AccountRegisterActivity.this,
-							R.string.auth_code_timeout, Toast.LENGTH_SHORT)
-							.show();
+					MyToast.show(AccountRegisterActivity.this,
+							R.string.auth_code_timeout, Toast.LENGTH_SHORT);
 					setBody(R.layout.account_register_activity_step1_layout);
 				}
 
 			} catch (Exception e) {
 				e.printStackTrace();
-				Toast.makeText(AccountRegisterActivity.this,
-						R.string.auth_error, Toast.LENGTH_SHORT).show();
+				MyToast.show(AccountRegisterActivity.this, R.string.auth_error,
+						Toast.LENGTH_SHORT);
 			}
 		}
 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(AccountRegisterActivity.this, R.string.auth_error,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(AccountRegisterActivity.this, R.string.auth_error,
+					Toast.LENGTH_SHORT);
 		}
 	};
 
@@ -183,25 +180,24 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		String pwd2 = pwd2ET.getText().toString().trim();
 
 		if (nickname == null || nickname.equals("")) {
-			Toast.makeText(this, R.string.pls_input_nickname, Toast.LENGTH_SHORT).show();
+			MyToast.show(this, R.string.pls_input_nickname, Toast.LENGTH_SHORT);
 			return;
 		}
-		
+
 		if (pwd1 == null || pwd1.equals("")) {
-			Toast.makeText(this, R.string.pls_input_pwd, Toast.LENGTH_SHORT)
-					.show();
+			MyToast.show(this, R.string.pls_input_pwd, Toast.LENGTH_SHORT);
 			return;
 		}
 
 		if (pwd2 == null || pwd2.equals("")) {
-			Toast.makeText(this, R.string.pls_input_confirm_pwd,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(this, R.string.pls_input_confirm_pwd,
+					Toast.LENGTH_SHORT);
 			return;
 		}
 
 		if (!pwd1.equals(pwd2)) {
-			Toast.makeText(this, R.string.pwd1_is_different_from_pwd2,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(this, R.string.pwd1_is_different_from_pwd2,
+					Toast.LENGTH_SHORT);
 			return;
 		}
 
@@ -225,7 +221,8 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			try {
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 				String result = data.getString("result");
 				if (result.equals("0")) {
 					// register ok, jump to login view
@@ -243,21 +240,25 @@ public class AccountRegisterActivity extends IMeetingNavigationActivity {
 										}
 									}).show();
 				} else if (result.equals("6")) {
-					Toast.makeText(AccountRegisterActivity.this, R.string.register_timeout, Toast.LENGTH_SHORT).show();
+					MyToast.show(AccountRegisterActivity.this,
+							R.string.register_timeout, Toast.LENGTH_SHORT);
 					setBody(R.layout.account_register_activity_step1_layout);
 				} else {
-					Toast.makeText(AccountRegisterActivity.this, R.string.error_in_regsiter, Toast.LENGTH_SHORT).show();
+					MyToast.show(AccountRegisterActivity.this,
+							R.string.error_in_regsiter, Toast.LENGTH_SHORT);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				Toast.makeText(AccountRegisterActivity.this, R.string.error_in_regsiter, Toast.LENGTH_SHORT).show();
+				MyToast.show(AccountRegisterActivity.this,
+						R.string.error_in_regsiter, Toast.LENGTH_SHORT);
 			}
 		}
 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(AccountRegisterActivity.this, R.string.error_in_regsiter, Toast.LENGTH_SHORT).show();
+			MyToast.show(AccountRegisterActivity.this,
+					R.string.error_in_regsiter, Toast.LENGTH_SHORT);
 		}
 	};
 }

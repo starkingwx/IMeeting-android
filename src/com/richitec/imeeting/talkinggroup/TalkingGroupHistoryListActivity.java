@@ -35,6 +35,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemStyle;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
@@ -171,7 +172,8 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		public void onFinished(HttpResponseResult responseResult) {
 			listView.onRefreshComplete();
 			try {
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 				JSONObject pager = data.getJSONObject("pager");
 				hasNext = pager.getBoolean("hasNext");
 				offset = pager.getInt("offset");
@@ -211,7 +213,8 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		@Override
 		public void onFinished(HttpResponseResult responseResult) {
 			try {
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 				JSONObject pager = data.getJSONObject("pager");
 				hasNext = pager.getBoolean("hasNext");
 				offset = pager.getInt("offset");
@@ -318,7 +321,8 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 			try {
 				String groupId = selectedGroupInfo
 						.getString(TalkGroup.conferenceId.name());
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 
 				Intent intent = new Intent(
 						TalkingGroupHistoryListActivity.this,
@@ -329,17 +333,16 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 				startActivityForResult(intent, REQ_OPEN_GROUP_TALK);
 			} catch (Exception e1) {
 				e1.printStackTrace();
-				Toast.makeText(TalkingGroupHistoryListActivity.this,
-						R.string.error_in_join_group, Toast.LENGTH_SHORT)
-						.show();
+				MyToast.show(TalkingGroupHistoryListActivity.this,
+						R.string.error_in_join_group, Toast.LENGTH_SHORT);
 			}
 		}
 
 		@Override
 		public void onForbidden(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupHistoryListActivity.this,
-					R.string.join_conf_forbidden, Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupHistoryListActivity.this,
+					R.string.join_conf_forbidden, Toast.LENGTH_SHORT);
 		}
 
 		@Override
@@ -377,8 +380,8 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupHistoryListActivity.this,
-					R.string.error_in_join_group, Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupHistoryListActivity.this,
+					R.string.error_in_join_group, Toast.LENGTH_SHORT);
 		}
 
 	};
@@ -389,7 +392,8 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			try {
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 				String groupId = data.getString(TalkGroup.conferenceId.name());
 				String owner = data.getString(TalkGroup.owner.name());
 
@@ -401,17 +405,26 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 				startActivityForResult(intent, REQ_OPEN_GROUP_TALK);
 			} catch (Exception e) {
 				e.printStackTrace();
-				Toast.makeText(TalkingGroupHistoryListActivity.this,
-						R.string.error_in_create_group, Toast.LENGTH_SHORT)
-						.show();
+				MyToast.show(TalkingGroupHistoryListActivity.this,
+						R.string.error_in_create_group, Toast.LENGTH_SHORT);
 			}
 		}
 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupHistoryListActivity.this,
-					R.string.error_in_create_group, Toast.LENGTH_SHORT).show();
+			switch (responseResult.getStatusCode()) {
+			case 402:
+				MyToast.show(TalkingGroupHistoryListActivity.this,
+						R.string.payment_required, Toast.LENGTH_SHORT);
+				break;
+
+			default:
+				MyToast.show(TalkingGroupHistoryListActivity.this,
+						R.string.error_in_create_group, Toast.LENGTH_SHORT);
+				break;
+			}
+
 		}
 	};
 
@@ -437,8 +450,8 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(TalkingGroupHistoryListActivity.this,
-					R.string.error_in_del_group, Toast.LENGTH_SHORT).show();
+			MyToast.show(TalkingGroupHistoryListActivity.this,
+					R.string.error_in_del_group, Toast.LENGTH_SHORT);
 		}
 	};
 

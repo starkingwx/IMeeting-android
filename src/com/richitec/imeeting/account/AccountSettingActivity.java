@@ -32,6 +32,7 @@ import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.DataStorageUtils;
 import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
@@ -137,14 +138,14 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		String password = pwdET.getText().toString().trim();
 
 		if (userName.equals("")) {
-			Toast.makeText(this, R.string.number_cannot_be_null,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(this, R.string.number_cannot_be_null,
+					Toast.LENGTH_SHORT);
 			return;
 		}
 
 		if (password.equals("")) {
-			Toast.makeText(this, R.string.password_cannot_be_null,
-					Toast.LENGTH_SHORT).show();
+			MyToast.show(this, R.string.password_cannot_be_null,
+					Toast.LENGTH_SHORT);
 			return;
 		}
 
@@ -168,8 +169,9 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		@Override
 		public void onFinished(HttpResponseResult responseResult) {
 			try {
-				
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 				String result = data.getString("result");
 				if (result.equals("0")) {
 					// login success
@@ -197,14 +199,14 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		if (progressDialog != null) {
 			progressDialog.dismiss();
 		}
-		Toast.makeText(this, R.string.login_error, Toast.LENGTH_LONG).show();
+		MyToast.show(this, R.string.login_error, Toast.LENGTH_LONG);
 	}
 
 	public void loginFailed() {
 		if (progressDialog != null) {
 			progressDialog.dismiss();
 		}
-		Toast.makeText(this, R.string.login_failed, Toast.LENGTH_LONG).show();
+		MyToast.show(this, R.string.login_failed, Toast.LENGTH_LONG);
 	}
 
 	public void loginSuccess(JSONObject data) {

@@ -54,6 +54,7 @@ import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.StringUtils;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.SystemConstants;
@@ -208,7 +209,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 		// init contacts in address book list view
 		_mIn7PreinTalkingGroupContactsListView = (ListView) findViewById(R.id.contactIn7PreinTalkingGroup_listView);
-		LayoutParams params = _mIn7PreinTalkingGroupContactsListView.getLayoutParams();
+		LayoutParams params = _mIn7PreinTalkingGroupContactsListView
+				.getLayoutParams();
 		Display display = getWindowManager().getDefaultDisplay();
 		params.width = (int) (display.getWidth() * 0.33);
 		_mIn7PreinTalkingGroupContactsListView.setLayoutParams(params);
@@ -264,7 +266,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 							AddressBookManager.PHONENUMBER_MATCHING_INDEXES);
 
 			// set data
-			if (ContactSearchStatus.SEARCHBYNAME == _mContactSearchStatus) {
+			if (ContactSearchStatus.SEARCHBYNAME == _mContactSearchStatus
+					|| ContactSearchStatus.SEARCHBYCHINESENAME == _mContactSearchStatus) {
 				// get display name
 				SpannableString _displayName = new SpannableString(
 						_contact.getDisplayName());
@@ -441,7 +444,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 		// check the selected contact is in talking group attendees
 		if (_mTalkingGroupContactsPhoneArray.contains(selectedPhone)) {
-			Toast.makeText(
+			MyToast.show(
 					ContactSelectActivity.this,
 					AddressBookManager.getInstance()
 							.getContactsDisplayNamesByPhone(selectedPhone)
@@ -450,7 +453,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 									.getResources()
 									.getString(
 											R.string.toast_selectedContact_existedInTalkingGroup_attendees),
-					Toast.LENGTH_SHORT).show();
+					Toast.LENGTH_SHORT);
 
 			return;
 		}
@@ -571,7 +574,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 	// contact search status
 	enum ContactSearchStatus {
-		NONESEARCH, SEARCHBYNAME, SEARCHBYPHONE
+		NONESEARCH, SEARCHBYNAME, SEARCHBYCHINESENAME, SEARCHBYPHONE
 	}
 
 	// nav back button on click listener
@@ -626,7 +629,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			public void onFinished(HttpResponseResult responseResult) {
 				dismissProgressDlg();
 				try {
-					JSONObject data = new JSONObject(responseResult.getResponseText());
+					JSONObject data = new JSONObject(
+							responseResult.getResponseText());
 					String groupId = data.getString(TalkGroup.conferenceId
 							.name());
 					String owner = data.getString(TalkGroup.owner.name());
@@ -640,18 +644,25 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 					ContactSelectActivity.this.finish();
 				} catch (Exception e) {
 					e.printStackTrace();
-					Toast.makeText(ContactSelectActivity.this,
-							R.string.error_in_create_group, Toast.LENGTH_SHORT)
-							.show();
+					MyToast.show(ContactSelectActivity.this,
+							R.string.error_in_create_group, Toast.LENGTH_SHORT);
 				}
 			}
 
 			@Override
 			public void onFailed(HttpResponseResult responseResult) {
 				dismissProgressDlg();
-				Toast.makeText(ContactSelectActivity.this,
-						R.string.error_in_create_group, Toast.LENGTH_SHORT)
-						.show();
+				switch (responseResult.getStatusCode()) {
+				case 402:
+					MyToast.show(ContactSelectActivity.this,
+							R.string.payment_required, Toast.LENGTH_SHORT);
+					break;
+
+				default:
+					MyToast.show(ContactSelectActivity.this,
+							R.string.error_in_create_group, Toast.LENGTH_SHORT);
+					break;
+				}
 			}
 		};
 	}
@@ -667,9 +678,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 					"Confirm add new contacts to talking group, then back to talking group detail info activity");
 			JSONArray attendeesToInvite = getSelectedMembers();
 			if (attendeesToInvite.length() <= 0) {
-				Toast.makeText(ContactSelectActivity.this,
-						R.string.no_new_member_selected, Toast.LENGTH_SHORT)
-						.show();
+				MyToast.show(ContactSelectActivity.this,
+						R.string.no_new_member_selected, Toast.LENGTH_SHORT);
 				return;
 			}
 
@@ -698,9 +708,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			@Override
 			public void onFailed(HttpResponseResult responseResult) {
 				dismissProgressDlg();
-				Toast.makeText(ContactSelectActivity.this,
-						R.string.error_in_invite_member, Toast.LENGTH_SHORT)
-						.show();
+				MyToast.show(ContactSelectActivity.this,
+						R.string.error_in_invite_member, Toast.LENGTH_SHORT);
 			}
 		};
 
@@ -716,6 +725,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				_mContactSearchStatus = ContactSearchStatus.NONESEARCH;
 			} else if (s.toString().matches("^[0-9]*$")) {
 				_mContactSearchStatus = ContactSearchStatus.SEARCHBYPHONE;
+			} else if (s.toString().matches(".*[\u4e00-\u9fa5].*")) {
+				_mContactSearchStatus = ContactSearchStatus.SEARCHBYCHINESENAME;
 			} else {
 				_mContactSearchStatus = ContactSearchStatus.SEARCHBYNAME;
 			}
@@ -725,6 +736,11 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			case SEARCHBYNAME:
 				_mPresentContactsInABInfoArray = AddressBookManager
 						.getInstance().getContactsByName(s.toString());
+				break;
+
+			case SEARCHBYCHINESENAME:
+				_mPresentContactsInABInfoArray = AddressBookManager
+						.getInstance().getContactsByChineseName(s.toString());
 				break;
 
 			case SEARCHBYPHONE:
@@ -817,15 +833,19 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				if (null == _addedManualInputContactPhoneNumber
 						|| _addedManualInputContactPhoneNumber
 								.equalsIgnoreCase("")) {
-					Toast.makeText(ContactSelectActivity.this,
+					MyToast.show(ContactSelectActivity.this,
 							R.string.toast_manualInputContact_phoneNumber_null,
-							Toast.LENGTH_SHORT).show();
+							Toast.LENGTH_SHORT);
 
 					return;
 				}
-				
-				if (_addedManualInputContactPhoneNumber.endsWith(getString(R.string.call_center))) {
-					Toast.makeText(ContactSelectActivity.this, R.string.toast_phone_number_identical_to_call_center, Toast.LENGTH_SHORT).show();
+
+				if (_addedManualInputContactPhoneNumber
+						.endsWith(getString(R.string.call_center))) {
+					MyToast.show(
+							ContactSelectActivity.this,
+							R.string.toast_phone_number_identical_to_call_center,
+							Toast.LENGTH_SHORT);
 					return;
 				}
 
@@ -844,7 +864,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 					// check the new added contact is in talking group attendees
 					if (_mTalkingGroupContactsPhoneArray
 							.contains(_addedManualInputContactPhoneNumber)) {
-						Toast.makeText(
+						MyToast.show(
 								ContactSelectActivity.this,
 								AddressBookManager
 										.getInstance()
@@ -855,7 +875,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 												.getResources()
 												.getString(
 														R.string.toast_selectedContact_existedInTalkingGroup_attendees),
-								Toast.LENGTH_SHORT).show();
+								Toast.LENGTH_SHORT);
 
 						return;
 					}
@@ -866,14 +886,14 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 								.equalsIgnoreCase((String) _preinTalkingGroupContact
 										.getExtension().get(
 												SELECTED_CONTACT_SELECTEDPHONE))) {
-							Toast.makeText(
+							MyToast.show(
 									ContactSelectActivity.this,
 									_preinTalkingGroupContact.getDisplayName()
 											+ ContactSelectActivity.this
 													.getResources()
 													.getString(
 															R.string.toast_selectedContact_useTheSelectedPhone_existedInPreinTalkingGroup_contacts),
-									Toast.LENGTH_SHORT).show();
+									Toast.LENGTH_SHORT);
 
 							return;
 						}
@@ -916,7 +936,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 					// check the matched contact is selected flag
 					if ((Boolean) _matchedContact.getExtension().get(
 							CONTACT_IS_SELECTED)) {
-						Toast.makeText(
+						MyToast.show(
 								ContactSelectActivity.this,
 								_matchedContact.getDisplayName()
 										+ ContactSelectActivity.this
@@ -927,7 +947,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 																		.getExtension()
 																		.get(SELECTED_CONTACT_SELECTEDPHONE)) ? R.string.toast_selectedContact_useTheSelectedPhone_existedInPreinTalkingGroup_contacts
 																: R.string.toast_selectedContact_useAnotherPhone_existedInPreinTalkingGroup_contacts),
-								Toast.LENGTH_SHORT).show();
+								Toast.LENGTH_SHORT);
 
 						return;
 					}
@@ -1178,10 +1198,11 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 					default:
 						// hide soft keyboard
-						InputMethodManager imm = (InputMethodManager)getSystemService(
-							      Context.INPUT_METHOD_SERVICE);
-						imm.hideSoftInputFromWindow(((EditText) findViewById(R.id.contact_search_editText)).getWindowToken(), 0);
-							
+						InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(
+								((EditText) findViewById(R.id.contact_search_editText))
+										.getWindowToken(), 0);
+
 						// set contact phone numbers for selecting
 						_mContactPhoneNumbersSelectPopupWindow
 								.setContactPhones4Selecting(

@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.richitec.commontoolkit.utils.HttpUtils;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
@@ -52,15 +53,16 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 		public void onFinished(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			try {
-				JSONObject data = new JSONObject(responseResult.getResponseText());
+				JSONObject data = new JSONObject(
+						responseResult.getResponseText());
 				int result = data.getInt("result");
 				if (result == 0) {
 					double balance = data.getDouble("balance");
 					TextView balanceTV = (TextView) findViewById(R.id.account_balance);
 					balanceTV.setText(String.format("￥%.2f", balance));
 				} else {
-					Toast.makeText(AccountChargeActivity.this,
-							R.string.get_balance_failed, Toast.LENGTH_SHORT).show();
+					MyToast.show(AccountChargeActivity.this,
+							R.string.get_balance_failed, Toast.LENGTH_SHORT);
 				}
 
 			} catch (Exception e) {
@@ -71,8 +73,8 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
-			Toast.makeText(AccountChargeActivity.this,
-					R.string.get_balance_failed, Toast.LENGTH_SHORT).show();
+			MyToast.show(AccountChargeActivity.this,
+					R.string.get_balance_failed, Toast.LENGTH_SHORT);
 		}
 	};
 
@@ -88,14 +90,12 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 		String cardNumber = numberET.getText().toString().trim();
 		String cardPwd = pwdET.getText().toString().trim();
 		if (cardNumber == null || cardNumber.equals("")) {
-			Toast.makeText(this, R.string.input_card_number, Toast.LENGTH_SHORT)
-					.show();
+			MyToast.show(this, R.string.input_card_number, Toast.LENGTH_SHORT);
 			return;
 		}
 
 		if (cardPwd == null || cardPwd.equals("")) {
-			Toast.makeText(this, R.string.input_card_pwd, Toast.LENGTH_SHORT)
-					.show();
+			MyToast.show(this, R.string.input_card_pwd, Toast.LENGTH_SHORT);
 			return;
 		}
 
@@ -140,20 +140,20 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 
 			switch (status) {
 			case HttpStatus.SC_NOT_FOUND:
-				Toast.makeText(AccountChargeActivity.this,
+				MyToast.show(AccountChargeActivity.this,
 						R.string.charge_failed_no_account_exist,
-						Toast.LENGTH_SHORT).show();
+						Toast.LENGTH_SHORT);
 				break;
 
 			case HttpStatus.SC_BAD_REQUEST:
-				Toast.makeText(AccountChargeActivity.this,
+				MyToast.show(AccountChargeActivity.this,
 						R.string.charge_failed_invalid_card_number,
-						Toast.LENGTH_SHORT).show();
+						Toast.LENGTH_SHORT);
 				break;
 
 			default:
-				Toast.makeText(AccountChargeActivity.this,
-						R.string.charge_failed, Toast.LENGTH_SHORT).show();
+				MyToast.show(AccountChargeActivity.this,
+						R.string.charge_failed, Toast.LENGTH_SHORT);
 				break;
 			}
 		}

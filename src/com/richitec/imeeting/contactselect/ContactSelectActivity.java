@@ -823,6 +823,11 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 					return;
 				}
+				
+				if (_addedManualInputContactPhoneNumber.endsWith(getString(R.string.call_center))) {
+					Toast.makeText(ContactSelectActivity.this, R.string.toast_phone_number_identical_to_call_center, Toast.LENGTH_SHORT).show();
+					return;
+				}
 
 				// dismiss add manual input contact popup window
 				dismiss();

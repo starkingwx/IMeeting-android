@@ -53,10 +53,16 @@ public class AccountChargeActivity extends IMeetingNavigationActivity {
 			dismissProgressDlg();
 			try {
 				JSONObject data = new JSONObject(responseResult.getResponseText());
-				double balance = data.getDouble("balance");
-				TextView balanceTV = (TextView) findViewById(R.id.account_balance);
+				int result = data.getInt("result");
+				if (result == 0) {
+					double balance = data.getDouble("balance");
+					TextView balanceTV = (TextView) findViewById(R.id.account_balance);
+					balanceTV.setText(String.format("￥%.2f", balance));
+				} else {
+					Toast.makeText(AccountChargeActivity.this,
+							R.string.get_balance_failed, Toast.LENGTH_SHORT).show();
+				}
 
-				balanceTV.setText(String.format("%.2f", balance));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

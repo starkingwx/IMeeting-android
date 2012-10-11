@@ -29,5 +29,5 @@
     <string name="toast_selectedContact_existedInTalkingGroup_attendees"> 已使用此号码加入群聊</string>
     <string name="toast_selectedContact_useTheSelectedPhone_existedInPreinTalkingGroup_contacts"> 已使用此号码准备加入群聊</string>
     <string name="toast_selectedContact_useAnotherPhone_existedInPreinTalkingGroup_contacts"> 已使用其他号码准备加入群聊</string>
-
+	<string name="toast_phone_number_identical_to_call_center">输入的电话号码不能与智会呼入中心号码相同！</string>
 </resources>

@@ -94,11 +94,7 @@ public class TalkingGroupActivity extends Activity {
 		notifier.setSubscriberID(UserManager.getInstance().getUser().getName());
 		notifier.setTopic(groupId);
 		notifier.setNotifierActionListener(notifyCallbackListener);
-//		try {
-			notifier.connect();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+		notifier.connect();
 
 		timer = new Timer();
 		timer.schedule(new HeartBeatTimerTask(), 10000, 10000);
@@ -140,6 +136,8 @@ public class TalkingGroupActivity extends Activity {
 		params.width = isOwner() ? btWidth - 2 : btWidth - 1;
 		dialBt.setLayoutParams(params);
 
+		dialBt.setText(isOwner() ? R.string.dial_all : R.string.dial);
+
 		params = leaveBt.getLayoutParams();
 		params.width = btWidth - 1;
 		leaveBt.setLayoutParams(params);
@@ -180,9 +178,7 @@ public class TalkingGroupActivity extends Activity {
 		intent.putExtra(
 				ContactSelectActivity.CONTACT_SELECT_ACTIVITY_PARAM_TALKINGGROUPSTATUS,
 				TalkingGroupStatus.GOING);
-		bundle.putString(
-				TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID,
-				groupId);
+		bundle.putString(TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID, groupId);
 
 		ArrayList<String> inAttendees = new ArrayList<String>();
 		String accountName = UserManager.getInstance().getUser().getName();
@@ -222,46 +218,94 @@ public class TalkingGroupActivity extends Activity {
 	}
 
 	public void onDialAction(View v) {
-		Button dialButton = (Button) findViewById(R.id.gt_dial_bt);
-		String text = dialButton.getText().toString();
-		if (text.equals(getString(R.string.dial))) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(
-					TalkingGroupActivity.this)
-					.setMessage(
-							getString(R.string.do_you_want_to_call_into_group_talking))
-					.setPositiveButton(R.string.call_in,
-							new DialogInterface.OnClickListener() {
 
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									callMeIntoGroupTalking();
-								}
-							}).setNegativeButton(R.string.cancel, null);
-			builder.show();
-		} else if (text.equals(getString(R.string.calling_in))) {
+		if (isOwner()) {
+			// in owner mode, call all member
+			if (isNeedCallAllMember()) {
+				new AlertDialog.Builder(this)
+						.setTitle(R.string.alert_title)
+						.setMessage(R.string.is_need_call_all_member)
+						.setPositiveButton(R.string.call,
+								new DialogInterface.OnClickListener() {
 
-		} else if (text.equals(getString(R.string.hangup_talking))) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(
-					TalkingGroupActivity.this)
-					.setMessage(
-							getString(R.string.do_you_wanna_end_group_talking))
-					.setPositiveButton(R.string.end_group_talking,
-							new DialogInterface.OnClickListener() {
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										callAllMember();
+									}
+								}).setNegativeButton(R.string.cancel, null)
+						.show();
+			} else {
+				new AlertDialog.Builder(this).setTitle(R.string.alert_title)
+						.setMessage(R.string.no_member_need_to_call)
+						.setPositiveButton(R.string.ok, null).show();
+			}
+		} else {
+			// in attendee mode, just call myself into conference
+			Button dialButton = (Button) findViewById(R.id.gt_dial_bt);
+			String text = dialButton.getText().toString();
+			if (text.equals(getString(R.string.dial))) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						TalkingGroupActivity.this)
+						.setMessage(
+								getString(R.string.do_you_want_to_call_into_group_talking))
+						.setPositiveButton(R.string.call_in,
+								new DialogInterface.OnClickListener() {
 
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									hangMeUpFromGroupTalking();
-								}
-							}).setNegativeButton(R.string.cancel, null);
-			builder.show();
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										callMeIntoGroupTalking();
+									}
+								}).setNegativeButton(R.string.cancel, null);
+				builder.show();
+			} else if (text.equals(getString(R.string.calling_in))) {
+
+			} else if (text.equals(getString(R.string.hangup_talking))) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						TalkingGroupActivity.this)
+						.setMessage(
+								getString(R.string.do_you_wanna_end_group_talking))
+						.setPositiveButton(R.string.end_group_talking,
+								new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										hangMeUpFromGroupTalking();
+									}
+								}).setNegativeButton(R.string.cancel, null);
+				builder.show();
+			}
 		}
+
+	}
+
+	/**
+	 * check if need to call al member
+	 * 
+	 * @return true: need call, false: don't need
+	 */
+	private boolean isNeedCallAllMember() {
+		List<Map<String, String>> memberList = memberListAdatper
+				.getMemberList();
+		boolean need = false;
+		for (Map<String, String> member : memberList) {
+			String phoneStatus = member.get(Attendee.telephone_status.name());
+			if (Attendee.PhoneStatus.Failed.name().equals(phoneStatus)
+					|| Attendee.PhoneStatus.Terminated.name().equals(
+							phoneStatus)) {
+				need = true;
+				break;
+			}
+		}
+		return need;
 	}
 
 	public void onLeaveAction(View v) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(
 				TalkingGroupActivity.this)
+				.setTitle(R.string.alert_title)
 				.setMessage(getString(R.string.do_you_want_to_leave_group))
 				.setPositiveButton(R.string.ok,
 						new DialogInterface.OnClickListener() {
@@ -309,7 +353,8 @@ public class TalkingGroupActivity extends Activity {
 			memberListView.onRefreshComplete();
 
 			try {
-				JSONArray attendees = new JSONArray(responseResult.getResponseText());
+				JSONArray attendees = new JSONArray(
+						responseResult.getResponseText());
 				memberListAdatper.setData(attendees);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -550,7 +595,8 @@ public class TalkingGroupActivity extends Activity {
 
 		@Override
 		public void doAction(String event, JSONObject data) {
-			Log.d(SystemConstants.TAG, "NotifierCallbackListener - doAction: " + data.toString());
+			Log.d(SystemConstants.TAG, "NotifierCallbackListener - doAction: "
+					+ data.toString());
 			if (event.equals(Notify.notice.name())) {
 				// process notice message
 				try {
@@ -592,7 +638,9 @@ public class TalkingGroupActivity extends Activity {
 			if (Notify.Action.update_status.name().equals(action)) {
 				JSONObject attendee = notice.getJSONObject(Attendee.attendee
 						.name());
-				updateDialButtonStatus(attendee);
+				if (!isOwner()) {
+					updateDialButtonStatus(attendee);
+				}
 				memberListAdatper.updateMember(attendee);
 			} else if (Notify.Action.update_attendee_list.name().equals(action)) {
 				refreshMemberList();
@@ -628,6 +676,34 @@ public class TalkingGroupActivity extends Activity {
 			}
 		}
 	}
+
+	private void callAllMember() {
+		progressDlg = ProgressDialog.show(TalkingGroupActivity.this, null,
+				getString(R.string.sending_request));
+		HashMap<String, String> param = new HashMap<String, String>();
+		param.put(TalkGroup.conferenceId.name(), groupId);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.call_all_url),
+				PostRequestFormat.URLENCODED, param, null,
+				HttpRequestType.ASYNCHRONOUS, onFinishedCallAllMember);
+	}
+
+	private OnHttpRequestListener onFinishedCallAllMember = new OnHttpRequestListener() {
+
+		@Override
+		public void onFinished(HttpResponseResult responseResult) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupActivity.this, R.string.calling_all,
+					Toast.LENGTH_SHORT).show();
+		}
+
+		@Override
+		public void onFailed(HttpResponseResult responseResult) {
+			dismissProgressDlg();
+			Toast.makeText(TalkingGroupActivity.this, R.string.call_all_failed,
+					Toast.LENGTH_SHORT).show();
+		}
+	};
 
 	private void updateDialButtonStatus(JSONObject attendee) {
 		try {

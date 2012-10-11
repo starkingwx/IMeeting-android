@@ -81,6 +81,11 @@
     <string name="group_talk_title">群聊号：</string>
     <string name="add_member">添加成员</string>
     <string name="sms_invite">短信邀请</string>
+	<string name="dial_all">呼叫全体</string>
+	<string name="is_need_call_all_member">确定要呼叫所有未参会成员吗？</string>
+	<string name="no_member_need_to_call">没有需要呼叫的成员！</string>
+	<string name="call_all_failed">全体呼叫失败…，请稍后重试</string>
+	<string name="calling_all">正在呼叫所有未参会成员…</string>
     <string name="dial">开始语音</string>
     <string name="calling_in">正在接入</string>
     <string name="call_in">接入</string>
@@ -95,7 +100,7 @@
     <string name="you_have_been_kicked_out">您被发起人移出群聊！</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
-    <string name="do_you_want_to_leave_group">您要离开群聊吗？</string>
+    <string name="do_you_want_to_leave_group">您要离开群聊吗？\n点击确定后系统将挂断您的电话，不影响其他人的使用。\n您可在群聊列表中重新加入本次群聊。</string>
     <string name="call">呼叫</string>
     <string name="hang_up">挂断</string>
     <string name="kick_out">移出群聊</string>
@@ -174,7 +179,7 @@
 
     <!-- account charge -->
     <string name="account_charge">账户充值</string>
-    <string name="your_account_balance_is">账户余额(元)：</string>
+    <string name="your_account_balance_is">账户余额：</string>
     <string name="no_enough_money_do_charge">充值请向下看</string>
     <string name="card_charge">智会卡充值</string>
     <string name="input_card_number">请输入智会卡卡号</string>
@@ -189,7 +194,7 @@
     <string name="charge_failed">充值失败，请重试！</string>
 
     <!-- version upgrade -->
-    <string name="detect_new_version">发现新版本【%s】，\n是否升级？</string>
+    <string name="detect_new_version" formatted="false">发现新版本【%s】，\n是否升级？\n本次更新内容：\n%s</string>
     <string name="upgrade">升级</string>
 
 </resources>

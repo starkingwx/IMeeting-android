@@ -15,6 +15,7 @@
     <string name="get_attendee_list_url">/conference/attendeeList</string>
     <string name="unjoin_conf_url">/conference/unjoin</string>
     <string name="call_url">/conference/call</string>
+    <string name="call_all_url">/conference/callAll</string>
     <string name="hangup_url">/conference/hangup</string>
     <string name="kickout_url">/conference/kickout</string>
     <string name="hide_group_url">/conference/hide</string>

@@ -85,7 +85,7 @@
             android:drawableTop="@drawable/dial"
             android:onClick="onDialAction"
             android:paddingTop="12dip"
-            android:text="@string/dial"
+            android:text="@string/dial_all"
             android:textColor="@android:color/white" />
 
         <ImageView

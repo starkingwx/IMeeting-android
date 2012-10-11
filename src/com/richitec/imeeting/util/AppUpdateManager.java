@@ -44,6 +44,7 @@ public class AppUpdateManager {
 			try {
 				Log.d(SystemConstants.TAG, "response text: " + responseResult.getResponseText());
 				JSONObject data = new JSONObject(responseResult.getResponseText());
+				String comment = data.getString("comment");
 				VersionUtils.serverVerion = data.getString("version");
 				if (VersionUtils.compareVersion(VersionUtils.serverVerion,
 						VersionUtils.localVersion) > 0
@@ -52,7 +53,7 @@ public class AppUpdateManager {
 					// prompt update dialog
 					String detectNewVersion = context.getString(R.string.detect_new_version);
 					detectNewVersion = String.format(detectNewVersion,
-							VersionUtils.serverVerion);
+							VersionUtils.serverVerion, comment);
 
 					new AlertDialog.Builder(context)
 							.setTitle(R.string.alert_title)

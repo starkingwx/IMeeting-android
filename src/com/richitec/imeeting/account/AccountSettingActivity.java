@@ -68,9 +68,6 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 				BarButtonItemStyle.RIGHT_GO, R.string.register_nav_btn_title,
 				new RigisterBtnOnClickListener()));
 
-		// userInfoSettings =
-		// getSharedPreferences(SystemConstants.user_info.name(), 0);
-
 		loginUrl = getString(R.string.server_url)
 				+ getString(R.string.login_url);
 

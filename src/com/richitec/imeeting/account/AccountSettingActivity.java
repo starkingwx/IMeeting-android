@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -189,7 +190,11 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 			String userKey = data.getString("userkey");
 			UserManager.getInstance().setUserKey(userKey);
 			saveUserAccount();
-			pushActivity(TalkingGroupHistoryListActivity.class);
+//			pushActivity(TalkingGroupHistoryListActivity.class);
+			Intent intent = new Intent(AccountSettingActivity.this, TalkingGroupHistoryListActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			
 			finish();
 
 		} catch (JSONException e) {

@@ -91,7 +91,7 @@
     <string name="calling_in">正在接入</string>
     <string name="call_in">接入</string>
     <string name="hangup_talking">结束语音</string>
-    <string name="leave">离开群聊</string>
+    <string name="leave">我要离开</string>
     <string name="calling">正在呼叫</string>
     <string name="talking">正在通话</string>
     <string name="call_failed">呼叫失败</string>
@@ -101,12 +101,12 @@
     <string name="you_have_been_kicked_out">您被发起人移出群聊！</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
-    <string name="do_you_want_to_leave_group">您要离开群聊吗？\n点击确定后系统将挂断您的电话，不影响其他人的使用。\n您可在群聊列表中重新加入本次群聊。</string>
+    <string name="do_you_want_to_leave_group">您要离开当前群聊吗？\n点击确定后系统将挂断您的电话，不影响其他人的使用。</string>
     <string name="call">呼叫</string>
     <string name="hang_up">挂断</string>
     <string name="kick_out">移出群聊</string>
     <string name="send_sms">发送短信</string>
-    <string name="operation_on_sb">选择对%s的操作</string>
+    <string name="operation_on_sb">选择对 %s 的操作</string>
     <string name="call_is_forbidden_for_sb">不允许呼叫%s</string>
     <string name="hangup_is_forbidden_for_sb">不允许挂断%s</string>
     <string name="kickout_is_forbidden_for_sb">不允许移出%s</string>

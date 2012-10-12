@@ -1,6 +1,5 @@
 package com.richitec.imeeting.talkinggroup;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +7,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,11 +36,11 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
-import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.Notify;
@@ -56,6 +51,7 @@ import com.richitec.imeeting.contactselect.ContactSelectActivity.TalkingGroupSta
 import com.richitec.imeeting.talkinggroup.adapter.MemberListAdapter;
 import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
 import com.richitec.imeeting.talkinggroup.statusfilter.OwnerModeStatusFilter;
+import com.richitec.imeeting.util.AppUtil;
 import com.richitec.websocket.notifier.NotifierCallbackListener;
 import com.richitec.websocket.notifier.WebSocketNotifier;
 
@@ -386,6 +382,7 @@ public class TalkingGroupActivity extends Activity {
 
 	private void doActionForSelectedMemberInOwnerMode(Map<String, String> member) {
 		final String userName = member.get(Attendee.username.name());
+		String displayName = AppUtil.getDisplayNameFromAttendee(member);
 		String onlineStatus = member.get(Attendee.online_status.name());
 		String phoneStatus = member.get(Attendee.telephone_status.name());
 
@@ -413,7 +410,7 @@ public class TalkingGroupActivity extends Activity {
 		actionList.add(getString(R.string.cancel));
 
 		String operationTitle = String.format(
-				getString(R.string.operation_on_sb), userName);
+				getString(R.string.operation_on_sb), displayName);
 		final String[] actions = actionList.toArray(new String[] {});
 		new AlertDialog.Builder(this).setTitle(operationTitle)
 				.setItems(actions, new DialogInterface.OnClickListener() {
@@ -668,7 +665,7 @@ public class TalkingGroupActivity extends Activity {
 				} else {
 					// update attendee list
 					String toastMsg = String.format(
-							getString(R.string.sb_is_kicked_out), attendeeName);
+							getString(R.string.sb_is_kicked_out), AppUtil.getDisplayName(attendeeName));
 					MyToast.show(TalkingGroupActivity.this, toastMsg,
 							Toast.LENGTH_SHORT);
 					refreshMemberList();

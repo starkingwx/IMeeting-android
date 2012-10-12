@@ -2,46 +2,31 @@ package com.richitec.imeeting.account;
 
 import java.util.HashMap;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemStyle;
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.DataStorageUtils;
 import com.richitec.commontoolkit.utils.HttpUtils;
-import com.richitec.commontoolkit.utils.MyToast;
-import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
-import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
+import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
-import com.richitec.imeeting.IMeetingAppLaunchActivity;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.SystemConstants;
-import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
 import com.richitec.imeeting.util.AppUpdateManager;
@@ -63,11 +48,6 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 
 		// set title text
 		setTitle(R.string.account_setting_nav_title_text);
-
-//		// init user register bar button item
-//		setRightBarButtonItem(new IMeetingBarButtonItem(this,
-//				BarButtonItemStyle.RIGHT_GO, R.string.register_nav_btn_title,
-//				new RigisterBtnOnClickListener()));
 
 		loginUrl = getString(R.string.server_url)
 				+ getString(R.string.login_url);
@@ -117,18 +97,6 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		}
 	};
 
-	// inner class
-	// user register button on click listener
-//	class RigisterBtnOnClickListener implements OnClickListener {
-//
-//		@Override
-//		public void onClick(View v) {
-//			// go to account register activity
-//			pushActivity(AccountRegisterActivity.class);
-//		}
-//
-//	}
-	
 	public void onRegister(View v) {
 		pushActivity(AccountRegisterActivity.class);
 	}

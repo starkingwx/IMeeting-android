@@ -6,10 +6,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.view.KeyEvent.DispatcherState;
-
 import com.richitec.commontoolkit.addressbook.AddressBookManager;
-import com.richitec.commontoolkit.addressbook.ContactBean;
 import com.richitec.imeeting.constants.Attendee;
 
 public class AppUtil {
@@ -53,6 +50,15 @@ public class AppUtil {
 			if (userName.equals(displayName) && nickname != null && !nickname.equals("")) {
 				displayName = nickname;
 			}
+		}
+		return displayName;
+	}
+	
+	public static String getDisplayName(String phoneNumber) {
+		String displayName = phoneNumber;
+		List<String> contactDisplayNames = AddressBookManager.getInstance().getContactsDisplayNamesByPhone(phoneNumber);
+		if (contactDisplayNames.size() > 0) {
+			displayName = contactDisplayNames.get(0);
 		}
 		return displayName;
 	}

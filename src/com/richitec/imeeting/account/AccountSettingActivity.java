@@ -64,10 +64,10 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		// set title text
 		setTitle(R.string.account_setting_nav_title_text);
 
-		// init user register bar button item
-		setRightBarButtonItem(new IMeetingBarButtonItem(this,
-				BarButtonItemStyle.RIGHT_GO, R.string.register_nav_btn_title,
-				new RigisterBtnOnClickListener()));
+//		// init user register bar button item
+//		setRightBarButtonItem(new IMeetingBarButtonItem(this,
+//				BarButtonItemStyle.RIGHT_GO, R.string.register_nav_btn_title,
+//				new RigisterBtnOnClickListener()));
 
 		loginUrl = getString(R.string.server_url)
 				+ getString(R.string.login_url);
@@ -119,14 +119,18 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 
 	// inner class
 	// user register button on click listener
-	class RigisterBtnOnClickListener implements OnClickListener {
-
-		@Override
-		public void onClick(View v) {
-			// go to account register activity
-			pushActivity(AccountRegisterActivity.class);
-		}
-
+//	class RigisterBtnOnClickListener implements OnClickListener {
+//
+//		@Override
+//		public void onClick(View v) {
+//			// go to account register activity
+//			pushActivity(AccountRegisterActivity.class);
+//		}
+//
+//	}
+	
+	public void onRegister(View v) {
+		pushActivity(AccountRegisterActivity.class);
 	}
 
 	public void onLogin(View v) {

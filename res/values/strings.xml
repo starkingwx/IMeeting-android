@@ -14,7 +14,7 @@
 
     <!-- account setting activity -->
     <string name="account_setting_nav_title_text">账户设置</string>
-    <string name="register_nav_btn_title">注册</string>
+    <string name="register_btn_title">注册新账户</string>
     <string name="login_name_editText_hint">请输入您注册的手机号码</string>
     <string name="login_pwd_editText_hint">请输入您的密码</string>
     <string name="remember_pwd_textView_text">记住密码</string>

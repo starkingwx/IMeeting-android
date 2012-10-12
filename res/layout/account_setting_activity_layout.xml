@@ -79,6 +79,19 @@
             android:text="@string/login_confirm_btn_title"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/white" />
+        
+          <Button
+            android:id="@+id/register_btn"
+            android:layout_width="fill_parent"
+            android:layout_height="46dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/register_btn_bg"
+            android:onClick="onRegister"
+            android:text="@string/register_btn_title"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/white" />
+        
     </LinearLayout>
 
 </LinearLayout>

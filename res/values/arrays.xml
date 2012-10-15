@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string-array name="group_long_press_menu">
-        <item >@string/delete_group</item>
-        <item >@string/cancel</item>
+        <item>@string/delete_group</item>
+        <item>@string/cancel</item>
     </string-array>
+    <string-array name="leave_talkgroup_menu">
+        <item>@string/only_leave_talkgroup</item>
+        <item>@string/close_talkgroup</item>
+        <item>@string/cancel</item>
+    </string-array>
+
 </resources>

@@ -299,20 +299,46 @@ public class TalkingGroupActivity extends Activity {
 	}
 
 	public void onLeaveAction(View v) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(
-				TalkingGroupActivity.this)
-				.setTitle(R.string.alert_title)
-				.setMessage(getString(R.string.do_you_want_to_leave_group))
-				.setPositiveButton(R.string.ok,
-						new DialogInterface.OnClickListener() {
+		if (isOwner()) {
+			// owner mode
+			new AlertDialog.Builder(this)
+					.setTitle(R.string.select_operation)
+					.setItems(R.array.leave_talkgroup_menu,
+							new DialogInterface.OnClickListener() {
 
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								leaveGroupTalk();
-							}
-						}).setNegativeButton(R.string.cancel, null);
-		builder.show();
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									switch (which) {
+									case 0:
+										leaveGroupTalk();
+										break;
+									case 1:
+										closeGroupTalk();
+										break;
+									default:
+										break;
+									}
+
+								}
+							}).show();
+		} else {
+			// normal attendee mode
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					TalkingGroupActivity.this)
+					.setTitle(R.string.alert_title)
+					.setMessage(getString(R.string.do_you_want_to_leave_group))
+					.setPositiveButton(R.string.ok,
+							new DialogInterface.OnClickListener() {
+
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									leaveGroupTalk();
+								}
+							}).setNegativeButton(R.string.cancel, null);
+			builder.show();
+		}
 	}
 
 	@Override
@@ -329,6 +355,40 @@ public class TalkingGroupActivity extends Activity {
 				+ getString(R.string.unjoin_conf_url),
 				PostRequestFormat.URLENCODED, params, null,
 				HttpRequestType.ASYNCHRONOUS, null);
+		TalkingGroupActivity.this.finish();
+	}
+
+	/**
+	 * send request to server to destroy
+	 */
+	private void closeGroupTalk() {
+		progressDlg = ProgressDialog.show(TalkingGroupActivity.this, null,
+				getString(R.string.destroying_talkgroup));
+		HashMap<String, String> params = new HashMap<String, String>();
+		params.put(TalkGroup.conferenceId.name(), groupId);
+		HttpUtils.postSignatureRequest(getString(R.string.server_url)
+				+ getString(R.string.destroy_conf_url),
+				PostRequestFormat.URLENCODED, params, null,
+				HttpRequestType.ASYNCHRONOUS, onFinishedCloseGroupTalk);
+	}
+
+	private OnHttpRequestListener onFinishedCloseGroupTalk = new OnHttpRequestListener() {
+
+		@Override
+		public void onFinished(HttpResponseResult responseResult) {
+			onCloseGroupTalkRequestReturn();
+		}
+
+		@Override
+		public void onFailed(HttpResponseResult responseResult) {
+			onCloseGroupTalkRequestReturn();
+		}
+	};
+
+	private void onCloseGroupTalkRequestReturn() {
+		dismissProgressDlg();
+		timer.cancel();
+		notifier.disconnect();
 		TalkingGroupActivity.this.finish();
 	}
 
@@ -665,10 +725,30 @@ public class TalkingGroupActivity extends Activity {
 				} else {
 					// update attendee list
 					String toastMsg = String.format(
-							getString(R.string.sb_is_kicked_out), AppUtil.getDisplayName(attendeeName));
+							getString(R.string.sb_is_kicked_out),
+							AppUtil.getDisplayName(attendeeName));
 					MyToast.show(TalkingGroupActivity.this, toastMsg,
 							Toast.LENGTH_SHORT);
 					refreshMemberList();
+				}
+			} else if (Notify.Action.conf_destoryed.name().equals(action)) {
+				if (!isOwner()) {
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							TalkingGroupActivity.this)
+							.setTitle(R.string.alert_title)
+							.setMessage(
+									getString(R.string.talkgroup_has_been_closed))
+							.setPositiveButton(R.string.ok,
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											leaveGroupTalk();
+										}
+									});
+					builder.show();
 				}
 			}
 		}

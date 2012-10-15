@@ -3,7 +3,7 @@
 
     <!-- iMeeting server url -->
     <string name="server_url">http://www.wetalking.net/imeeting</string>
-    <!-- <string name="server_url">http://192.168.1.142:8080/imeeting</string> -->
+    <!-- <string name="server_url">http://192.168.1.133:8080/imeeting</string> -->
     <string name="login_url">/user/login</string>
     <string name="retrieve_auth_code_url">/user/getPhoneCode</string>
     <string name="check_auth_code_url">/user/checkPhoneCode</string>
@@ -20,6 +20,7 @@
     <string name="kickout_url">/conference/kickout</string>
     <string name="hide_group_url">/conference/hide</string>
     <string name="heart_beat_url">/conference/heartbeat</string>
+    <string name="destroy_conf_url">/conference/destroy</string>
     <string name="account_balance_url">/accountBalance</string>
     <string name="card_charge_url">/cardCharge</string>
     <string name="upload_addressbook_url">/addressbook/upload</string>

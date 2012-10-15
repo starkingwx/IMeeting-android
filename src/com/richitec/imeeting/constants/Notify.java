@@ -12,6 +12,7 @@ public enum Notify {
 		update_status,
 		update_attendee_list,
 		kickout,
-		invited
+		invited,
+		conf_destoryed
 	}
 }

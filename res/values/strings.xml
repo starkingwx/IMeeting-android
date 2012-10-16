@@ -121,8 +121,8 @@
     <string name="do_you_want_to_call_into_group_talking">需要接入语音群聊吗？</string>
     <string name="do_you_wanna_end_group_talking">要结束当前语音群聊吗？</string>
     <string name="end_group_talking">结束语音</string>
-	<string name="close_talkgroup">离开并结束群聊</string>
-	<string name="only_leave_talkgroup">离开群聊</string>
+	<string name="close_talkgroup">挂断全体并离开</string>
+	<string name="only_leave_talkgroup">挂断自己并离开</string>
 	<string name="destroying_talkgroup">正在结束群聊…</string>
 	<string name="talkgroup_has_been_closed">发起人关闭了当前群聊！</string>
     <!-- setting activity -->

@@ -11,6 +11,8 @@
 # generated files
 bin/
 gen/
-
+libs/
+obj/
+prebuilt/
 # Local configuration file (sdk path, etc)
 local.properties

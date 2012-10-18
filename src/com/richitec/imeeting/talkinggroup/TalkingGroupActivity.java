@@ -196,6 +196,13 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 			currentView = GTViewType.VideoView;
 		}
 	}
+	
+	public void onSwitchToMemberListView(View v) {
+		if (currentView == GTViewType.VideoView) {
+			showMemberListView();
+			currentView = GTViewType.MemberListView;
+		}
+	}
 
 	public void onAddMemberAction(View v) {
 		Intent intent = new Intent(this, ContactSelectActivity.class);

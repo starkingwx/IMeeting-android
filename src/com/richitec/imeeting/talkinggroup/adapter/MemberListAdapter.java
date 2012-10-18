@@ -191,6 +191,8 @@ public class MemberListAdapter extends BaseAdapter {
 		Bitmap avatar = AppUtil.getAvatar(userName);
 		if (avatar != null) {
 			viewHolder.avatarView.setImageBitmap(avatar);
+		} else {
+			viewHolder.avatarView.setImageResource(R.drawable.default_avatar);
 		}
 		
 		viewHolder.nameView.setText(displayName);

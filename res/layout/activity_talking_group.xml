@@ -35,12 +35,14 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
-                    android:textColor="@android:color/white"
+                    android:layout_marginBottom="2dip"
+                    android:layout_marginRight="2dip"
+                    android:layout_marginTop="2dip"
                     android:background="@drawable/right_bar_button_item_bg"
-                    android:layout_margin="5dip"
-                    android:textSize="16dp"
                     android:onClick="onSwitchToVideoView"
-                    android:text="@string/video" />
+                    android:text="@string/video"
+                    android:textColor="@android:color/white"
+                    android:textSize="16dp" />
             </RelativeLayout>
 
             <com.handmark.pulltorefresh.library.PullToRefreshListView

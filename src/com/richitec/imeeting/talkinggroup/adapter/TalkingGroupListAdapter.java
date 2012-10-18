@@ -135,9 +135,11 @@ public class TalkingGroupListAdapter extends BaseAdapter {
 								.setText(AppUtil.getDisplayNameFromAttendee(attendee));
 						String userName = attendee.getString(Attendee.username.name());
 						Bitmap avatar = AppUtil.getAvatar(userName);
+						ImageView imgView = (ImageView) _tableRowItem.findViewById(R.id.attendee_avatar_imageView);
 						if (avatar != null) {
-							ImageView imgView = (ImageView) _tableRowItem.findViewById(R.id.attendee_avatar_imageView);
 							imgView.setImageBitmap(avatar);
+						} else {
+							imgView.setImageResource(R.drawable.default_avatar);
 						}
 					}
 				} else {

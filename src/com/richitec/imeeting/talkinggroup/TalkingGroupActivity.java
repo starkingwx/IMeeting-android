@@ -16,20 +16,27 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Display;
+import android.view.GestureDetector.OnGestureListener;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
@@ -55,16 +62,19 @@ import com.richitec.imeeting.util.AppUtil;
 import com.richitec.websocket.notifier.NotifierCallbackListener;
 import com.richitec.websocket.notifier.WebSocketNotifier;
 
-public class TalkingGroupActivity extends Activity {
+public class TalkingGroupActivity extends Activity implements OnGestureListener {
 	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID = "talking group id";
 	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUP_ATTENDEESPHONE = "talking group attendees phone";
 
 	private static final int REQ_CONTACT_SELECT = 0;
+	private static final int MIN_FLING_DISTANCE = 100;
 
 	private ProgressDialog progressDlg;
 	private MemberListAdapter memberListAdatper;
 	private Handler handler;
 	private PullToRefreshListView memberListView;
+	private ViewFlipper flipper;
+	private GestureDetector gestureDetector;
 
 	private WebSocketNotifier notifier;
 
@@ -73,6 +83,12 @@ public class TalkingGroupActivity extends Activity {
 
 	private Map<String, String> selectedMember;
 	private Timer timer;
+
+	enum GTViewType {
+		MemberListView, VideoView
+	}
+
+	private GTViewType currentView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,6 +99,10 @@ public class TalkingGroupActivity extends Activity {
 		Intent intent = getIntent();
 		groupId = intent.getStringExtra(TalkGroup.conferenceId.name());
 		owner = intent.getStringExtra(TalkGroup.owner.name());
+
+		gestureDetector = new GestureDetector(this);
+		flipper = (ViewFlipper) findViewById(R.id.gt_view_flipper);
+		currentView = GTViewType.MemberListView;
 
 		initUI();
 
@@ -146,6 +166,7 @@ public class TalkingGroupActivity extends Activity {
 		memberListView.getRefreshableView().setAdapter(memberListAdatper);
 		memberListView.getRefreshableView().setOnItemClickListener(
 				onMemberSeletecedListener);
+		
 		memberListView.setOnRefreshListener(new OnRefreshListener<ListView>() {
 
 			@Override
@@ -167,6 +188,13 @@ public class TalkingGroupActivity extends Activity {
 		String accountName = UserManager.getInstance().getUser().getName();
 		boolean isOwner = accountName.equals(owner) ? true : false;
 		return isOwner;
+	}
+
+	public void onSwitchToVideoView(View v) {
+		if (currentView == GTViewType.MemberListView) {
+			showVideoView();
+			currentView = GTViewType.VideoView;
+		}
 	}
 
 	public void onAddMemberAction(View v) {
@@ -954,4 +982,69 @@ public class TalkingGroupActivity extends Activity {
 		}
 
 	}
+
+	private void showVideoView() {
+		flipper.setInAnimation(this, R.anim.left_in);
+		flipper.setOutAnimation(this, R.anim.left_out);
+		flipper.showNext();
+	}
+
+	private void showMemberListView() {
+		flipper.setInAnimation(this, R.anim.right_in);
+		flipper.setOutAnimation(this, R.anim.right_out);
+		flipper.showPrevious();
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		return gestureDetector.onTouchEvent(event);
+	}
+
+	@Override
+	public boolean onDown(MotionEvent e) {
+		return false;
+	}
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
+			float velocityY) {
+		Log.d(SystemConstants.TAG, "e1 x: " + e1.getX() + " e2 x: " + e2.getX());
+		if (e1.getX() - e2.getX() > MIN_FLING_DISTANCE) {
+			if (currentView == GTViewType.MemberListView) {
+				showVideoView();
+			}
+			currentView = GTViewType.VideoView;
+			return true;
+		} else if (e2.getX() - e1.getX() > MIN_FLING_DISTANCE) {
+			if (currentView == GTViewType.VideoView) {
+				showMemberListView();
+			}
+			currentView = GTViewType.MemberListView;
+			return true;
+		}
+
+		return false;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
+			float distanceY) {
+		return false;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		return false;
+	}
+
 }

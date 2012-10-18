@@ -80,6 +80,9 @@
 
     <!-- talking group -->
     <string name="group_talk_title">群聊号：</string>
+    <string name="video">视频</string>
+    <string name="open_camera">打开镜头</string>
+    <string name="close_camera">关闭镜头</string>
     <string name="add_member">添加成员</string>
     <string name="sms_invite">短信邀请</string>
 	<string name="dial_all">呼叫全体</string>
@@ -125,6 +128,7 @@
 	<string name="only_leave_talkgroup">挂断自己并离开</string>
 	<string name="destroying_talkgroup">正在结束群聊…</string>
 	<string name="talkgroup_has_been_closed">发起人关闭了当前群聊！</string>
+	
     <!-- setting activity -->
     <string name="setting_nav_title_text">设置</string>
     <string name="accountSetting_btn_title">账户设置</string>

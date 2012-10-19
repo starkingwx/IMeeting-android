@@ -4,13 +4,13 @@
     android:layout_height="fill_parent"
     android:background="@drawable/img_normal_bg" >
 
-    <ImageView
-        android:id="@+id/large_video_view"
+    <FrameLayout
+        android:id="@+id/large_video_layout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
-    <ImageView
-        android:id="@+id/small_video_view"
+    <FrameLayout
+        android:id="@+id/small_video_layout"
         android:layout_width="114dp"
         android:layout_height="152dp"
         android:layout_above="@+id/gt_camera_op_bt"
@@ -42,7 +42,6 @@
         android:background="@drawable/gt_video_view_title_bt_bg"
         android:drawableRight="@drawable/triangle"
         android:paddingRight="5dp"
-        android:text="13813005146"
         android:textColor="@drawable/gt_video_view_title_bt_fg" />
 
     <Button

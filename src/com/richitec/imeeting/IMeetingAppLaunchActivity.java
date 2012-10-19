@@ -13,6 +13,7 @@ import com.richitec.commontoolkit.utils.DataStorageUtils;
 import com.richitec.imeeting.account.AccountSettingActivity;
 import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
+import com.richitec.imeeting.video.ECVideoEncoder;
 
 public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 

@@ -52,22 +52,75 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_setOutImgWidth(JNIEnv* env,
 	out_img_width = outImgWidth;
 }
 
-void Java_com_richitec_imeeting_video_ECVideoEncoder_setOutImgHeight(JNIEnv* env,
-		jobject thiz, jint outImgHeight) {
+void Java_com_richitec_imeeting_video_ECVideoEncoder_setOutImgHeight(
+		JNIEnv* env, jobject thiz, jint outImgHeight) {
 	out_img_height = outImgHeight;
 }
 
-void Java_com_richitec_imeeting_video_ECVideoEncoder_setupVideoEncoder(JNIEnv* env,
-		jobject thiz) {
+void Java_com_richitec_imeeting_video_ECVideoEncoder_setupVideoEncoder(
+		JNIEnv* env, jobject thiz) {
+	qvo = (QuickVideoOutput*) malloc(sizeof(QuickVideoOutput));
+	qvo->width = out_img_width;
+	qvo->height = out_img_height;
 
+	char *rtmp_full_path[300];
+	memset(rtmp_full_path, 0, 300);
+	sprintf(rtmp_full_path, "%s/%s/%s live=1 conn=S:%s", rtmp_url, group_id, live_name, live_name);
+	D("rtmp full path: %s", rtmp_full_path);
+	int ret = init_quick_video_output(qvo, rtmp_full_path, "flv");
+	if (ret < 0) {
+		D("quick video output initial failed.");
+		Java_com_richitec_imeeting_video_ECVideoEncoder_releaseVideoEncoder(env, thiz);
+		return;
+	}
+
+	enum PixelFormat dst_pix_fmt = qvo->video_stream->codec->pix_fmt;
+	src_pix_fmt = PIX_FMT_NV21;
+
+	raw_picture = alloc_picture(dst_pix_fmt, qvo->width, qvo->height);
+	tmp_picture = avcodec_alloc_frame();
+	raw_picture->pts = 0;
+
+	is_video_encode_ready = 1;
 }
 
-void Java_com_richitec_imeeting_video_ECVideoEncoder_releaseVideoEncoder(JNIEnv* env,
-		jobject thiz) {
+void Java_com_richitec_imeeting_video_ECVideoEncoder_releaseVideoEncoder(
+		JNIEnv* env, jobject thiz) {
+	is_video_encode_ready = 0;
 
+	if (qvo) {
+		close_quick_video_ouput(qvo);
+		free(qvo);
+		qvo = NULL;
+	}
+
+	if (raw_picture) {
+		if (raw_picture->data[0]) {
+			av_free(raw_picture->data[0]);
+		}
+		av_free(raw_picture);
+		raw_picture = NULL;
+	}
+
+	if (tmp_picture) {
+		av_free(tmp_picture);
+		tmp_picture = NULL;
+	}
 }
 
-void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(JNIEnv* env,
-		jobject thiz, jbyteArray buffer, jint width, jint height) {
+void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
+		JNIEnv* env, jobject thiz, jbyteArray buffer, jint width, jint height) {
+	if (!qvo || !is_video_encode_ready) {
+		return;
+	}
 
+	AVCodecContext *c = qvo->video_stream->codec;
+
+	jbyte *p_buffer_array = (*env)->GetByteArrayElements(env, buffer, 0);
+	avpicture_fill((AVPicture *)tmp_picture, p_buffer_array, src_pix_fmt, width, height);
+	(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array, JNI_ABORT);
+
+	sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize, 0, height, raw_picture->data, raw_picture->linesize);
+	int out_size = write_video_frame(qvo, raw_picture);
+	raw_picture->pts++;
 }

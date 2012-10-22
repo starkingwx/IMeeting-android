@@ -33,6 +33,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +60,7 @@ import com.richitec.imeeting.talkinggroup.adapter.MemberListAdapter;
 import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
 import com.richitec.imeeting.talkinggroup.statusfilter.OwnerModeStatusFilter;
 import com.richitec.imeeting.util.AppUtil;
+import com.richitec.imeeting.video.VideoManager;
 import com.richitec.websocket.notifier.NotifierCallbackListener;
 import com.richitec.websocket.notifier.WebSocketNotifier;
 
@@ -76,6 +78,8 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	private ViewFlipper flipper;
 	private GestureDetector gestureDetector;
 
+	private VideoManager videoManager;
+
 	private WebSocketNotifier notifier;
 
 	private String groupId;
@@ -83,6 +87,9 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	private Map<String, String> selectedMember;
 	private Timer timer;
+
+	private FrameLayout largeVideoLayout;
+	private FrameLayout smallVideoLayout;
 
 	enum GTViewType {
 		MemberListView, VideoView
@@ -103,6 +110,8 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		gestureDetector = new GestureDetector(this);
 		flipper = (ViewFlipper) findViewById(R.id.gt_view_flipper);
 		currentView = GTViewType.MemberListView;
+
+		videoManager = new VideoManager(this);
 
 		initUI();
 
@@ -166,7 +175,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		memberListView.getRefreshableView().setAdapter(memberListAdatper);
 		memberListView.getRefreshableView().setOnItemClickListener(
 				onMemberSeletecedListener);
-		
+
 		memberListView.setOnRefreshListener(new OnRefreshListener<ListView>() {
 
 			@Override
@@ -182,6 +191,9 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		}
 
 		refreshMemberList();
+
+		largeVideoLayout = (FrameLayout) findViewById(R.id.large_video_layout);
+		smallVideoLayout = (FrameLayout) findViewById(R.id.small_video_layout);
 	}
 
 	private boolean isOwner() {
@@ -196,7 +208,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 			currentView = GTViewType.VideoView;
 		}
 	}
-	
+
 	public void onSwitchToMemberListView(View v) {
 		if (currentView == GTViewType.VideoView) {
 			showMemberListView();
@@ -373,6 +385,19 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 								}
 							}).setNegativeButton(R.string.cancel, null);
 			builder.show();
+		}
+	}
+
+	public void onCameraButtonAction(View v) {
+		Button bt = (Button) v;
+		if (!videoManager.isVideoLiving()) {
+			videoManager.attachVideoPreview(smallVideoLayout);
+			videoManager.startVideoLive();
+			bt.setText(R.string.close_camera);
+		} else {
+			videoManager.detachVideoPreview();
+			videoManager.stopVideoLive();
+			bt.setText(R.string.open_camera);
 		}
 	}
 

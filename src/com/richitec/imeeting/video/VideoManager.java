@@ -73,7 +73,8 @@ public class VideoManager implements Camera.PreviewCallback,
 	public void attachVideoPreview(ViewGroup parentView) {
 		previewSurfaceParent = parentView;
 		if (previewSurfaceParent != null) {
-			previewSurface.setLayoutParams(previewSurfaceParent.getLayoutParams());
+			previewSurface.setLayoutParams(previewSurfaceParent
+					.getLayoutParams());
 			previewSurfaceParent.addView(previewSurface);
 		}
 	}
@@ -109,11 +110,6 @@ public class VideoManager implements Camera.PreviewCallback,
 		camera = getCamera(currentCameraPostion);
 		if (camera != null) {
 			camera.setPreviewCallback(this);
-			try {
-				camera.setPreviewDisplay(previewSurface.getHolder());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 			camera.startPreview();
 			Log.d(SystemConstants.TAG, "start to live video");
 		} else {
@@ -163,7 +159,8 @@ public class VideoManager implements Camera.PreviewCallback,
 								p.setPreviewSize(320, 240);
 								camera.setParameters(p);
 								currentCameraPostion = CameraPosition.FrontCamera;
-								Log.d(SystemConstants.TAG, "open front camera ok!!!");
+								Log.d(SystemConstants.TAG,
+										"open front camera ok!!!");
 								break;
 							}
 						}
@@ -207,13 +204,17 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	@Override
 	public void surfaceCreated(SurfaceHolder arg0) {
-		// TODO Auto-generated method stub
-
+		try {
+			if (camera != null) {
+				camera.setPreviewDisplay(previewSurface.getHolder());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
-		// TODO Auto-generated method stub
 
 	}
 }

@@ -84,6 +84,7 @@
     <string name="video">视频</string>
     <string name="open_camera">打开镜头</string>
     <string name="close_camera">关闭镜头</string>
+    <string name="camera_cannot_open">摄像头无法打开！</string>
     <string name="add_member">添加成员</string>
     <string name="sms_invite">短信邀请</string>
 	<string name="dial_all">呼叫全体</string>

@@ -3,6 +3,7 @@ package com.richitec.imeeting.video;
 import java.io.IOException;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
@@ -48,13 +49,33 @@ public class VideoManager implements Camera.PreviewCallback,
 	private boolean videoLiving;
 
 	public VideoManager(Context context) {
-		currentCameraPostion = CameraPosition.BackCamera;
+		currentCameraPostion = CameraPosition.FrontCamera;
 		previewSurface = new SurfaceView(context);
 		previewSurface.getHolder().addCallback(this);
 		previewSurface.getHolder().setType(
 				SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		videoEncoder = new ECVideoEncoder();
 		videoLiving = false;
+	}
+
+	public void setRtmpUrl(String rtmpUrl) {
+		videoEncoder.setRtmpUrl(rtmpUrl);
+	}
+
+	public void setLiveName(String liveName) {
+		videoEncoder.setLiveName(liveName);
+	}
+
+	public void setGroupId(String groupId) {
+		videoEncoder.setGroupId(groupId);
+	}
+
+	public void setImgWidth(int imgWidth) {
+		videoEncoder.setOutImgWidth(imgWidth);
+	}
+
+	public void setImgHeight(int imgHeight) {
+		videoEncoder.setOutImgHeight(imgHeight);
 	}
 
 	private void releaseCamera() {
@@ -87,28 +108,27 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	/**
 	 * start to live video
+	 * 
+	 * @throws Exception
 	 */
-	public void startVideoLive() {
-		try {
-			startVideoCapture();
+	public void startVideoLive() throws Exception {
+		startVideoCapture();
 
-			// new Thread(new Runnable() {
-			//
-			// @Override
-			// public void run() {
-			// videoEncoder.setupVideoEncoder();
-			// }
-			// }).start();
+		new Thread(new Runnable() {
 
-			videoLiving = true;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			@Override
+			public void run() {
+				videoEncoder.setupVideoEncoder();
+			}
+		}).start();
+
+		videoLiving = true;
 	}
 
 	private void startVideoCapture() throws Exception {
 		camera = getCamera(currentCameraPostion);
 		if (camera != null) {
+			camera.setPreviewDisplay(previewSurface.getHolder());
 			camera.setPreviewCallback(this);
 			camera.startPreview();
 			Log.d(SystemConstants.TAG, "start to live video");
@@ -119,7 +139,7 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	public void stopVideoLive() {
 		releaseCamera();
-		// videoEncoder.releaseVideoEncoder();
+		videoEncoder.releaseVideoEncoder();
 		videoLiving = false;
 	}
 
@@ -137,15 +157,15 @@ public class VideoManager implements Camera.PreviewCallback,
 		}
 	}
 
-	@SuppressLint("NewApi")
+	@TargetApi(9)
 	private Camera getCamera(CameraPosition position) {
 		Camera camera = null;
+		int sdk = android.os.Build.VERSION.SDK_INT;
+		Log.d(SystemConstants.TAG, "version sdk: " + sdk);
 		try {
 			if (position == CameraPosition.FrontCamera) {
-				String version = android.os.Build.VERSION.RELEASE;
-				int result = VersionUtils.compareVersion(version, "2.3");
-				if (result >= 0) {
-					// android version is equal to or larger than 2.3
+				if (sdk >= 9) {
+					// android version is equal to or larger than API 9
 					// we can use the following code
 					int cameraNum = Camera.getNumberOfCameras();
 					if (cameraNum > 1) {
@@ -173,7 +193,9 @@ public class VideoManager implements Camera.PreviewCallback,
 			} else {
 				// get back camera
 				camera = Camera.open(); // attempt to get back Camera instance
-				camera.setDisplayOrientation(90);
+				if (sdk >= 8) {
+					camera.setDisplayOrientation(90);
+				}
 				Parameters p = camera.getParameters();
 				p.setPreviewSize(320, 240);
 				camera.setParameters(p);
@@ -189,11 +211,11 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	@Override
 	public void onPreviewFrame(byte[] data, Camera camera) {
-		Log.d(SystemConstants.TAG, "onPreviewFrame");
 		Size size = camera.getParameters().getPreviewSize();
 		int w = size.width;
 		int h = size.height;
-		Log.d(SystemConstants.TAG, "frame width: " + w + " height: " + h);
+
+		videoEncoder.processRawFrame(data, w, h);
 	}
 
 	@Override

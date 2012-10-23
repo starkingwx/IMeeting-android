@@ -55,11 +55,14 @@
         android:onClick="onSwitchToMemberListView" />
 
     <Button
+        android:id="@+id/gt_camera_switch_bt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
+        android:onClick="onSwitchCameraAction"
+        android:visibility="gone"
         android:background="@drawable/camera_switch_button_bg" />
 
 </RelativeLayout>

@@ -112,6 +112,11 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		currentView = GTViewType.MemberListView;
 
 		videoManager = new VideoManager(this);
+		videoManager.setGroupId(groupId);
+		videoManager.setLiveName(UserManager.getInstance().getUser().getName());
+		videoManager.setRtmpUrl(getString(R.string.rtmp_server_url));
+		videoManager.setImgWidth(144);
+		videoManager.setImgHeight(192);
 
 		initUI();
 
@@ -389,18 +394,42 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	}
 
 	public void onCameraButtonAction(View v) {
-		Button bt = (Button) v;
 		if (!videoManager.isVideoLiving()) {
-			videoManager.attachVideoPreview(smallVideoLayout);
-			videoManager.startVideoLive();
-			bt.setText(R.string.close_camera);
+			try {
+				videoManager.startVideoLive();
+				videoManager.attachVideoPreview(smallVideoLayout);
+				onCameraOpen();
+			} catch (Exception e) {
+				MyToast.show(this, R.string.camera_cannot_open, Toast.LENGTH_SHORT);
+				e.printStackTrace();
+			}
 		} else {
 			videoManager.detachVideoPreview();
 			videoManager.stopVideoLive();
-			bt.setText(R.string.open_camera);
+			onCameraClosed();
 		}
 	}
+	
+	public void onSwitchCameraAction(View v) {
+		videoManager.switchCamera();
+	}
 
+	private void onCameraOpen() {
+		Button cameraSwitchBt = (Button) findViewById(R.id.gt_camera_switch_bt);
+		cameraSwitchBt.setVisibility(View.VISIBLE);
+		
+		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
+		cameraBt.setText(R.string.close_camera);
+	}
+	
+	private void onCameraClosed() {
+		Button cameraSwitchBt = (Button) findViewById(R.id.gt_camera_switch_bt);
+		cameraSwitchBt.setVisibility(View.GONE);
+		
+		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
+		cameraBt.setText(R.string.open_camera);
+	}
+	
 	@Override
 	public void onBackPressed() {
 		onLeaveAction(null);

@@ -67,6 +67,7 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_setupVideoEncoder(
 	memset(rtmp_full_path, 0, sizeof rtmp_full_path);
 	sprintf(rtmp_full_path, "%s/%s/%s live=1 conn=S:%s", rtmp_url, group_id, live_name, live_name);
 	D("rtmp full path: %s", rtmp_full_path);
+
 	int ret = init_quick_video_output(qvo, rtmp_full_path, "flv");
 	if (ret < 0) {
 		D("quick video output initial failed.");

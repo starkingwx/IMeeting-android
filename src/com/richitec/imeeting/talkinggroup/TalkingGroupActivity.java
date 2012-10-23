@@ -14,22 +14,22 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 import android.view.Display;
-import android.view.GestureDetector.OnGestureListener;
 import android.view.GestureDetector;
+import android.view.GestureDetector.OnGestureListener;
 import android.view.MotionEvent;
-import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -91,6 +91,8 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	private FrameLayout largeVideoLayout;
 	private FrameLayout smallVideoLayout;
 
+	private WakeLock wakeLock;
+
 	enum GTViewType {
 		MemberListView, VideoView
 	}
@@ -118,6 +120,10 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		videoManager.setImgWidth(144);
 		videoManager.setImgHeight(192);
 
+		PowerManager powerMan = (PowerManager) this
+				.getSystemService(Context.POWER_SERVICE);
+		wakeLock = powerMan.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
+		
 		initUI();
 
 		notifier = new WebSocketNotifier();
@@ -400,7 +406,8 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 				videoManager.attachVideoPreview(smallVideoLayout);
 				onCameraOpen();
 			} catch (Exception e) {
-				MyToast.show(this, R.string.camera_cannot_open, Toast.LENGTH_SHORT);
+				MyToast.show(this, R.string.camera_cannot_open,
+						Toast.LENGTH_SHORT);
 				e.printStackTrace();
 			}
 		} else {
@@ -409,7 +416,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 			onCameraClosed();
 		}
 	}
-	
+
 	public void onSwitchCameraAction(View v) {
 		videoManager.switchCamera();
 	}
@@ -417,19 +424,23 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	private void onCameraOpen() {
 		Button cameraSwitchBt = (Button) findViewById(R.id.gt_camera_switch_bt);
 		cameraSwitchBt.setVisibility(View.VISIBLE);
-		
+
 		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
 		cameraBt.setText(R.string.close_camera);
+		
+		wakeLock.acquire();
 	}
-	
+
 	private void onCameraClosed() {
 		Button cameraSwitchBt = (Button) findViewById(R.id.gt_camera_switch_bt);
 		cameraSwitchBt.setVisibility(View.GONE);
-		
+
 		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
 		cameraBt.setText(R.string.open_camera);
+		
+		wakeLock.release();
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		onLeaveAction(null);

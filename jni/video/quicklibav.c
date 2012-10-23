@@ -82,8 +82,6 @@ static AVStream * create_video_stream(AVFormatContext *oc, enum CodecID codec_id
     AVDictionary *dict = 0;
     av_dict_set(&dict, "profile", "baseline", 0);
 
-    D("set x264 profile");
-    
     /* open video codec */
     if (avcodec_open2(c, codec, &dict) < 0) {
         D("Could not open codec");
@@ -127,7 +125,6 @@ int init_quick_video_output(QuickVideoOutput *qvo, const char *filename, const c
     qvo->video_output_context = oc;
     
     AVStream *video_st = create_video_stream(oc, fmt->video_codec, qvo->width, qvo->height);
-    D("after create video stream");
 
     if (!video_st) {
         D("Could not add video stream\n");
@@ -140,7 +137,6 @@ int init_quick_video_output(QuickVideoOutput *qvo, const char *filename, const c
     video_outbuf_size = 100000 + 12 * video_st->codec->width * video_st->codec->height;
     video_outbuf = av_malloc(video_outbuf_size);
     
-    D("begin to dump format");
     av_dump_format(oc, 0, filename, 1);
     
     /* open the output file, if needed */
@@ -154,11 +150,6 @@ int init_quick_video_output(QuickVideoOutput *qvo, const char *filename, const c
             D("file open ok\n");
         }
     }
-    
-    
-  //  printf("video stream time base: %d / %d - codec time base: %d / %d\n",video_st->time_base.num, video_st->time_base.den, video_st->codec->time_base.num, video_st->codec->time_base.den);
-    
-    D("begin to write header");
     /* write the stream header, if any */
     avformat_write_header(oc, NULL);
     

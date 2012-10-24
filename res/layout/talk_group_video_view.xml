@@ -61,8 +61,8 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
+        android:background="@drawable/camera_switch_button_bg"
         android:onClick="onSwitchCameraAction"
-        android:visibility="gone"
-        android:background="@drawable/camera_switch_button_bg" />
+        android:visibility="gone" />
 
 </RelativeLayout>

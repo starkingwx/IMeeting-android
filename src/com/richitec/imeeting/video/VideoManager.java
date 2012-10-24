@@ -4,14 +4,17 @@ import java.io.IOException;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
 import android.hardware.Camera.Size;
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.richitec.commontoolkit.utils.VersionUtils;
@@ -47,8 +50,11 @@ public class VideoManager implements Camera.PreviewCallback,
 	private ECVideoEncoder videoEncoder;
 
 	private boolean videoLiving;
+	private Activity activity;
 
-	public VideoManager(Context context) {
+	public VideoManager(Activity context) {
+		this.activity = context;
+
 		currentCameraPostion = CameraPosition.FrontCamera;
 		previewSurface = new SurfaceView(context);
 		previewSurface.getHolder().addCallback(this);
@@ -104,6 +110,14 @@ public class VideoManager implements Camera.PreviewCallback,
 		if (previewSurfaceParent != null) {
 			previewSurfaceParent.removeView(previewSurface);
 		}
+	}
+
+	public void hideVideoPreview() {
+		previewSurface.setVisibility(View.GONE);
+	}
+
+	public void showVideoPreview() {
+		previewSurface.setVisibility(View.VISIBLE);
 	}
 
 	/**
@@ -174,16 +188,15 @@ public class VideoManager implements Camera.PreviewCallback,
 							Camera.getCameraInfo(i, cinfo);
 							if (cinfo.facing == CameraInfo.CAMERA_FACING_FRONT) {
 								camera = Camera.open(i);
-								camera.setDisplayOrientation(90);
-								Parameters p = camera.getParameters();
-								p.setPreviewSize(320, 240);
-								camera.setParameters(p);
+								setupCamera(camera, i);
 								currentCameraPostion = CameraPosition.FrontCamera;
 								Log.d(SystemConstants.TAG,
 										"open front camera ok!!!");
 								break;
 							}
 						}
+					} else {
+						camera = getCamera(CameraPosition.BackCamera);
 					}
 				} else {
 					// there is no way to get front camera below version 2.3
@@ -193,12 +206,7 @@ public class VideoManager implements Camera.PreviewCallback,
 			} else {
 				// get back camera
 				camera = Camera.open(); // attempt to get back Camera instance
-				if (sdk >= 8) {
-					camera.setDisplayOrientation(90);
-				}
-				Parameters p = camera.getParameters();
-				p.setPreviewSize(320, 240);
-				camera.setParameters(p);
+				setupCamera(camera, 0);
 				currentCameraPostion = CameraPosition.BackCamera;
 				Log.d(SystemConstants.TAG, "open back camera ok!!!");
 			}
@@ -209,34 +217,90 @@ public class VideoManager implements Camera.PreviewCallback,
 		return camera;
 	}
 
+	@TargetApi(8)
+	private void setupCamera(Camera camera, int cameraId) {
+		int sdk = android.os.Build.VERSION.SDK_INT;
+		if (sdk >= 8) {
+			camera.setDisplayOrientation(90);
+		}
+		// else if (sdk >= 9) {
+		// setCameraDisplayOrientation(cameraId, camera);
+		// }
+		Parameters p = camera.getParameters();
+		p.setPreviewSize(320, 240);
+		camera.setParameters(p);
+	}
+
+	@TargetApi(9)
+	private void setCameraDisplayOrientation(int cameraId, Camera camera) {
+		CameraInfo info = new CameraInfo();
+		Camera.getCameraInfo(cameraId, info);
+		int rotation = activity.getWindowManager().getDefaultDisplay()
+				.getRotation();
+		int degrees = 0;
+		switch (rotation) {
+		case Surface.ROTATION_0:
+			degrees = 0;
+			break;
+		case Surface.ROTATION_90:
+			degrees = 90;
+			break;
+		case Surface.ROTATION_180:
+			degrees = 180;
+			break;
+		case Surface.ROTATION_270:
+			degrees = 270;
+			break;
+		}
+
+		int result;
+		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+			result = (info.orientation + degrees) % 360;
+			result = (360 - result) % 360; // compensate the mirror
+		} else { // back-facing
+			result = (info.orientation - degrees + 360) % 360;
+		}
+
+		Log.d(SystemConstants.TAG, String.format(
+				"rotation: %d, facing: %d, info orientation: %d, result: %d",
+				rotation, info.facing, info.orientation, result));
+		camera.setDisplayOrientation(result);
+	}
+
 	@Override
 	public void onPreviewFrame(byte[] data, Camera camera) {
+		Log.d(SystemConstants.TAG, "onPreviewFrame");
 		Size size = camera.getParameters().getPreviewSize();
-		int w = size.width;
-		int h = size.height;
+		if (size != null) {
+			int w = size.width;
+			int h = size.height;
 
-		videoEncoder.processRawFrame(data, w, h);
+			videoEncoder.processRawFrame(data, w, h);
+		}
 	}
 
 	@Override
 	public void surfaceChanged(SurfaceHolder arg0, int arg1, int arg2, int arg3) {
-		// TODO Auto-generated method stub
-
+		Log.d(SystemConstants.TAG, "surfaceChanged");
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder arg0) {
-		try {
-			if (camera != null) {
+		Log.d(SystemConstants.TAG, "surfaceCreated");
+		if (camera != null) {
+			try {
 				camera.setPreviewDisplay(previewSurface.getHolder());
+				camera.setPreviewCallback(this);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
+			camera.startPreview();
 		}
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
-
+		Log.d(SystemConstants.TAG, "surfaceDestroyed");
+		camera.stopPreview();
 	}
 }

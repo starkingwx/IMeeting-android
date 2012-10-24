@@ -93,6 +93,8 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	private WakeLock wakeLock;
 
+	protected Handler messageHandler;
+
 	enum GTViewType {
 		MemberListView, VideoView
 	}
@@ -123,7 +125,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		PowerManager powerMan = (PowerManager) this
 				.getSystemService(Context.POWER_SERVICE);
 		wakeLock = powerMan.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
-		
+
 		initUI();
 
 		notifier = new WebSocketNotifier();
@@ -135,6 +137,8 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 		timer = new Timer();
 		timer.schedule(new HeartBeatTimerTask(), 10000, 10000);
+
+		messageHandler = new Handler(Looper.myLooper());
 	}
 
 	private void initUI() {
@@ -401,16 +405,50 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	public void onCameraButtonAction(View v) {
 		if (!videoManager.isVideoLiving()) {
-			try {
-				videoManager.startVideoLive();
-				videoManager.attachVideoPreview(smallVideoLayout);
-				onCameraOpen();
-			} catch (Exception e) {
-				MyToast.show(this, R.string.camera_cannot_open,
-						Toast.LENGTH_SHORT);
-				e.printStackTrace();
-			}
+			startVideoLive();
 		} else {
+			stopVideoLive();
+		}
+	}
+
+	private void startVideoLive() {
+		if (!videoManager.isVideoLiving()) {
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						videoManager.startVideoLive();
+
+						messageHandler.post(new Runnable() {
+
+							@Override
+							public void run() {
+								videoManager
+										.attachVideoPreview(smallVideoLayout);
+								onCameraOpen();
+							}
+						});
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						messageHandler.post(new Runnable() {
+
+							@Override
+							public void run() {
+								MyToast.show(TalkingGroupActivity.this,
+										R.string.camera_cannot_open,
+										Toast.LENGTH_SHORT);
+							}
+						});
+					}
+				}
+			}).start();
+		}
+	}
+
+	private void stopVideoLive() {
+		if (videoManager.isVideoLiving()) {
 			videoManager.detachVideoPreview();
 			videoManager.stopVideoLive();
 			onCameraClosed();
@@ -427,7 +465,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
 		cameraBt.setText(R.string.close_camera);
-		
+
 		wakeLock.acquire();
 	}
 
@@ -437,7 +475,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
 		cameraBt.setText(R.string.open_camera);
-		
+
 		wakeLock.release();
 	}
 
@@ -447,6 +485,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	}
 
 	private void leaveGroupTalk() {
+		stopVideoLive();
 		timer.cancel();
 		notifier.disconnect();
 		HashMap<String, String> params = new HashMap<String, String>();
@@ -487,6 +526,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	private void onCloseGroupTalkRequestReturn() {
 		dismissProgressDlg();
+		stopVideoLive();
 		timer.cancel();
 		notifier.disconnect();
 		TalkingGroupActivity.this.finish();
@@ -1059,12 +1099,20 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		flipper.setInAnimation(this, R.anim.left_in);
 		flipper.setOutAnimation(this, R.anim.left_out);
 		flipper.showNext();
+
+		if (videoManager.isVideoLiving()) {
+			videoManager.showVideoPreview();
+		}
 	}
 
 	private void showMemberListView() {
 		flipper.setInAnimation(this, R.anim.right_in);
 		flipper.setOutAnimation(this, R.anim.right_out);
 		flipper.showPrevious();
+
+		if (videoManager.isVideoLiving()) {
+			videoManager.hideVideoPreview();
+		}
 	}
 
 	@Override

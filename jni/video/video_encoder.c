@@ -7,6 +7,7 @@
 #include <string.h>
 #include <jni.h>
 #include "../common.h"
+#include "util.h"
 #include "quicklibav.h"
 #include "libswscale/swscale.h"
 
@@ -114,19 +115,31 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 	if (!qvo || !is_video_encode_ready) {
 		return;
 	}
-
 	D("process raw frame - width: %d height: %d", width, height);
+
+	jint rotateWidth, rotateHeight;
 
 	AVCodecContext *c = qvo->video_stream->codec;
 
 	jbyte *p_buffer_array = (*env)->GetByteArrayElements(env, buffer, 0);
-	avpicture_fill((AVPicture *)tmp_picture, p_buffer_array, src_pix_fmt, width, height);
+
+	unsigned char * p_rotated_buffer = rotateYUV420SPDegree90(p_buffer_array, width, height, &rotateWidth, &rotateHeight);
+	if (!p_rotated_buffer) {
+		(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array, JNI_ABORT);
+		return;
+	}
+	D("rotate YUV420SP ok");
+	avpicture_fill((AVPicture *)tmp_picture, p_rotated_buffer, src_pix_fmt, rotateWidth, rotateHeight);
+	D("avpicture fill ok");
+
 	(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array, JNI_ABORT);
+	D("release byte array");
 
-	img_convert_ctx = sws_getCachedContext(img_convert_ctx, width, height, src_pix_fmt, qvo->width, qvo->height, c->pix_fmt, SWS_BILINEAR, NULL, NULL, NULL);
-
-	sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize, 0, height, raw_picture->data, raw_picture->linesize);
-
+	D("roated width: %d, height: %d", rotateWidth, rotateHeight);
+	img_convert_ctx = sws_getCachedContext(img_convert_ctx, rotateWidth, rotateHeight, src_pix_fmt, qvo->width, qvo->height, c->pix_fmt, SWS_BILINEAR, NULL, NULL, NULL);
+	D("get convert ctx ok");
+	sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize, 0, rotateHeight, raw_picture->data, raw_picture->linesize);
+	D("scale image ok");
 	int out_size = write_video_frame(qvo, raw_picture);
 
 	D("stream pts val: %lld time base: %d / %d", qvo->video_stream->pts.val, qvo->video_stream->time_base.num, qvo->video_stream->time_base.den);
@@ -135,4 +148,6 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 
 
 	raw_picture->pts++;
+
+	free(p_rotated_buffer);
 }

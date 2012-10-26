@@ -28,6 +28,11 @@ import com.richitec.imeeting.constants.SystemConstants;
  */
 public class VideoManager implements Camera.PreviewCallback,
 		SurfaceHolder.Callback {
+	// rotation degree
+	private static final int Rotation_0 = 0;
+	private static final int Rotation_90 = 90;
+	private static final int Rotation_270 = 270;
+	
 	enum CameraPosition {
 		FrontCamera(1), BackCamera(0);
 
@@ -51,7 +56,8 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	private boolean videoLiving;
 	private Activity activity;
-
+	
+	private int imageRotationDegree;
 	public VideoManager(Activity context) {
 		this.activity = context;
 
@@ -62,6 +68,7 @@ public class VideoManager implements Camera.PreviewCallback,
 				SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		videoEncoder = new ECVideoEncoder();
 		videoLiving = false;
+		imageRotationDegree = Rotation_0;
 	}
 
 	public void setRtmpUrl(String rtmpUrl) {
@@ -190,6 +197,7 @@ public class VideoManager implements Camera.PreviewCallback,
 								camera = Camera.open(i);
 								setupCamera(camera, i);
 								currentCameraPostion = CameraPosition.FrontCamera;
+								imageRotationDegree = Rotation_270;
 								Log.d(SystemConstants.TAG,
 										"open front camera ok!!!");
 								break;
@@ -208,6 +216,7 @@ public class VideoManager implements Camera.PreviewCallback,
 				camera = Camera.open(); // attempt to get back Camera instance
 				setupCamera(camera, 0);
 				currentCameraPostion = CameraPosition.BackCamera;
+				imageRotationDegree = Rotation_90;
 				Log.d(SystemConstants.TAG, "open back camera ok!!!");
 			}
 		} catch (Exception e) {
@@ -275,7 +284,7 @@ public class VideoManager implements Camera.PreviewCallback,
 			int w = size.width;
 			int h = size.height;
 
-			videoEncoder.processRawFrame(data, w, h);
+			videoEncoder.processRawFrame(data, w, h, imageRotationDegree);
 		}
 	}
 

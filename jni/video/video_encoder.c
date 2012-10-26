@@ -7,7 +7,7 @@
 #include <string.h>
 #include <jni.h>
 #include "../common.h"
-#include "util.h"
+#include "../util/yuv_util.h"
 #include "quicklibav.h"
 #include "libswscale/swscale.h"
 
@@ -111,7 +111,7 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_releaseVideoEncoder(
 }
 
 void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
-		JNIEnv* env, jobject thiz, jbyteArray buffer, jint width, jint height) {
+		JNIEnv* env, jobject thiz, jbyteArray buffer, jint width, jint height, jint rotateDegree) {
 	if (!qvo || !is_video_encode_ready) {
 		return;
 	}
@@ -123,23 +123,20 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 
 	jbyte *p_buffer_array = (*env)->GetByteArrayElements(env, buffer, 0);
 
-	unsigned char * p_rotated_buffer = rotateYUV420SPDegree90(p_buffer_array, width, height, &rotateWidth, &rotateHeight);
+	D("process raw frame - rotate degree: %d", rotateDegree);
+
+	unsigned char * p_rotated_buffer = rotateYUV420SP(p_buffer_array, width, height, rotateDegree, &rotateWidth, &rotateHeight);
 	if (!p_rotated_buffer) {
 		(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array, JNI_ABORT);
 		return;
 	}
-	D("rotate YUV420SP ok");
 	avpicture_fill((AVPicture *)tmp_picture, p_rotated_buffer, src_pix_fmt, rotateWidth, rotateHeight);
 	D("avpicture fill ok");
-
 	(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array, JNI_ABORT);
-	D("release byte array");
 
-	D("roated width: %d, height: %d", rotateWidth, rotateHeight);
 	img_convert_ctx = sws_getCachedContext(img_convert_ctx, rotateWidth, rotateHeight, src_pix_fmt, qvo->width, qvo->height, c->pix_fmt, SWS_BILINEAR, NULL, NULL, NULL);
-	D("get convert ctx ok");
 	sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize, 0, rotateHeight, raw_picture->data, raw_picture->linesize);
-	D("scale image ok");
+	D("scale ok");
 	int out_size = write_video_frame(qvo, raw_picture);
 
 	D("stream pts val: %lld time base: %d / %d", qvo->video_stream->pts.val, qvo->video_stream->time_base.num, qvo->video_stream->time_base.den);

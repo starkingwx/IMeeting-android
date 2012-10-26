@@ -64,8 +64,9 @@ public class ECVideoEncoder {
 	 *            - frame width
 	 * @param height
 	 *            - frame height
+	 * @param rotateDegree - rotation degree
 	 */
-	public native void processRawFrame(byte[] buffer, int width, int height);
+	public native void processRawFrame(byte[] buffer, int width, int height, int rotateDegree);
 
 	static {
 		System.loadLibrary("video");

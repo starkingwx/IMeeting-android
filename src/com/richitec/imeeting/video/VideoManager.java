@@ -2,10 +2,9 @@ package com.richitec.imeeting.video;
 
 import java.io.IOException;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.Context;
+import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
@@ -17,7 +16,6 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.imeeting.constants.SystemConstants;
 
 /**
@@ -120,11 +118,15 @@ public class VideoManager implements Camera.PreviewCallback,
 	}
 
 	public void hideVideoPreview() {
-		previewSurface.setVisibility(View.GONE);
+		if (previewSurfaceParent != null) {
+			previewSurfaceParent.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	public void showVideoPreview() {
-		previewSurface.setVisibility(View.VISIBLE);
+		if (previewSurfaceParent != null) {
+			previewSurfaceParent.setVisibility(View.VISIBLE);
+		}
 	}
 
 	/**
@@ -237,6 +239,7 @@ public class VideoManager implements Camera.PreviewCallback,
 		// }
 		Parameters p = camera.getParameters();
 		p.setPreviewSize(320, 240);
+		p.setPreviewFormat(ImageFormat.NV21);
 		camera.setParameters(p);
 	}
 

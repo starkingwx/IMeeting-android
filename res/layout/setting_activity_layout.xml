@@ -1,66 +1,33 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-    <LinearLayout
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    >
+    
+    <ScrollView 
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="30dp"
-        android:paddingRight="30dp" >
-
-        <View
-            android:id="@+id/settingTopMarginView"
+        android:layout_height="fill_parent"
+        >
+          
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="40dp" />
-
-        <Button
-            android:id="@+id/accountSetting_btn"
-            android:layout_width="fill_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="center"
-            android:background="@drawable/setting_item_btn_bg"
-            android:text="@string/accountSetting_btn_title"
-            android:textColor="@color/dim_gray" />
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingBottom="10.0dp"
+             >
+             
+            <!--第一个白框  -->
+            <include layout="@layout/setting_activity_content_first_layout"/>      
+            <!-- 第二个白框 -->
+            <include layout="@layout/setting_activity_content_second_layout"  />          
+            <!-- 第三个白匡 -->
+            <include layout="@layout/setting_activity_content_third_layout"/>
+ 
+        </LinearLayout>
         
-        <Button
-            android:id="@+id/accountCharge_btn"
-            android:layout_width="fill_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="center"
-            android:background="@drawable/setting_item_btn_bg"
-            android:onClick="onAccountChargeButtonClick"
-            android:text="@string/accountCharge_btn_title"
-            android:textColor="@color/dim_gray" />
-
-        <Button
-            android:id="@+id/addressbook_upload_btn"
-            android:layout_width="fill_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="center"
-            android:background="@drawable/setting_item_btn_bg"
-            android:onClick="onAddressBookUploadButtonClick"
-            android:text="@string/addressbook_upload_btn_title"
-            android:textColor="@color/dim_gray" />
-        
-        <Button
-            android:id="@+id/help_btn"
-            android:layout_width="fill_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="center"
-            android:background="@drawable/setting_item_btn_bg"
-            android:text="@string/support_btn_title"
-            android:textColor="@color/dim_gray" />
-
-        <Button
-            android:id="@+id/about_btn"
-            android:layout_width="fill_parent"
-            android:layout_height="56dp"
-            android:layout_gravity="center"
-            android:background="@drawable/setting_item_btn_bg"
-            android:text="@string/about_btn_title"
-            android:textColor="@color/dim_gray" />
-    </LinearLayout>
-
-</ScrollView>
+    </ScrollView>
+    
+</LinearLayout>

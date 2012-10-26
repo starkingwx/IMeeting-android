@@ -39,23 +39,12 @@ public class SettingActivity extends IMeetingNavigationActivity {
 		super.onCreate(savedInstanceState);
 
 		// set content view
-		setContentView(R.layout.setting_activity_layout2);
+		setContentView(R.layout.setting_activity_layout);
 
 		// set title text
 		setTitle(R.string.setting_nav_title_text);
 
 		// bind account setting button on click listener
-		/*((Button) findViewById(R.id.accountSetting_btn))
-				.setOnClickListener(new AccountSettingBtnOnClickListener());
-		
-
-		// bind help button on click listener
-		((Button) findViewById(R.id.help_btn))
-				.setOnClickListener(new HelpBtnOnClickListener());
-
-		// bind about button on click listener
-		((Button) findViewById(R.id.about_btn))
-				.setOnClickListener(new AboutBtnOnClickListener());*/
 		
 		((LinearLayout)findViewById(R.id.accountSetting_item))
 				.setOnClickListener(new AccountSettingBtnOnClickListener());

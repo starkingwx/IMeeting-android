@@ -52,7 +52,7 @@ public class ECVideoDecoder {
 	public void stopFetchVideo() {
 		if (executor != null) {
 			executor.setFetchListener(null);
-			
+			executor.cancel();
 		}
 	}
 }

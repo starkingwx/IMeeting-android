@@ -24,6 +24,29 @@ static struct SwsContext *img_convert_ctx = NULL;
 static enum PixelFormat src_pix_fmt;
 static int is_video_encode_ready = 0; // boolean flag
 
+void release_video_encoder() {
+	is_video_encode_ready = 0;
+
+	if (qvo) {
+		close_quick_video_ouput(qvo);
+		free(qvo);
+		qvo = NULL;
+	}
+
+	if (raw_picture) {
+		if (raw_picture->data[0]) {
+			av_free(raw_picture->data[0]);
+		}
+		av_free(raw_picture);
+		raw_picture = NULL;
+	}
+
+	if (tmp_picture) {
+		av_free(tmp_picture);
+		tmp_picture = NULL;
+	}
+}
+
 void Java_com_richitec_imeeting_video_ECVideoEncoder_setRtmpUrl(JNIEnv* env,
 		jobject thiz, jstring rtmpUrl) {
 	const char *str = (*env)->GetStringUTFChars(env, rtmpUrl, 0);
@@ -66,13 +89,14 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_setupVideoEncoder(
 
 	char rtmp_full_path[300];
 	memset(rtmp_full_path, 0, sizeof rtmp_full_path);
-	sprintf(rtmp_full_path, "%s/%s/%s live=1 conn=S:%s", rtmp_url, group_id, live_name, live_name);
+	sprintf(rtmp_full_path, "%s/%s/%s live=1 conn=S:%s", rtmp_url, group_id,
+			live_name, live_name);
 	D("rtmp full path: %s", rtmp_full_path);
 
 	int ret = init_quick_video_output(qvo, rtmp_full_path, "flv");
 	if (ret < 0) {
 		D("quick video output initial failed.");
-		Java_com_richitec_imeeting_video_ECVideoEncoder_releaseVideoEncoder(env, thiz);
+		release_video_encoder();
 		return;
 	}
 
@@ -88,30 +112,12 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_setupVideoEncoder(
 
 void Java_com_richitec_imeeting_video_ECVideoEncoder_releaseVideoEncoder(
 		JNIEnv* env, jobject thiz) {
-	is_video_encode_ready = 0;
-
-	if (qvo) {
-		close_quick_video_ouput(qvo);
-		free(qvo);
-		qvo = NULL;
-	}
-
-	if (raw_picture) {
-		if (raw_picture->data[0]) {
-			av_free(raw_picture->data[0]);
-		}
-		av_free(raw_picture);
-		raw_picture = NULL;
-	}
-
-	if (tmp_picture) {
-		av_free(tmp_picture);
-		tmp_picture = NULL;
-	}
+	release_video_encoder();
 }
 
 void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
-		JNIEnv* env, jobject thiz, jbyteArray buffer, jint width, jint height, jint rotateDegree) {
+		JNIEnv* env, jobject thiz, jbyteArray buffer, jint width, jint height,
+		jint rotateDegree) {
 	if (!qvo || !is_video_encode_ready) {
 		return;
 	}
@@ -125,24 +131,32 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 
 	D("process raw frame - rotate degree: %d", rotateDegree);
 
-	unsigned char * p_rotated_buffer = rotateYUV420SP(p_buffer_array, width, height, rotateDegree, &rotateWidth, &rotateHeight);
+	unsigned char * p_rotated_buffer = rotateYUV420SP(p_buffer_array, width,
+			height, rotateDegree, &rotateWidth, &rotateHeight);
 	if (!p_rotated_buffer) {
-		(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array, JNI_ABORT);
+		(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array,
+				JNI_ABORT);
 		return;
 	}
-	avpicture_fill((AVPicture *)tmp_picture, p_rotated_buffer, src_pix_fmt, rotateWidth, rotateHeight);
+	avpicture_fill((AVPicture *) tmp_picture, p_rotated_buffer, src_pix_fmt,
+			rotateWidth, rotateHeight);
 	D("avpicture fill ok");
 	(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array, JNI_ABORT);
 
-	img_convert_ctx = sws_getCachedContext(img_convert_ctx, rotateWidth, rotateHeight, src_pix_fmt, qvo->width, qvo->height, c->pix_fmt, SWS_BILINEAR, NULL, NULL, NULL);
-	sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize, 0, rotateHeight, raw_picture->data, raw_picture->linesize);
+	img_convert_ctx = sws_getCachedContext(img_convert_ctx, rotateWidth,
+			rotateHeight, src_pix_fmt, qvo->width, qvo->height, c->pix_fmt,
+			SWS_BILINEAR, NULL, NULL, NULL);
+	sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize, 0,
+			rotateHeight, raw_picture->data, raw_picture->linesize);
 	D("scale ok");
 	int out_size = write_video_frame(qvo, raw_picture);
 
-	D("stream pts val: %lld time base: %d / %d", qvo->video_stream->pts.val, qvo->video_stream->time_base.num, qvo->video_stream->time_base.den);
-	double video_pts = (double)qvo->video_stream->pts.val * qvo->video_stream->time_base.num / qvo->video_stream->time_base.den;
+	D(
+			"stream pts val: %lld time base: %d / %d", qvo->video_stream->pts.val, qvo->video_stream->time_base.num, qvo->video_stream->time_base.den);
+	double video_pts = (double) qvo->video_stream->pts.val
+			* qvo->video_stream->time_base.num
+			/ qvo->video_stream->time_base.den;
 	D("write video frame - size: %d video pts: %f", out_size, video_pts);
-
 
 	raw_picture->pts++;
 

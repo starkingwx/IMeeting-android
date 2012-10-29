@@ -4,6 +4,6 @@ include $(CLEAR_VARS)
 LOCAL_LDLIBS := -llog
 
 LOCAL_MODULE    := util
-LOCAL_SRC_FILES := yuv_util.c
+LOCAL_SRC_FILES := yuv_util.c jni_util.c
 
 include $(BUILD_STATIC_LIBRARY)

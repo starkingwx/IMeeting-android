@@ -1,5 +1,7 @@
 package com.richitec.imeeting.video;
 
+import android.graphics.Bitmap;
+
 /**
  * fetch the video from RTMP server, and decode it
  * 
@@ -55,4 +57,30 @@ public class ECVideoDecoder {
 			executor.cancel();
 		}
 	}
+
+	public void setRtmpUrl(String rtmpUrl) {
+		this.rtmpUrl = rtmpUrl;
+	}
+
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
+
+	public void setDstImgWidth(int dstImgWidth) {
+		this.dstImgWidth = dstImgWidth;
+	}
+
+	public void setDstImgHeight(int dstImgHeight) {
+		this.dstImgHeight = dstImgHeight;
+	}
+
+	public void setFetchListener(VideoFetchListener fetchListener) {
+		this.fetchListener = fetchListener;
+	}
+
+	static {
+		System.loadLibrary("video");
+	}
+
+	
 }

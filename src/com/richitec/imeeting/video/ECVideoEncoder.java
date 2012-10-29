@@ -23,6 +23,12 @@ public class ECVideoEncoder {
 	 * @param name
 	 */
 	public native void setLiveName(String name);
+	
+	/**
+	 * get the name of living video
+	 * @return
+	 */
+	public native String getLiveName();
 
 	/**
 	 * set group id for living video

@@ -17,6 +17,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,11 +61,13 @@ import com.richitec.imeeting.talkinggroup.adapter.MemberListAdapter;
 import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
 import com.richitec.imeeting.talkinggroup.statusfilter.OwnerModeStatusFilter;
 import com.richitec.imeeting.util.AppUtil;
+import com.richitec.imeeting.video.VideoFetchListener;
 import com.richitec.imeeting.video.VideoManager;
 import com.richitec.websocket.notifier.NotifierCallbackListener;
 import com.richitec.websocket.notifier.WebSocketNotifier;
 
-public class TalkingGroupActivity extends Activity implements OnGestureListener {
+public class TalkingGroupActivity extends Activity implements
+		OnGestureListener, VideoFetchListener {
 	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID = "talking group id";
 	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUP_ATTENDEESPHONE = "talking group attendees phone";
 
@@ -121,6 +124,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		videoManager.setRtmpUrl(getString(R.string.rtmp_server_url));
 		videoManager.setImgWidth(144);
 		videoManager.setImgHeight(192);
+		videoManager.setVideoFetchListener(this);
 
 		PowerManager powerMan = (PowerManager) this
 				.getSystemService(Context.POWER_SERVICE);
@@ -219,15 +223,13 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	public void onSwitchToVideoView(View v) {
 		if (currentView == GTViewType.MemberListView) {
-			showVideoView();
-			currentView = GTViewType.VideoView;
+			switchToVideoView();
 		}
 	}
 
 	public void onSwitchToMemberListView(View v) {
 		if (currentView == GTViewType.VideoView) {
-			showMemberListView();
-			currentView = GTViewType.MemberListView;
+			switchToMemberListView();
 		}
 	}
 
@@ -582,6 +584,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	private void doActionForSelectedMemberInOwnerMode(Map<String, String> member) {
 		final String userName = member.get(Attendee.username.name());
+		String videoStatus = member.get(Attendee.video_status.name());
 		String displayName = AppUtil.getDisplayNameFromAttendee(member);
 		String onlineStatus = member.get(Attendee.online_status.name());
 		String phoneStatus = member.get(Attendee.telephone_status.name());
@@ -589,6 +592,10 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		String accountName = UserManager.getInstance().getUser().getName();
 
 		List<String> actionList = new ArrayList<String>();
+//		if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+			actionList.add(getString(R.string.watch_video));
+//		}
+
 		if (!Attendee.OnlineStatus.online.name().equals(onlineStatus)
 				|| accountName.equals(userName)) {
 			if (Attendee.PhoneStatus.Terminated.name().equals(phoneStatus)
@@ -628,6 +635,9 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 							sendSMS(numbers);
 						} else if (action.equals(getString(R.string.kick_out))) {
 							kickout(userName);
+						} else if (action
+								.equals(getString(R.string.watch_video))) {
+							watchVideo(userName);
 						}
 					}
 				}).show();
@@ -786,6 +796,15 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 			intent.putExtra("sms_body", smsBody);
 			startActivity(intent);
 		}
+	}
+
+	private void watchVideo(String targetUserName) {
+		if (!targetUserName.equals(videoManager.getVideoDecoder()
+				.getCurrentVideoUserName())) {
+			videoManager.stopVideoFetch();
+			videoManager.startVideoFetch(targetUserName);
+		}
+		switchToVideoView();
 	}
 
 	private NotifierCallbackListener notifyCallbackListener = new NotifierCallbackListener() {
@@ -1095,7 +1114,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	}
 
-	private void showVideoView() {
+	private void switchToVideoView() {
 		flipper.setInAnimation(this, R.anim.left_in);
 		flipper.setOutAnimation(this, R.anim.left_out);
 		flipper.showNext();
@@ -1103,9 +1122,11 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		if (videoManager.isVideoLiving()) {
 			videoManager.showVideoPreview();
 		}
+
+		currentView = GTViewType.VideoView;
 	}
 
-	private void showMemberListView() {
+	private void switchToMemberListView() {
 		flipper.setInAnimation(this, R.anim.right_in);
 		flipper.setOutAnimation(this, R.anim.right_out);
 		flipper.showPrevious();
@@ -1113,6 +1134,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		if (videoManager.isVideoLiving()) {
 			videoManager.hideVideoPreview();
 		}
+		currentView = GTViewType.MemberListView;
 	}
 
 	@Override
@@ -1131,13 +1153,13 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		Log.d(SystemConstants.TAG, "e1 x: " + e1.getX() + " e2 x: " + e2.getX());
 		if (e1.getX() - e2.getX() > MIN_FLING_DISTANCE) {
 			if (currentView == GTViewType.MemberListView) {
-				showVideoView();
+				switchToVideoView();
 			}
 			currentView = GTViewType.VideoView;
 			return true;
 		} else if (e2.getX() - e1.getX() > MIN_FLING_DISTANCE) {
 			if (currentView == GTViewType.VideoView) {
-				showMemberListView();
+				switchToMemberListView();
 			}
 			currentView = GTViewType.MemberListView;
 			return true;
@@ -1165,6 +1187,35 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		return false;
+	}
+
+	@Override
+	public void onFetchNewImage(Bitmap image) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onFetchFailed() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onVideoFetchBeginToPrepare(String username) {
+		Log.d(SystemConstants.TAG, "onVideoFetchBeginToPrepare : " + username);
+	}
+
+	@Override
+	public void onVideoFetchPrepared() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onFetchEnd() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

@@ -107,6 +107,7 @@
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
     <string name="do_you_want_to_leave_group">您要离开当前群聊吗？\n点击确定后系统将挂断您的电话，不影响其他人的使用。</string>
+    <string name="watch_video">观看视频</string>
     <string name="call">呼叫</string>
     <string name="hang_up">挂断</string>
     <string name="kick_out">移出群聊</string>

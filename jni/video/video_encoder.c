@@ -63,6 +63,11 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_setLiveName(JNIEnv* env,
 	(*env)->ReleaseStringUTFChars(env, name, str);
 }
 
+jstring Java_com_richitec_imeeting_video_ECVideoEncoder_getLiveName(JNIEnv* env,
+		jobject thiz) {
+	return (*env)->NewStringUTF(env, live_name);
+}
+
 void Java_com_richitec_imeeting_video_ECVideoEncoder_setGroupId(JNIEnv* env,
 		jobject thiz, jstring groupId) {
 	const char *str = (*env)->GetStringUTFChars(env, groupId, 0);

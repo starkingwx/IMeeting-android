@@ -51,7 +51,8 @@ public class VideoManager implements Camera.PreviewCallback,
 	private SurfaceView previewSurface;
 	private ViewGroup previewSurfaceParent;
 	private ECVideoEncoder videoEncoder;
-
+	private ECVideoDecoder videoDecoder;
+	
 	private boolean videoLiving;
 	private Activity activity;
 	
@@ -65,30 +66,47 @@ public class VideoManager implements Camera.PreviewCallback,
 		previewSurface.getHolder().setType(
 				SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		videoEncoder = new ECVideoEncoder();
+		videoDecoder = new ECVideoDecoder();
 		videoLiving = false;
 		imageRotationDegree = Rotation_0;
 	}
 
+	public ECVideoDecoder getVideoDecoder() {
+		return videoDecoder;
+	}
+	
 	public void setRtmpUrl(String rtmpUrl) {
 		videoEncoder.setRtmpUrl(rtmpUrl);
+		videoDecoder.setRtmpUrl(rtmpUrl);
 	}
 
 	public void setLiveName(String liveName) {
 		videoEncoder.setLiveName(liveName);
 	}
+	
+	public String getLiveName() {
+		return videoEncoder.getLiveName();
+	}
 
 	public void setGroupId(String groupId) {
 		videoEncoder.setGroupId(groupId);
+		videoDecoder.setGroupId(groupId);
 	}
 
 	public void setImgWidth(int imgWidth) {
 		videoEncoder.setOutImgWidth(imgWidth);
+		videoDecoder.setDstImgWidth(imgWidth);
 	}
 
 	public void setImgHeight(int imgHeight) {
 		videoEncoder.setOutImgHeight(imgHeight);
+		videoDecoder.setDstImgHeight(imgHeight);
 	}
 
+	public void setVideoFetchListener(VideoFetchListener listener) {
+		videoDecoder.setFetchListener(listener);
+	}
+	
 	private void releaseCamera() {
 		if (camera != null) {
 			camera.stopPreview();
@@ -315,4 +333,14 @@ public class VideoManager implements Camera.PreviewCallback,
 		Log.d(SystemConstants.TAG, "surfaceDestroyed");
 		camera.stopPreview();
 	}
+	
+	public void startVideoFetch(String userName) {
+		videoDecoder.startFetchVideo(userName);
+	}
+	
+	public void stopVideoFetch() {
+		videoDecoder.stopFetchVideo();
+	}
+	
+	
 }

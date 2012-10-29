@@ -7,7 +7,7 @@
 
 #include <jni.h>
 #include "../common.h"
-#import "libavformat/avformat.h"
+#include "libavformat/avformat.h"
 
 void Java_com_richitec_imeeting_video_ECVideoDecoder_setupVideoDecoder(
 		JNIEnv* env, jobject thiz) {

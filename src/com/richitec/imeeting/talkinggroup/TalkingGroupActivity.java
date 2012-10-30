@@ -125,7 +125,8 @@ public class TalkingGroupActivity extends Activity implements
 		videoManager.setImgWidth(144);
 		videoManager.setImgHeight(192);
 		videoManager.setVideoFetchListener(this);
-
+		videoManager.initResources();
+		
 		PowerManager powerMan = (PowerManager) this
 				.getSystemService(Context.POWER_SERVICE);
 		wakeLock = powerMan.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
@@ -488,6 +489,7 @@ public class TalkingGroupActivity extends Activity implements
 
 	private void leaveGroupTalk() {
 		stopVideoLive();
+		videoManager.releaseResources();
 		timer.cancel();
 		notifier.disconnect();
 		HashMap<String, String> params = new HashMap<String, String>();
@@ -529,6 +531,7 @@ public class TalkingGroupActivity extends Activity implements
 	private void onCloseGroupTalkRequestReturn() {
 		dismissProgressDlg();
 		stopVideoLive();
+		videoManager.releaseResources();
 		timer.cancel();
 		notifier.disconnect();
 		TalkingGroupActivity.this.finish();
@@ -592,9 +595,9 @@ public class TalkingGroupActivity extends Activity implements
 		String accountName = UserManager.getInstance().getUser().getName();
 
 		List<String> actionList = new ArrayList<String>();
-//		if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+		if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
 			actionList.add(getString(R.string.watch_video));
-//		}
+		}
 
 		if (!Attendee.OnlineStatus.online.name().equals(onlineStatus)
 				|| accountName.equals(userName)) {

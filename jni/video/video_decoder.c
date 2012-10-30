@@ -11,6 +11,7 @@
 
 void Java_com_richitec_imeeting_video_ECVideoDecoder_setupVideoDecoder(
 		JNIEnv* env, jobject thiz) {
+	D("setup video decoder");
 	av_register_all();
 	avformat_network_init();
 }

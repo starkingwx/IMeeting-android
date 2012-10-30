@@ -9,28 +9,33 @@
 #include "../common.h"
 #include "libavformat/avformat.h"
 #include "libavcodec/avcodec.h"
+#include "libswscale/swscale.h"
 
-static enum PixelFormat dst_pix_fmt = PIX_FMT_RGB0;
+static enum PixelFormat dst_pix_fmt = PIX_FMT_RGB24;
 
 int openVideoInputStream(JNIEnv* env, jobject thiz, const char *playPath) {
-	AVFormatContext *inputFormatContext;
-	AVCodecContext *videoCodecContext;
-	AVCodec *videoCodec;
-	int videoStream;
+	D("open video input stream");
+	AVFormatContext *inputFormatContext = NULL;
+	AVCodecContext *videoCodecContext = NULL;
+	AVCodec *videoCodec = NULL;
+	int videoStream = -1;
 
 	int err = avformat_open_input(&inputFormatContext, playPath, NULL, NULL);
 	if (err < 0) {
 		D("ffmpeg: unable to open input");
 		return -1;
 	}
+	D("avformat_open_input ok");
 
 	err = avformat_find_stream_info(inputFormatContext, NULL);
 	if (err < 0) {
 		D("ffmpeg: unable to find stream info");
 		return -1;
 	}
+	D("avformat_find_stream_info ok");
 
 	av_dump_format(inputFormatContext, 0, playPath, 0);
+	D("av_dump_format ok");
 
 	videoStream = -1;
 
@@ -41,6 +46,7 @@ int openVideoInputStream(JNIEnv* env, jobject thiz, const char *playPath) {
 			videoStream = index;
 		}
 	}
+	D("video stream: %d", videoStream);
 
 	if (videoStream == -1) {
 		D("ffmpeg: unable to find video stream");
@@ -75,11 +81,113 @@ int openVideoInputStream(JNIEnv* env, jobject thiz, const char *playPath) {
 }
 
 void readVideoFrame(JNIEnv* env, jobject thiz) {
+	D("### read video frame start");
+	jclass thisClass = (*env)->GetObjectClass(env, thiz);
 
+	AVFormatContext *inputFormatContext = get_int_field(env, thiz,
+			"pInputFormatContext");
+	AVCodecContext *videoCodecContext = get_int_field(env, thiz,
+			"pVideoCodecContext");
+	jint videoStream = get_int_field(env, thiz, "videoStream");
+	jint imgWidth = get_int_field(env, thiz, "imgWidth");
+	jint imgHeight = get_int_field(env, thiz, "imgHeight");
+
+	if (!inputFormatContext) {
+		return;
+	}
+
+	AVPacket packet;
+
+	// allocate a video frame to store the decoded image
+	AVFrame *videoFrame = avcodec_alloc_frame();
+	if (!videoFrame) {
+		D("cannot allocate video frame");
+		call_void_method(env, thiz, "handleError");
+		return;
+	}
+
+	AVFrame *videoPicture = alloc_picture(dst_pix_fmt, imgWidth, imgHeight);
+	if (!videoPicture) {
+		D("failed to alloc video picture");
+		if (videoFrame) {
+			av_free(videoFrame);
+		}
+		call_void_method(env, thiz, "handleError");
+		return;
+	}
+
+	int gotPicture;
+	struct SwsContext *img_convert_ctx = NULL;
+	jsize pic_data_len = imgWidth * imgHeight * 3;
+	jbyteArray pic_data = (*env)->NewByteArray(env, pic_data_len);
+	while (av_read_frame(inputFormatContext, &packet) >= 0) {
+		jfieldID cancelFid = (*env)->GetFieldID(env, thisClass, "cancel", "Z");
+		jboolean cancel = (*env)->GetBooleanField(env, thiz, cancelFid);
+		if (cancel) {
+			D("video fetch executor is cancelled");
+			break;
+		}
+		D("read video frame");
+
+		// check if the packet is from video stream
+		if (packet.stream_index == videoStream) {
+			// decode video frame
+			avcodec_decode_video2(videoCodecContext, videoFrame, &gotPicture,
+					&packet);
+			if (gotPicture) {
+				D("got video frame");
+				img_convert_ctx = sws_getCachedContext(img_convert_ctx,
+						videoCodecContext->width, videoCodecContext->height,
+						videoCodecContext->pix_fmt, imgWidth, imgHeight,
+						dst_pix_fmt, SWS_BILINEAR, NULL, NULL, NULL);
+
+				// convert YUV420 to RGB
+				sws_scale(img_convert_ctx, videoFrame->data,
+						videoFrame->linesize, 0, videoCodecContext->height,
+						videoPicture->data, videoPicture->linesize);
+
+				jmethodID processVideoPictureMid = (*env)->GetMethodID(env,
+						thisClass, "processVideoPicture", "([B)V");
+				if (processVideoPictureMid != NULL) {
+					(*env)->SetByteArrayRegion(env, pic_data, 0, pic_data_len,
+							videoPicture->data);
+
+					(*env)->CallVoidMethod(env, thiz, processVideoPictureMid,
+							pic_data);
+				}
+			}
+		}
+
+	}
+
+	if (videoFrame) {
+		av_free(videoFrame);
+	}
+	if (videoPicture) {
+		if (videoPicture->data[0]) {
+			av_free(videoPicture->data[0]);
+		}
+		av_free(videoPicture);
+	}
 }
 
-void close_video_input_stream() {
+void close_video_input_stream(JNIEnv* env, jobject thiz) {
+	AVFormatContext *inputFormatContext = get_int_field(env, thiz,
+			"pInputFormatContext");
+	AVCodecContext *videoCodecContext = get_int_field(env, thiz,
+			"pVideoCodecContext");
 
+	if (videoCodecContext) {
+		avcodec_close(videoCodecContext);
+		videoCodecContext = NULL;
+		set_int_field(env, thiz, "pVideoCodecContext", videoCodecContext);
+	}
+	if (inputFormatContext) {
+		avformat_close_input(&inputFormatContext);
+		inputFormatContext = NULL;
+		set_int_field(env, thiz, "pInputFormatContext", inputFormatContext);
+	}
+	D("video input stream closed");
 }
 
 void Java_com_richitec_imeeting_video_VideoFetchExecutor_startFetchVideo(
@@ -89,16 +197,58 @@ void Java_com_richitec_imeeting_video_VideoFetchExecutor_startFetchVideo(
 			"Ljava/lang/String;");
 	jstring username = (*env)->GetObjectField(env, thiz, fid);
 
-	jmethodID mid = (*env)->GetMethodID(env, thisClass, "onVideoFetchBeginToPrepare", "(Ljava/lang/String;)V");
-	if (mid != NULL) {
-		D("call void method - mid is not null");
-		(*env)->CallVoidMethod(env, thiz, mid, username);
+	jmethodID onBeginToPreparedMid = (*env)->GetMethodID(env, thisClass,
+			"onVideoFetchBeginToPrepare", "(Ljava/lang/String;)V");
+	if (onBeginToPreparedMid != NULL) {
+		(*env)->CallVoidMethod(env, thiz, onBeginToPreparedMid, username);
 	}
 
+	jstring accountName = get_string_field(env, thiz, "accountName");
+	jstring groupId = get_string_field(env, thiz, "groupId");
+	jstring rtmpUrl = get_string_field(env, thiz, "rtmpUrl");
+	char playPath[300];
+	memset(playPath, 0, sizeof playPath);
+
+	const char *user_name = (*env)->GetStringUTFChars(env, username, 0);
+	const char *account_name = (*env)->GetStringUTFChars(env, accountName, 0);
+	const char *group_id = (*env)->GetStringUTFChars(env, groupId, 0);
+	const char *rtmp_url = (*env)->GetStringUTFChars(env, rtmpUrl, 0);
+
+	sprintf(playPath, "%s/%s/%s live=1 conn=S:%s", rtmp_url, group_id,
+			user_name, account_name);
+	D("video play path: %s", playPath);
+
+	(*env)->ReleaseStringUTFChars(env, username, user_name);
+	(*env)->ReleaseStringUTFChars(env, accountName, account_name);
+	(*env)->ReleaseStringUTFChars(env, groupId, group_id);
+	(*env)->ReleaseStringUTFChars(env, rtmpUrl, rtmp_url);
+
+	int ret = openVideoInputStream(env, thiz, playPath);
+	if (ret < 0) {
+		D("video input stream open failed");
+		call_void_method(env, thiz, "handleError");
+		return;
+	}
+
+	jmethodID onVideoFetchPreparedMid = (*env)->GetMethodID(env, thisClass,
+			"onVideoFetchPrepared", "()V");
+	if (onVideoFetchPreparedMid != NULL) {
+		(*env)->CallVoidMethod(env, thiz, onVideoFetchPreparedMid);
+	}
+
+	readVideoFrame(env, thiz);
+
+	jmethodID onFetchEndMid = (*env)->GetMethodID(env, thisClass, "onFetchEnd",
+			"()V");
+	if (onFetchEndMid != NULL) {
+		(*env)->CallVoidMethod(env, thiz, onFetchEndMid);
+	}
+
+	close_video_input_stream(env, thiz);
 }
 
 void Java_com_richitec_imeeting_video_VideoFetchExecutor_closeVideoInputStream(
 		JNIEnv* env, jobject thiz) {
-	close_video_input_stream();
+	close_video_input_stream(env, thiz);
 }
 

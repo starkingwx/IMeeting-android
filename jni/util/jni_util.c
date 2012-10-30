@@ -7,7 +7,7 @@
 #include "../common.h"
 #include <jni.h>
 
-int get_int_field(JNIEnv* env, jobject thiz, const char *field_name) {
+jint get_int_field(JNIEnv* env, jobject thiz, const char *field_name) {
 	jclass c = (*env)->GetObjectClass(env, thiz);
 	jfieldID fid = (*env)->GetFieldID(env, c, field_name, "I");
 	if (fid != NULL) {
@@ -49,12 +49,10 @@ jobject get_object_field(JNIEnv* env, jobject thiz, const char *field_name,
 	}
 }
 
-void call_void_method(JNIEnv *env, jobject obj, const char *method_name,
-		const char *method_sig, jvalue *args) {
-	jclass clazz = (*env)->GetObjectClass(env, obj);
-	jmethodID mid = (*env)->GetMethodID(env, clazz, method_name, method_sig);
+void call_void_method(JNIEnv* env, jobject thiz, const char *method_name) {
+	jclass clazz = (*env)->GetObjectClass(env, thiz);
+	jmethodID mid = (*env)->GetMethodID(env, clazz, method_name, "()V");
 	if (mid != NULL) {
-		D("call void method - mid is not null");
-		(*env)->CallVoidMethod(env, obj, mid, args);
+		(*env)->CallVoidMethod(env, thiz, mid);
 	}
 }

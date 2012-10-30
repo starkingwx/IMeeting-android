@@ -153,7 +153,7 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 			SWS_BILINEAR, NULL, NULL, NULL);
 	sws_scale(img_convert_ctx, tmp_picture->data, tmp_picture->linesize, 0,
 			rotateHeight, raw_picture->data, raw_picture->linesize);
-	D("scale ok");
+
 	int out_size = write_video_frame(qvo, raw_picture);
 
 	D(

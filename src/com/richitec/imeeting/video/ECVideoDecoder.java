@@ -1,6 +1,5 @@
 package com.richitec.imeeting.video;
 
-import android.graphics.Bitmap;
 
 /**
  * fetch the video from RTMP server, and decode it

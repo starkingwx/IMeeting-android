@@ -1,6 +1,10 @@
 package com.richitec.imeeting.video;
 
+import com.richitec.commontoolkit.user.UserManager;
+import com.richitec.imeeting.constants.SystemConstants;
+
 import android.graphics.Bitmap;
+import android.util.Log;
 
 /**
  * Executor to fetch the video from RTMP server
@@ -9,6 +13,8 @@ import android.graphics.Bitmap;
  * 
  */
 public class VideoFetchExecutor extends Thread implements VideoFetchListener {
+	private String accountName;
+	
 	private int imgWidth;
 	private int imgHeight;
 	private String rtmpUrl;
@@ -16,7 +22,7 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 	private String username;
 
 	private VideoFetchListener fetchListener;
-	private boolean isCancelled;
+	private boolean cancel;
 
 	// native members
 	private int pInputFormatContext;
@@ -24,10 +30,10 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 	private int videoStream;
 	private int pVideoFrame;
 	private int pVideoPicture;
-	private int pImgConvertCtx;
 
 	public VideoFetchExecutor() {
-		isCancelled = false;
+		cancel = false;
+		accountName = UserManager.getInstance().getUser().getName();
 	}
 
 	public void setFetchListener(VideoFetchListener fetchListener) {
@@ -73,7 +79,18 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 	}
 
 	public void cancel() {
-		isCancelled = true;
+		cancel = true;
+	}
+	
+	private void processVideoPicture(byte[] imgData) {
+		Log.d(SystemConstants.TAG, "processVideoPicture - img length: " + imgData.length);
+		
+		for (int i = 0; i < imgData.length; i++) {
+			Log.d(SystemConstants.TAG, " " + imgData[i]);
+		}
+		
+		
+//		Bitmap bmp = Bitmap.createBitmap(imgData, width, height, Bitmap.Config.ARGB_8888);
 	}
 
 	@Override

@@ -30,7 +30,7 @@ public class VideoManager implements Camera.PreviewCallback,
 	private static final int Rotation_0 = 0;
 	private static final int Rotation_90 = 90;
 	private static final int Rotation_270 = 270;
-	
+
 	enum CameraPosition {
 		FrontCamera(1), BackCamera(0);
 
@@ -52,11 +52,14 @@ public class VideoManager implements Camera.PreviewCallback,
 	private ViewGroup previewSurfaceParent;
 	private ECVideoEncoder videoEncoder;
 	private ECVideoDecoder videoDecoder;
-	
+
 	private boolean videoLiving;
 	private Activity activity;
-	
+
 	private int imageRotationDegree;
+
+	private boolean resInit;
+
 	public VideoManager(Activity context) {
 		this.activity = context;
 
@@ -69,12 +72,13 @@ public class VideoManager implements Camera.PreviewCallback,
 		videoDecoder = new ECVideoDecoder();
 		videoLiving = false;
 		imageRotationDegree = Rotation_0;
+		resInit = false;
 	}
 
 	public ECVideoDecoder getVideoDecoder() {
 		return videoDecoder;
 	}
-	
+
 	public void setRtmpUrl(String rtmpUrl) {
 		videoEncoder.setRtmpUrl(rtmpUrl);
 		videoDecoder.setRtmpUrl(rtmpUrl);
@@ -83,7 +87,7 @@ public class VideoManager implements Camera.PreviewCallback,
 	public void setLiveName(String liveName) {
 		videoEncoder.setLiveName(liveName);
 	}
-	
+
 	public String getLiveName() {
 		return videoEncoder.getLiveName();
 	}
@@ -106,7 +110,7 @@ public class VideoManager implements Camera.PreviewCallback,
 	public void setVideoFetchListener(VideoFetchListener listener) {
 		videoDecoder.setFetchListener(listener);
 	}
-	
+
 	private void releaseCamera() {
 		if (camera != null) {
 			camera.stopPreview();
@@ -144,6 +148,20 @@ public class VideoManager implements Camera.PreviewCallback,
 	public void showVideoPreview() {
 		if (previewSurfaceParent != null) {
 			previewSurfaceParent.setVisibility(View.VISIBLE);
+		}
+	}
+
+	public void initResources() {
+		if (!resInit) {
+			videoDecoder.setupVideoDecoder();
+			resInit = true;
+		}
+	}
+
+	public void releaseResources() {
+		if (resInit) {
+			videoDecoder.releaseVideoDecoder();
+			resInit = false;
 		}
 	}
 
@@ -333,14 +351,13 @@ public class VideoManager implements Camera.PreviewCallback,
 		Log.d(SystemConstants.TAG, "surfaceDestroyed");
 		camera.stopPreview();
 	}
-	
+
 	public void startVideoFetch(String userName) {
 		videoDecoder.startFetchVideo(userName);
 	}
-	
+
 	public void stopVideoFetch() {
 		videoDecoder.stopFetchVideo();
 	}
-	
-	
+
 }

@@ -33,8 +33,10 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView.ScaleType;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,9 +93,14 @@ public class TalkingGroupActivity extends Activity implements
 	private Map<String, String> selectedMember;
 	private Timer timer;
 
+	private Button videoViewTitleButton;
 	private FrameLayout largeVideoLayout;
 	private FrameLayout smallVideoLayout;
 
+	private ImageView friendVideoView;
+	
+	private boolean smallVideoViewIsMine = true;
+	
 	private WakeLock wakeLock;
 
 	protected Handler messageHandler;
@@ -212,10 +219,48 @@ public class TalkingGroupActivity extends Activity implements
 
 		refreshMemberList();
 
+		videoViewTitleButton = (Button) findViewById(R.id.gt_video_view_title_bt);
+		
 		largeVideoLayout = (FrameLayout) findViewById(R.id.large_video_layout);
 		smallVideoLayout = (FrameLayout) findViewById(R.id.small_video_layout);
+		
+		friendVideoView = new ImageView(this);
+		friendVideoView.setScaleType(ScaleType.CENTER);
+		friendVideoView.setBackgroundResource(R.color.dark_gray);
+		
+		getCurrentFriendVideoView().addView(friendVideoView);
 	}
 
+	private FrameLayout getCurrentMyVideoView() {
+		if (smallVideoViewIsMine) {
+			return smallVideoLayout;
+		} else {
+			return largeVideoLayout;
+		}
+	}
+	
+	private FrameLayout getCurrentFriendVideoView() {
+		if (smallVideoViewIsMine) {
+			return largeVideoLayout;
+		} else {
+			return smallVideoLayout;
+		}
+	}
+	
+	private void swapVideoView() {
+		smallVideoViewIsMine = !smallVideoViewIsMine;
+
+		FrameLayout myVideoLayout = getCurrentMyVideoView();
+		myVideoLayout.removeAllViews();
+		FrameLayout friendVideoLayout = getCurrentFriendVideoView();
+		friendVideoLayout.removeAllViews();
+
+		videoManager.detachVideoPreview();
+		videoManager.attachVideoPreview(myVideoLayout);
+		
+		friendVideoLayout.addView(this.friendVideoView);
+	}
+	
 	private boolean isOwner() {
 		String accountName = UserManager.getInstance().getUser().getName();
 		boolean isOwner = accountName.equals(owner) ? true : false;
@@ -428,7 +473,7 @@ public class TalkingGroupActivity extends Activity implements
 							@Override
 							public void run() {
 								videoManager
-										.attachVideoPreview(smallVideoLayout);
+										.attachVideoPreview(getCurrentMyVideoView());
 								onCameraOpen();
 							}
 						});
@@ -1193,32 +1238,63 @@ public class TalkingGroupActivity extends Activity implements
 	}
 
 	@Override
-	public void onFetchNewImage(Bitmap image) {
-		// TODO Auto-generated method stub
-
+	public void onFetchNewImage(final Bitmap image) {
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				Log.d(SystemConstants.TAG, "onFetchNewImage - width: " + image.getWidth() + " height: " + image.getHeight());
+				friendVideoView.setImageBitmap(image);
+			}
+		});
 	}
 
 	@Override
 	public void onFetchFailed() {
-		// TODO Auto-generated method stub
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				dismissProgressDlg();
+				MyToast.show(TalkingGroupActivity.this, R.string.video_load_failed, Toast.LENGTH_SHORT);
+			}
+		});
 
 	}
 
 	@Override
-	public void onVideoFetchBeginToPrepare(String username) {
+	public void onVideoFetchBeginToPrepare(final String username) {
 		Log.d(SystemConstants.TAG, "onVideoFetchBeginToPrepare : " + username);
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				videoViewTitleButton.setText(AppUtil.getDisplayName(username));
+				progressDlg = ProgressDialog.show(TalkingGroupActivity.this, null, getString(R.string.loading_video));
+			}
+		});
 	}
 
 	@Override
 	public void onVideoFetchPrepared() {
-		// TODO Auto-generated method stub
-
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				dismissProgressDlg();
+			}
+		});
 	}
 
 	@Override
 	public void onFetchEnd() {
-		// TODO Auto-generated method stub
-
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				friendVideoView.setImageBitmap(null);
+			}
+		});
 	}
 
 }

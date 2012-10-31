@@ -139,30 +139,40 @@ unsigned char *rotateYUV420SP(jbyte *yuvInBuffer, jint inWidth, jint inHeight,
 	return outYuv;
 }
 
-static int convertUVtoRGB(int y, int u, int v) {
+static int convertYUVtoRGB(int y, int u, int v) {
 	int r, g, b;
-	r = y + (int) 1.402f * v;
-	g = y - (int) (0.344f * u + 0.714f * v);
-	b = y + (int) 1.772f * u;
+//	r = y + (int) 1.402f * v;
+//	g = y - (int) (0.344f * u + 0.714f * v);
+//	b = y + (int) 1.772f * u;
+
+	int rdif = v + ((v * 103) >> 8);
+	int invgdif = ((u * 88) >> 8) + ((v * 183) >> 8);
+	int bdif = u + ((u * 198) >> 8);
+
+	r = y + rdif;
+	g = y - invgdif;
+	b = y + bdif;
+
 	r = r > 255 ? 255 : r < 0 ? 0 : r;
 	g = g > 255 ? 255 : g < 0 ? 0 : g;
 	b = b > 255 ? 255 : b < 0 ? 0 : b;
 	return 0xff000000 | (b << 16) | (g << 8) | r;
 }
 
-void convertYUV420PToRGB8888(jbyte *data, jint width, jint height, int **outRGBData) {
+void convertYUV420PToRGB8888(jbyte *yuvData, jint width, jint height, int **outRGBData) {
 	int size = width * height;
 	int offset = size;
 	int u, v, y1, y2, y3, y4;
 
-	for (int i = 0, k = 0; i < size; i += 2, k += 1) {
-		y1 = data[i] & 0xff;
-		y2 = data[i + 1] & 0xff;
-		y3 = data[width + i] & 0xff;
-		y4 = data[width + i + 1] & 0xff;
+	int i, k;
+	for (i = 0, k = 0; i < size; i += 2, k += 1) {
+		y1 = yuvData[i] & 0xff;
+		y2 = yuvData[i + 1] & 0xff;
+		y3 = yuvData[width + i] & 0xff;
+		y4 = yuvData[width + i + 1] & 0xff;
 
-		u = data[offset + k] & 0xff;
-		v = data[offset + k + width] & 0xff;
+		u = yuvData[offset + k] & 0xff;
+		v = yuvData[offset + k + width] & 0xff;
 		u = u - 128;
 		v = v - 128;
 

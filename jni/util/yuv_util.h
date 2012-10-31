@@ -68,5 +68,5 @@ unsigned char *rotateYUV420SP(jbyte *yuvInBuffer, jint inWidth, jint inHeight, R
  * out param:
  *  outRGBData - the output RGB image data with size width*height
  */
-void convertYUV420PToRGB8888(jbyte *data, jint width, jint height, int **outRGBData);
+void convertYUV420PToRGB8888(jbyte *yuvData, jint width, jint height, int **outRGBData);
 #endif /* YUV_UTIL_H_ */

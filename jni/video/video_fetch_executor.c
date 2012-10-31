@@ -117,9 +117,11 @@ void readVideoFrame(JNIEnv* env, jobject thiz) {
 	}
 
 	int gotPicture;
-	struct SwsContext *img_convert_ctx = NULL;
-	jsize pic_data_len = imgWidth * imgHeight * 3;
-	jbyteArray pic_data = (*env)->NewByteArray(env, pic_data_len);
+//	struct SwsContext *img_convert_ctx = NULL;
+	jsize pic_data_len = imgWidth * imgHeight;
+	int *rgb_data = (int*)malloc(pic_data_len * sizeof(int));
+//	memset(rgb_data, 0xff, pic_data_len * sizeof(int));
+	jintArray pic_data = (*env)->NewIntArray(env, pic_data_len);
 	while (av_read_frame(inputFormatContext, &packet) >= 0) {
 		jfieldID cancelFid = (*env)->GetFieldID(env, thisClass, "cancel", "Z");
 		jboolean cancel = (*env)->GetBooleanField(env, thiz, cancelFid);
@@ -136,28 +138,34 @@ void readVideoFrame(JNIEnv* env, jobject thiz) {
 					&packet);
 			if (gotPicture) {
 				D("got video frame");
-				img_convert_ctx = sws_getCachedContext(img_convert_ctx,
-						videoCodecContext->width, videoCodecContext->height,
-						videoCodecContext->pix_fmt, imgWidth, imgHeight,
-						dst_pix_fmt, SWS_BILINEAR, NULL, NULL, NULL);
+//				img_convert_ctx = sws_getCachedContext(img_convert_ctx,
+//						videoCodecContext->width, videoCodecContext->height,
+//						videoCodecContext->pix_fmt, imgWidth, imgHeight,
+//						dst_pix_fmt, SWS_BILINEAR, NULL, NULL, NULL);
+//
+//				// convert YUV420 to RGB
+//				sws_scale(img_convert_ctx, videoFrame->data,
+//						videoFrame->linesize, 0, videoCodecContext->height,
+//						videoPicture->data, videoPicture->linesize);
 
-				// convert YUV420 to RGB
-				sws_scale(img_convert_ctx, videoFrame->data,
-						videoFrame->linesize, 0, videoCodecContext->height,
-						videoPicture->data, videoPicture->linesize);
+				convertYUV420PToRGB8888(videoFrame->data, videoFrame->width, videoFrame->height, &rgb_data);
 
 				jmethodID processVideoPictureMid = (*env)->GetMethodID(env,
-						thisClass, "processVideoPicture", "([B)V");
+						thisClass, "processVideoPicture", "([III)V");
 				if (processVideoPictureMid != NULL) {
-					(*env)->SetByteArrayRegion(env, pic_data, 0, pic_data_len,
-							videoPicture->data);
+					(*env)->SetIntArrayRegion(env, pic_data, 0, pic_data_len,
+							rgb_data);
 
 					(*env)->CallVoidMethod(env, thiz, processVideoPictureMid,
-							pic_data);
+							pic_data, videoFrame->width, videoFrame->height);
 				}
 			}
 		}
 
+	}
+
+	if (rgb_data) {
+		free(rgb_data);
 	}
 
 	if (videoFrame) {

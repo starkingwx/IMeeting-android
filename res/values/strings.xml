@@ -131,7 +131,8 @@
 	<string name="only_leave_talkgroup">挂断自己并离开</string>
 	<string name="destroying_talkgroup">正在结束群聊…</string>
 	<string name="talkgroup_has_been_closed">发起人关闭了当前群聊！</string>
-	
+	<string name="loading_video">正在加载视频…</string>
+	<string name="video_load_failed">视频加载失败！</string>
     <!-- setting activity -->
     <string name="setting_nav_title_text">设置</string>
     <string name="accountSetting_btn_title">账户设置</string>

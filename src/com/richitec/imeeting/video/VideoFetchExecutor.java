@@ -14,7 +14,7 @@ import android.util.Log;
  */
 public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 	private String accountName;
-	
+
 	private int imgWidth;
 	private int imgHeight;
 	private String rtmpUrl;
@@ -81,16 +81,14 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 	public void cancel() {
 		cancel = true;
 	}
-	
-	private void processVideoPicture(byte[] imgData) {
-		Log.d(SystemConstants.TAG, "processVideoPicture - img length: " + imgData.length);
-		
-		for (int i = 0; i < imgData.length; i++) {
-			Log.d(SystemConstants.TAG, " " + imgData[i]);
-		}
-		
-		
-//		Bitmap bmp = Bitmap.createBitmap(imgData, width, height, Bitmap.Config.ARGB_8888);
+
+	private void processVideoPicture(int[] rgbImgData, int width, int height) {
+		Log.d(SystemConstants.TAG, "processVideoPicture - img length: "
+				+ rgbImgData.length + " width: " + width + " height: " + height);
+
+		Bitmap bmp = Bitmap.createBitmap(rgbImgData, width, height,
+				Bitmap.Config.ARGB_8888);
+		onFetchNewImage(bmp);
 	}
 
 	@Override

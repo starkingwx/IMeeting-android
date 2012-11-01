@@ -317,7 +317,7 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	@Override
 	public void onPreviewFrame(byte[] data, Camera camera) {
-		Log.d(SystemConstants.TAG, "onPreviewFrame");
+//		Log.d(SystemConstants.TAG, "onPreviewFrame");
 		Size size = camera.getParameters().getPreviewSize();
 		if (size != null) {
 			int w = size.width;

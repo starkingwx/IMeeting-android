@@ -126,7 +126,7 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 	if (!qvo || !is_video_encode_ready) {
 		return;
 	}
-	D("process raw frame - width: %d height: %d", width, height);
+//	D("process raw frame - width: %d height: %d", width, height);
 
 	jint rotateWidth, rotateHeight;
 
@@ -134,7 +134,7 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 
 	jbyte *p_buffer_array = (*env)->GetByteArrayElements(env, buffer, 0);
 
-	D("process raw frame - rotate degree: %d", rotateDegree);
+//	D("process raw frame - rotate degree: %d", rotateDegree);
 
 	unsigned char * p_rotated_buffer = rotateYUV420SP(p_buffer_array, width,
 			height, rotateDegree, &rotateWidth, &rotateHeight);
@@ -143,9 +143,10 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 				JNI_ABORT);
 		return;
 	}
+
 	avpicture_fill((AVPicture *) tmp_picture, p_rotated_buffer, src_pix_fmt,
 			rotateWidth, rotateHeight);
-	D("avpicture fill ok");
+//	D("avpicture fill ok");
 	(*env)->ReleaseByteArrayElements(env, buffer, p_buffer_array, JNI_ABORT);
 
 	img_convert_ctx = sws_getCachedContext(img_convert_ctx, rotateWidth,
@@ -156,12 +157,12 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 
 	int out_size = write_video_frame(qvo, raw_picture);
 
-	D(
-			"stream pts val: %lld time base: %d / %d", qvo->video_stream->pts.val, qvo->video_stream->time_base.num, qvo->video_stream->time_base.den);
-	double video_pts = (double) qvo->video_stream->pts.val
-			* qvo->video_stream->time_base.num
-			/ qvo->video_stream->time_base.den;
-	D("write video frame - size: %d video pts: %f", out_size, video_pts);
+//	D(
+//			"stream pts val: %lld time base: %d / %d", qvo->video_stream->pts.val, qvo->video_stream->time_base.num, qvo->video_stream->time_base.den);
+//	double video_pts = (double) qvo->video_stream->pts.val
+//			* qvo->video_stream->time_base.num
+//			/ qvo->video_stream->time_base.den;
+//	D("write video frame - size: %d video pts: %f", out_size, video_pts);
 
 	raw_picture->pts++;
 

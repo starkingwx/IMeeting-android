@@ -1,7 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
-LOCAL_LDLIBS := -llog -lz
+LOCAL_LDLIBS := -llog -lz -ljnigraphics
 
 LOCAL_MODULE    := video
 LOCAL_SRC_FILES := quicklibav.c video_encoder.c video_decoder.c video_fetch_executor.c

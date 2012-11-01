@@ -225,7 +225,7 @@ public class TalkingGroupActivity extends Activity implements
 		smallVideoLayout = (FrameLayout) findViewById(R.id.small_video_layout);
 		
 		friendVideoView = new ImageView(this);
-		friendVideoView.setScaleType(ScaleType.CENTER);
+		friendVideoView.setScaleType(ScaleType.CENTER_CROP);
 		friendVideoView.setBackgroundResource(R.color.dark_gray);
 		
 		getCurrentFriendVideoView().addView(friendVideoView);

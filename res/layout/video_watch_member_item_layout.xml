@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/video_watch_member_avatar"
+            android:layout_width="40dip"
+            android:layout_height="40dip"
+            android:layout_marginBottom="2dip"
+            android:layout_marginLeft="5dip"
+            android:layout_marginTop="2dip"
+            android:scaleType="centerInside"
+            android:src="@drawable/default_avatar" />
+
+        <TextView
+            android:id="@+id/video_watch_member_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="star"
+            android:textColor="@color/dark_dim_gray"
+            android:textSize="20dp" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/video_on" />
+    </LinearLayout>
+
+</LinearLayout>

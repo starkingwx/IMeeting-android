@@ -28,14 +28,30 @@ public class MemberListAdapter extends BaseAdapter {
 	private LayoutInflater inflater;
 	private List<Map<String, String>> memberList;
 	private IStatusFilter filter;
-
+	private MemberUpdateListener updateListener;
+	
 	public MemberListAdapter(Context context) {
 		inflater = LayoutInflater.from(context);
 		memberList = new ArrayList<Map<String, String>>();
 	}
-
+	
+	public void setUpdateListener(MemberUpdateListener listener) {
+		this.updateListener = listener;
+	}
+	
 	public List<Map<String, String>> getMemberList() {
 		return memberList;
+	}
+	
+	public List<Map<String, String>> getVideoOnMemberList() {
+		List<Map<String, String>> members = new ArrayList<Map<String,String>>();
+		for (Map<String, String> member : memberList) {
+			String videoStatus = member.get(Attendee.video_status.name());
+			if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+				members.add(member);
+			}
+		}
+		return members;
 	}
 	
 	public void setStatusFilter(IStatusFilter filter) {
@@ -102,6 +118,10 @@ public class MemberListAdapter extends BaseAdapter {
 		}
 
 		notifyDataSetChanged();
+		
+		if (updateListener != null) {
+			updateListener.update(getVideoOnMemberList());
+		}
 	}
 
 	public void updateMember(JSONObject attendeeJson) {
@@ -125,6 +145,9 @@ public class MemberListAdapter extends BaseAdapter {
 					member.putAll(attendee);
 				}
 				notifyDataSetChanged();
+				if (updateListener != null) {
+					updateListener.update(getVideoOnMemberList());
+				}
 				break;
 			}
 		}
@@ -136,6 +159,9 @@ public class MemberListAdapter extends BaseAdapter {
 			if (memberName.equals(userName)) {
 				memberList.remove(member);
 				notifyDataSetChanged();
+				if (updateListener != null) {
+					updateListener.update(getVideoOnMemberList());
+				}
 				break;
 			}
 		}
@@ -174,7 +200,8 @@ public class MemberListAdapter extends BaseAdapter {
 					.findViewById(R.id.member_phone_status_icon);
 			viewHolder.phoneStatusTextView = (TextView) convertView
 					.findViewById(R.id.member_phone_status_text);
-
+			viewHolder.videoStatusIconView = (ImageView) convertView.findViewById(R.id.member_video_status_icon);
+			viewHolder.videoStatusTextView = (TextView) convertView.findViewById(R.id.member_video_status_text);
 			convertView.setTag(viewHolder);
 		} else {
 			viewHolder = (ViewHolder) convertView.getTag();
@@ -186,6 +213,7 @@ public class MemberListAdapter extends BaseAdapter {
 		String displayName = AppUtil.getDisplayNameFromAttendee(member);
 		String onlineStatus = member.get(Attendee.online_status.name());
 		String telephoneStatus = member.get(Attendee.telephone_status.name());
+		String videoStatus = member.get(Attendee.video_status.name());
 		
 		String userName = member.get(Attendee.username.name());
 		Bitmap avatar = AppUtil.getAvatar(userName);
@@ -200,11 +228,22 @@ public class MemberListAdapter extends BaseAdapter {
 		if (Attendee.OnlineStatus.online.name().equals(onlineStatus)) {
 			viewHolder.onlineStatusView
 					.setImageResource(R.drawable.online_flag);
-
+			if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+				viewHolder.videoStatusIconView.setImageResource(R.drawable.video_on);
+				viewHolder.videoStatusTextView.setText(R.string.video_is_on);
+			} else {
+				viewHolder.videoStatusIconView.setImageResource(R.drawable.video_off);
+				viewHolder.videoStatusTextView.setText("");
+			}
+			
 		} else {
 			viewHolder.onlineStatusView
 					.setImageResource(R.drawable.offline_flag);
+			viewHolder.videoStatusIconView.setImageResource(R.drawable.video_off);
+			viewHolder.videoStatusTextView.setText("");
 		}
+		
+		
 
 		if (Attendee.PhoneStatus.Terminated.name().equals(telephoneStatus)) {
 			viewHolder.phoneStatusIconView.setImageDrawable(null);
@@ -232,6 +271,8 @@ public class MemberListAdapter extends BaseAdapter {
 		public TextView nameView;
 		public ImageView phoneStatusIconView;
 		public TextView phoneStatusTextView;
+		public ImageView videoStatusIconView;
+		public TextView videoStatusTextView;
 	}
 
 }

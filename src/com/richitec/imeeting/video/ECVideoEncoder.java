@@ -23,6 +23,12 @@ public class ECVideoEncoder {
 	 * @param name
 	 */
 	public native void setLiveName(String name);
+	
+	/**
+	 * get the name of living video
+	 * @return
+	 */
+	public native String getLiveName();
 
 	/**
 	 * set group id for living video
@@ -64,8 +70,9 @@ public class ECVideoEncoder {
 	 *            - frame width
 	 * @param height
 	 *            - frame height
+	 * @param rotateDegree - rotation degree
 	 */
-	public native void processRawFrame(byte[] buffer, int width, int height);
+	public native void processRawFrame(byte[] buffer, int width, int height, int rotateDegree);
 
 	static {
 		System.loadLibrary("video");

@@ -17,6 +17,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.MediaRecorder.VideoEncoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,8 +34,10 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView.ScaleType;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,14 +61,17 @@ import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.contactselect.ContactSelectActivity;
 import com.richitec.imeeting.contactselect.ContactSelectActivity.TalkingGroupStatus;
 import com.richitec.imeeting.talkinggroup.adapter.MemberListAdapter;
+import com.richitec.imeeting.talkinggroup.adapter.VideoWatchListAdapter;
 import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
 import com.richitec.imeeting.talkinggroup.statusfilter.OwnerModeStatusFilter;
 import com.richitec.imeeting.util.AppUtil;
+import com.richitec.imeeting.video.VideoFetchListener;
 import com.richitec.imeeting.video.VideoManager;
 import com.richitec.websocket.notifier.NotifierCallbackListener;
 import com.richitec.websocket.notifier.WebSocketNotifier;
 
-public class TalkingGroupActivity extends Activity implements OnGestureListener {
+public class TalkingGroupActivity extends Activity implements
+		OnGestureListener, VideoFetchListener {
 	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID = "talking group id";
 	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUP_ATTENDEESPHONE = "talking group attendees phone";
 
@@ -75,6 +82,10 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	private MemberListAdapter memberListAdatper;
 	private Handler handler;
 	private PullToRefreshListView memberListView;
+
+	private AlertDialog.Builder videoWatchPopupListView;
+	private VideoWatchListAdapter videoWatchListAdapter;
+
 	private ViewFlipper flipper;
 	private GestureDetector gestureDetector;
 
@@ -88,10 +99,17 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	private Map<String, String> selectedMember;
 	private Timer timer;
 
+	private Button videoViewTitleButton;
 	private FrameLayout largeVideoLayout;
 	private FrameLayout smallVideoLayout;
 
+	private ImageView friendVideoView;
+
+	private boolean smallVideoViewIsMine = true;
+
 	private WakeLock wakeLock;
+
+	protected Handler messageHandler;
 
 	enum GTViewType {
 		MemberListView, VideoView
@@ -119,11 +137,14 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		videoManager.setRtmpUrl(getString(R.string.rtmp_server_url));
 		videoManager.setImgWidth(144);
 		videoManager.setImgHeight(192);
+		videoManager.setVideoFetchListener(this);
+		videoManager.initResources();
 
 		PowerManager powerMan = (PowerManager) this
 				.getSystemService(Context.POWER_SERVICE);
 		wakeLock = powerMan.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
-		
+		wakeLock.acquire();
+
 		initUI();
 
 		notifier = new WebSocketNotifier();
@@ -135,6 +156,8 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 		timer = new Timer();
 		timer.schedule(new HeartBeatTimerTask(), 10000, 10000);
+
+		messageHandler = new Handler(Looper.myLooper());
 	}
 
 	private void initUI() {
@@ -201,10 +224,66 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 			memberListAdatper.setStatusFilter(new AttendeeModeStatusFilter());
 		}
 
+		videoWatchListAdapter = new VideoWatchListAdapter(this);
+		memberListAdatper.setUpdateListener(videoWatchListAdapter);
+//		videoWatchPopupListView = new AlertDialog.Builder(this);
+//		videoWatchPopupListView.setTitle(R.string.pls_select_video_to_watch);
+//		videoWatchPopupListView.setAdapter(videoWatchListAdapter,
+//				videoWatchOnClickListener);
+//		videoWatchPopupListView.setPositiveButton(R.string.select_no_one, null);
+
 		refreshMemberList();
+
+		videoViewTitleButton = (Button) findViewById(R.id.gt_video_view_title_bt);
 
 		largeVideoLayout = (FrameLayout) findViewById(R.id.large_video_layout);
 		smallVideoLayout = (FrameLayout) findViewById(R.id.small_video_layout);
+
+		friendVideoView = new ImageView(this);
+		friendVideoView.setScaleType(ScaleType.CENTER_CROP);
+
+		getCurrentFriendVideoView().addView(friendVideoView);
+	}
+
+	private DialogInterface.OnClickListener videoWatchOnClickListener = new DialogInterface.OnClickListener() {
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			Map<String, String> member = (Map<String, String>) videoWatchListAdapter
+					.getItem(which);
+			String userName = member.get(Attendee.username.name());
+			watchVideo(userName);
+		}
+	};
+
+	private FrameLayout getCurrentMyVideoView() {
+		if (smallVideoViewIsMine) {
+			return smallVideoLayout;
+		} else {
+			return largeVideoLayout;
+		}
+	}
+
+	private FrameLayout getCurrentFriendVideoView() {
+		if (smallVideoViewIsMine) {
+			return largeVideoLayout;
+		} else {
+			return smallVideoLayout;
+		}
+	}
+
+	private void swapVideoView() {
+		smallVideoViewIsMine = !smallVideoViewIsMine;
+
+		FrameLayout myVideoLayout = getCurrentMyVideoView();
+		myVideoLayout.removeAllViews();
+		FrameLayout friendVideoLayout = getCurrentFriendVideoView();
+		friendVideoLayout.removeAllViews();
+
+		videoManager.detachVideoPreview();
+		videoManager.attachVideoPreview(myVideoLayout);
+
+		friendVideoLayout.addView(this.friendVideoView);
 	}
 
 	private boolean isOwner() {
@@ -215,15 +294,13 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	public void onSwitchToVideoView(View v) {
 		if (currentView == GTViewType.MemberListView) {
-			showVideoView();
-			currentView = GTViewType.VideoView;
+			switchToVideoView();
 		}
 	}
 
 	public void onSwitchToMemberListView(View v) {
 		if (currentView == GTViewType.VideoView) {
-			showMemberListView();
-			currentView = GTViewType.MemberListView;
+			switchToMemberListView();
 		}
 	}
 
@@ -399,18 +476,89 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		}
 	}
 
+	public void onVideoViewTitleClickAction(View v) {
+		List<Map<String, String>> videoOnMembers = memberListAdatper
+				.getVideoOnMemberList();
+		if (videoOnMembers.size() <= 0) {
+			MyToast.show(this, R.string.no_videos_living_now,
+					Toast.LENGTH_SHORT);
+			return;
+		}
+		
+		videoWatchPopupListView = new AlertDialog.Builder(this);
+		videoWatchPopupListView.setTitle(R.string.pls_select_video_to_watch);
+		videoWatchPopupListView.setAdapter(videoWatchListAdapter,
+				videoWatchOnClickListener);
+		videoWatchPopupListView.setPositiveButton(R.string.select_no_one, null);
+		
+		if (videoManager.getVideoDecoder().getCurrentVideoUserName() != null) {
+			videoWatchPopupListView.setNegativeButton(R.string.stop_watching_video,
+					new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog,
+						int which) {
+					videoManager.stopVideoFetch();
+					handler.post(new Runnable() {
+						
+						@Override
+						public void run() {
+							videoViewTitleButton.setText(R.string.tap_here_to_select_video);
+							friendVideoView.setImageBitmap(null);
+						}
+					});
+				}
+			});
+		}
+		videoWatchPopupListView.show();
+	}
+
 	public void onCameraButtonAction(View v) {
 		if (!videoManager.isVideoLiving()) {
-			try {
-				videoManager.startVideoLive();
-				videoManager.attachVideoPreview(smallVideoLayout);
-				onCameraOpen();
-			} catch (Exception e) {
-				MyToast.show(this, R.string.camera_cannot_open,
-						Toast.LENGTH_SHORT);
-				e.printStackTrace();
-			}
+			startVideoLive();
 		} else {
+			stopVideoLive();
+		}
+	}
+
+	private void startVideoLive() {
+		if (!videoManager.isVideoLiving()) {
+			new Thread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						videoManager.startVideoLive();
+
+						messageHandler.post(new Runnable() {
+
+							@Override
+							public void run() {
+								videoManager
+										.attachVideoPreview(getCurrentMyVideoView());
+								onCameraOpen();
+							}
+						});
+
+					} catch (Exception e) {
+						e.printStackTrace();
+						messageHandler.post(new Runnable() {
+
+							@Override
+							public void run() {
+								MyToast.show(TalkingGroupActivity.this,
+										R.string.camera_cannot_open,
+										Toast.LENGTH_SHORT);
+							}
+						});
+					}
+				}
+			}).start();
+		}
+	}
+
+	private void stopVideoLive() {
+		if (videoManager.isVideoLiving()) {
 			videoManager.detachVideoPreview();
 			videoManager.stopVideoLive();
 			onCameraClosed();
@@ -427,8 +575,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
 		cameraBt.setText(R.string.close_camera);
-		
-		wakeLock.acquire();
+
 	}
 
 	private void onCameraClosed() {
@@ -437,8 +584,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
 		cameraBt.setText(R.string.open_camera);
-		
-		wakeLock.release();
+
 	}
 
 	@Override
@@ -447,6 +593,9 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	}
 
 	private void leaveGroupTalk() {
+		wakeLock.release();
+		stopVideoLive();
+		videoManager.releaseResources();
 		timer.cancel();
 		notifier.disconnect();
 		HashMap<String, String> params = new HashMap<String, String>();
@@ -487,6 +636,9 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	private void onCloseGroupTalkRequestReturn() {
 		dismissProgressDlg();
+		wakeLock.release();
+		stopVideoLive();
+		videoManager.releaseResources();
 		timer.cancel();
 		notifier.disconnect();
 		TalkingGroupActivity.this.finish();
@@ -542,6 +694,7 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	private void doActionForSelectedMemberInOwnerMode(Map<String, String> member) {
 		final String userName = member.get(Attendee.username.name());
+		String videoStatus = member.get(Attendee.video_status.name());
 		String displayName = AppUtil.getDisplayNameFromAttendee(member);
 		String onlineStatus = member.get(Attendee.online_status.name());
 		String phoneStatus = member.get(Attendee.telephone_status.name());
@@ -549,6 +702,10 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		String accountName = UserManager.getInstance().getUser().getName();
 
 		List<String> actionList = new ArrayList<String>();
+		if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+			actionList.add(getString(R.string.watch_video));
+		}
+
 		if (!Attendee.OnlineStatus.online.name().equals(onlineStatus)
 				|| accountName.equals(userName)) {
 			if (Attendee.PhoneStatus.Terminated.name().equals(phoneStatus)
@@ -588,6 +745,9 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 							sendSMS(numbers);
 						} else if (action.equals(getString(R.string.kick_out))) {
 							kickout(userName);
+						} else if (action
+								.equals(getString(R.string.watch_video))) {
+							watchVideo(userName);
 						}
 					}
 				}).show();
@@ -595,7 +755,19 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	private void doActionForSelectedMemberInAttendeeMode(
 			Map<String, String> member) {
+		String userName = member.get(Attendee.username.name());
+		String videoStatus = member.get(Attendee.video_status.name());
+		String onlineStatus = member.get(Attendee.online_status.name());
 
+		if (Attendee.OnlineStatus.online.name().equals(onlineStatus)) {
+			if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+				watchVideo(userName);
+			} else {
+				MyToast.show(this, R.string.no_video_live, Toast.LENGTH_SHORT);
+			}
+		} else {
+			MyToast.show(this, R.string.member_not_online, Toast.LENGTH_SHORT);
+		}
 	}
 
 	private void call(String targetUserName) {
@@ -745,6 +917,21 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 					groupId);
 			intent.putExtra("sms_body", smsBody);
 			startActivity(intent);
+		}
+	}
+
+	private void watchVideo(String targetUserName) {
+		String username = videoManager.getVideoDecoder()
+				.getCurrentVideoUserName();
+		Log.d(SystemConstants.TAG, "current username: " + username);
+		if (!targetUserName.equals(username)) {
+			videoManager.stopVideoFetch();
+			videoViewTitleButton.setText("");
+			friendVideoView.setImageBitmap(null);
+			videoManager.startVideoFetch(targetUserName);
+		}
+		if (currentView == GTViewType.MemberListView) {
+			switchToVideoView();
 		}
 	}
 
@@ -1055,16 +1242,27 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 
 	}
 
-	private void showVideoView() {
+	private void switchToVideoView() {
 		flipper.setInAnimation(this, R.anim.left_in);
 		flipper.setOutAnimation(this, R.anim.left_out);
 		flipper.showNext();
+
+		if (videoManager.isVideoLiving()) {
+			videoManager.showVideoPreview();
+		}
+
+		currentView = GTViewType.VideoView;
 	}
 
-	private void showMemberListView() {
+	private void switchToMemberListView() {
 		flipper.setInAnimation(this, R.anim.right_in);
 		flipper.setOutAnimation(this, R.anim.right_out);
 		flipper.showPrevious();
+
+		if (videoManager.isVideoLiving()) {
+			videoManager.hideVideoPreview();
+		}
+		currentView = GTViewType.MemberListView;
 	}
 
 	@Override
@@ -1083,13 +1281,13 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 		Log.d(SystemConstants.TAG, "e1 x: " + e1.getX() + " e2 x: " + e2.getX());
 		if (e1.getX() - e2.getX() > MIN_FLING_DISTANCE) {
 			if (currentView == GTViewType.MemberListView) {
-				showVideoView();
+				switchToVideoView();
 			}
 			currentView = GTViewType.VideoView;
 			return true;
 		} else if (e2.getX() - e1.getX() > MIN_FLING_DISTANCE) {
 			if (currentView == GTViewType.VideoView) {
-				showMemberListView();
+				switchToMemberListView();
 			}
 			currentView = GTViewType.MemberListView;
 			return true;
@@ -1117,6 +1315,73 @@ public class TalkingGroupActivity extends Activity implements OnGestureListener 
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		return false;
+	}
+
+	@Override
+	public void onFetchNewImage(final Bitmap image) {
+		handler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				Log.d(SystemConstants.TAG,
+						"onFetchNewImage - width: " + image.getWidth()
+								+ " height: " + image.getHeight());
+				friendVideoView.setImageBitmap(image);
+			}
+		});
+	}
+
+	@Override
+	public void onFetchFailed() {
+		handler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				dismissProgressDlg();
+				videoViewTitleButton.setText(R.string.tap_here_to_select_video);
+				friendVideoView.setImageBitmap(null);
+				MyToast.show(TalkingGroupActivity.this,
+						R.string.video_load_failed, Toast.LENGTH_SHORT);
+			}
+		});
+
+	}
+
+	@Override
+	public void onVideoFetchBeginToPrepare(final String username) {
+		Log.d(SystemConstants.TAG, "onVideoFetchBeginToPrepare : " + username);
+		handler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				videoViewTitleButton.setText(AppUtil.getDisplayName(username));
+				progressDlg = ProgressDialog.show(TalkingGroupActivity.this,
+						null, getString(R.string.loading_video));
+			}
+		});
+	}
+
+	@Override
+	public void onVideoFetchPrepared() {
+		handler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				dismissProgressDlg();
+			}
+		});
+	}
+
+	@Override
+	public void onFetchEnd() {
+		handler.post(new Runnable() {
+
+			@Override
+			public void run() {
+				videoViewTitleButton.setText(R.string.tap_here_to_select_video);
+				friendVideoView.setImageBitmap(null);
+			}
+		});
 	}
 
 }

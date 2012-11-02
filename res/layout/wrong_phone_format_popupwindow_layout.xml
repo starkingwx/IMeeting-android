@@ -23,7 +23,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
-            android:gravity="center"
+            android:gravity="fill"
             android:text="@string/wrong_phone_format_inform_titleTextView_text"
             android:textColor="@android:color/white" />
         

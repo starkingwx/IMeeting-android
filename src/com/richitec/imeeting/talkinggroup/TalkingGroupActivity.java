@@ -18,7 +18,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.MediaRecorder.VideoEncoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,10 +33,10 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView.ScaleType;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,7 +82,6 @@ public class TalkingGroupActivity extends Activity implements
 	private Handler handler;
 	private PullToRefreshListView memberListView;
 
-	private AlertDialog.Builder videoWatchPopupListView;
 	private VideoWatchListAdapter videoWatchListAdapter;
 
 	private ViewFlipper flipper;
@@ -226,11 +224,6 @@ public class TalkingGroupActivity extends Activity implements
 
 		videoWatchListAdapter = new VideoWatchListAdapter(this);
 		memberListAdatper.setUpdateListener(videoWatchListAdapter);
-//		videoWatchPopupListView = new AlertDialog.Builder(this);
-//		videoWatchPopupListView.setTitle(R.string.pls_select_video_to_watch);
-//		videoWatchPopupListView.setAdapter(videoWatchListAdapter,
-//				videoWatchOnClickListener);
-//		videoWatchPopupListView.setPositiveButton(R.string.select_no_one, null);
 
 		refreshMemberList();
 
@@ -485,7 +478,7 @@ public class TalkingGroupActivity extends Activity implements
 			return;
 		}
 		
-		videoWatchPopupListView = new AlertDialog.Builder(this);
+		AlertDialog.Builder videoWatchPopupListView = new AlertDialog.Builder(this);
 		videoWatchPopupListView.setTitle(R.string.pls_select_video_to_watch);
 		videoWatchPopupListView.setAdapter(videoWatchListAdapter,
 				videoWatchOnClickListener);

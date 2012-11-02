@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaRecorder.VideoEncoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -60,6 +61,7 @@ import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.contactselect.ContactSelectActivity;
 import com.richitec.imeeting.contactselect.ContactSelectActivity.TalkingGroupStatus;
 import com.richitec.imeeting.talkinggroup.adapter.MemberListAdapter;
+import com.richitec.imeeting.talkinggroup.adapter.VideoWatchListAdapter;
 import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
 import com.richitec.imeeting.talkinggroup.statusfilter.OwnerModeStatusFilter;
 import com.richitec.imeeting.util.AppUtil;
@@ -80,6 +82,10 @@ public class TalkingGroupActivity extends Activity implements
 	private MemberListAdapter memberListAdatper;
 	private Handler handler;
 	private PullToRefreshListView memberListView;
+
+	private AlertDialog.Builder videoWatchPopupListView;
+	private VideoWatchListAdapter videoWatchListAdapter;
+
 	private ViewFlipper flipper;
 	private GestureDetector gestureDetector;
 
@@ -98,9 +104,9 @@ public class TalkingGroupActivity extends Activity implements
 	private FrameLayout smallVideoLayout;
 
 	private ImageView friendVideoView;
-	
+
 	private boolean smallVideoViewIsMine = true;
-	
+
 	private WakeLock wakeLock;
 
 	protected Handler messageHandler;
@@ -133,10 +139,11 @@ public class TalkingGroupActivity extends Activity implements
 		videoManager.setImgHeight(192);
 		videoManager.setVideoFetchListener(this);
 		videoManager.initResources();
-		
+
 		PowerManager powerMan = (PowerManager) this
 				.getSystemService(Context.POWER_SERVICE);
 		wakeLock = powerMan.newWakeLock(PowerManager.FULL_WAKE_LOCK, "My Lock");
+		wakeLock.acquire();
 
 		initUI();
 
@@ -217,19 +224,37 @@ public class TalkingGroupActivity extends Activity implements
 			memberListAdatper.setStatusFilter(new AttendeeModeStatusFilter());
 		}
 
+		videoWatchListAdapter = new VideoWatchListAdapter(this);
+		memberListAdatper.setUpdateListener(videoWatchListAdapter);
+//		videoWatchPopupListView = new AlertDialog.Builder(this);
+//		videoWatchPopupListView.setTitle(R.string.pls_select_video_to_watch);
+//		videoWatchPopupListView.setAdapter(videoWatchListAdapter,
+//				videoWatchOnClickListener);
+//		videoWatchPopupListView.setPositiveButton(R.string.select_no_one, null);
+
 		refreshMemberList();
 
 		videoViewTitleButton = (Button) findViewById(R.id.gt_video_view_title_bt);
-		
+
 		largeVideoLayout = (FrameLayout) findViewById(R.id.large_video_layout);
 		smallVideoLayout = (FrameLayout) findViewById(R.id.small_video_layout);
-		
+
 		friendVideoView = new ImageView(this);
 		friendVideoView.setScaleType(ScaleType.CENTER_CROP);
-		friendVideoView.setBackgroundResource(R.color.dark_gray);
-		
+
 		getCurrentFriendVideoView().addView(friendVideoView);
 	}
+
+	private DialogInterface.OnClickListener videoWatchOnClickListener = new DialogInterface.OnClickListener() {
+
+		@Override
+		public void onClick(DialogInterface dialog, int which) {
+			Map<String, String> member = (Map<String, String>) videoWatchListAdapter
+					.getItem(which);
+			String userName = member.get(Attendee.username.name());
+			watchVideo(userName);
+		}
+	};
 
 	private FrameLayout getCurrentMyVideoView() {
 		if (smallVideoViewIsMine) {
@@ -238,7 +263,7 @@ public class TalkingGroupActivity extends Activity implements
 			return largeVideoLayout;
 		}
 	}
-	
+
 	private FrameLayout getCurrentFriendVideoView() {
 		if (smallVideoViewIsMine) {
 			return largeVideoLayout;
@@ -246,7 +271,7 @@ public class TalkingGroupActivity extends Activity implements
 			return smallVideoLayout;
 		}
 	}
-	
+
 	private void swapVideoView() {
 		smallVideoViewIsMine = !smallVideoViewIsMine;
 
@@ -257,10 +282,10 @@ public class TalkingGroupActivity extends Activity implements
 
 		videoManager.detachVideoPreview();
 		videoManager.attachVideoPreview(myVideoLayout);
-		
+
 		friendVideoLayout.addView(this.friendVideoView);
 	}
-	
+
 	private boolean isOwner() {
 		String accountName = UserManager.getInstance().getUser().getName();
 		boolean isOwner = accountName.equals(owner) ? true : false;
@@ -451,6 +476,43 @@ public class TalkingGroupActivity extends Activity implements
 		}
 	}
 
+	public void onVideoViewTitleClickAction(View v) {
+		List<Map<String, String>> videoOnMembers = memberListAdatper
+				.getVideoOnMemberList();
+		if (videoOnMembers.size() <= 0) {
+			MyToast.show(this, R.string.no_videos_living_now,
+					Toast.LENGTH_SHORT);
+			return;
+		}
+		
+		videoWatchPopupListView = new AlertDialog.Builder(this);
+		videoWatchPopupListView.setTitle(R.string.pls_select_video_to_watch);
+		videoWatchPopupListView.setAdapter(videoWatchListAdapter,
+				videoWatchOnClickListener);
+		videoWatchPopupListView.setPositiveButton(R.string.select_no_one, null);
+		
+		if (videoManager.getVideoDecoder().getCurrentVideoUserName() != null) {
+			videoWatchPopupListView.setNegativeButton(R.string.stop_watching_video,
+					new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog,
+						int which) {
+					videoManager.stopVideoFetch();
+					handler.post(new Runnable() {
+						
+						@Override
+						public void run() {
+							videoViewTitleButton.setText(R.string.tap_here_to_select_video);
+							friendVideoView.setImageBitmap(null);
+						}
+					});
+				}
+			});
+		}
+		videoWatchPopupListView.show();
+	}
+
 	public void onCameraButtonAction(View v) {
 		if (!videoManager.isVideoLiving()) {
 			startVideoLive();
@@ -514,7 +576,6 @@ public class TalkingGroupActivity extends Activity implements
 		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
 		cameraBt.setText(R.string.close_camera);
 
-		wakeLock.acquire();
 	}
 
 	private void onCameraClosed() {
@@ -524,7 +585,6 @@ public class TalkingGroupActivity extends Activity implements
 		Button cameraBt = (Button) findViewById(R.id.gt_camera_op_bt);
 		cameraBt.setText(R.string.open_camera);
 
-		wakeLock.release();
 	}
 
 	@Override
@@ -533,6 +593,7 @@ public class TalkingGroupActivity extends Activity implements
 	}
 
 	private void leaveGroupTalk() {
+		wakeLock.release();
 		stopVideoLive();
 		videoManager.releaseResources();
 		timer.cancel();
@@ -575,6 +636,7 @@ public class TalkingGroupActivity extends Activity implements
 
 	private void onCloseGroupTalkRequestReturn() {
 		dismissProgressDlg();
+		wakeLock.release();
 		stopVideoLive();
 		videoManager.releaseResources();
 		timer.cancel();
@@ -693,7 +755,19 @@ public class TalkingGroupActivity extends Activity implements
 
 	private void doActionForSelectedMemberInAttendeeMode(
 			Map<String, String> member) {
+		String userName = member.get(Attendee.username.name());
+		String videoStatus = member.get(Attendee.video_status.name());
+		String onlineStatus = member.get(Attendee.online_status.name());
 
+		if (Attendee.OnlineStatus.online.name().equals(onlineStatus)) {
+			if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+				watchVideo(userName);
+			} else {
+				MyToast.show(this, R.string.no_video_live, Toast.LENGTH_SHORT);
+			}
+		} else {
+			MyToast.show(this, R.string.member_not_online, Toast.LENGTH_SHORT);
+		}
 	}
 
 	private void call(String targetUserName) {
@@ -847,12 +921,18 @@ public class TalkingGroupActivity extends Activity implements
 	}
 
 	private void watchVideo(String targetUserName) {
-		if (!targetUserName.equals(videoManager.getVideoDecoder()
-				.getCurrentVideoUserName())) {
+		String username = videoManager.getVideoDecoder()
+				.getCurrentVideoUserName();
+		Log.d(SystemConstants.TAG, "current username: " + username);
+		if (!targetUserName.equals(username)) {
 			videoManager.stopVideoFetch();
+			videoViewTitleButton.setText("");
+			friendVideoView.setImageBitmap(null);
 			videoManager.startVideoFetch(targetUserName);
 		}
-		switchToVideoView();
+		if (currentView == GTViewType.MemberListView) {
+			switchToVideoView();
+		}
 	}
 
 	private NotifierCallbackListener notifyCallbackListener = new NotifierCallbackListener() {
@@ -1240,10 +1320,12 @@ public class TalkingGroupActivity extends Activity implements
 	@Override
 	public void onFetchNewImage(final Bitmap image) {
 		handler.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				Log.d(SystemConstants.TAG, "onFetchNewImage - width: " + image.getWidth() + " height: " + image.getHeight());
+				Log.d(SystemConstants.TAG,
+						"onFetchNewImage - width: " + image.getWidth()
+								+ " height: " + image.getHeight());
 				friendVideoView.setImageBitmap(image);
 			}
 		});
@@ -1252,11 +1334,14 @@ public class TalkingGroupActivity extends Activity implements
 	@Override
 	public void onFetchFailed() {
 		handler.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				dismissProgressDlg();
-				MyToast.show(TalkingGroupActivity.this, R.string.video_load_failed, Toast.LENGTH_SHORT);
+				videoViewTitleButton.setText(R.string.tap_here_to_select_video);
+				friendVideoView.setImageBitmap(null);
+				MyToast.show(TalkingGroupActivity.this,
+						R.string.video_load_failed, Toast.LENGTH_SHORT);
 			}
 		});
 
@@ -1266,11 +1351,12 @@ public class TalkingGroupActivity extends Activity implements
 	public void onVideoFetchBeginToPrepare(final String username) {
 		Log.d(SystemConstants.TAG, "onVideoFetchBeginToPrepare : " + username);
 		handler.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				videoViewTitleButton.setText(AppUtil.getDisplayName(username));
-				progressDlg = ProgressDialog.show(TalkingGroupActivity.this, null, getString(R.string.loading_video));
+				progressDlg = ProgressDialog.show(TalkingGroupActivity.this,
+						null, getString(R.string.loading_video));
 			}
 		});
 	}
@@ -1278,7 +1364,7 @@ public class TalkingGroupActivity extends Activity implements
 	@Override
 	public void onVideoFetchPrepared() {
 		handler.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				dismissProgressDlg();
@@ -1289,9 +1375,10 @@ public class TalkingGroupActivity extends Activity implements
 	@Override
 	public void onFetchEnd() {
 		handler.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
+				videoViewTitleButton.setText(R.string.tap_here_to_select_video);
 				friendVideoView.setImageBitmap(null);
 			}
 		});

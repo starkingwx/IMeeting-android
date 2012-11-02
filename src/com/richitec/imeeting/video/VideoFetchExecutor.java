@@ -82,11 +82,6 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 		cancel = true;
 	}
 	
-	private Bitmap generateEmptyBitmap() {
-		Bitmap bmp = Bitmap.createBitmap(imgWidth, imgHeight, Bitmap.Config.ARGB_8888);
-		return bmp;
-	}
-
 	private void processVideoPicture(int[] rgbImgData, int width, int height) {
 		Log.d(SystemConstants.TAG, "processVideoPicture - img length: "
 				+ rgbImgData.length + " width: " + width + " height: " + height);
@@ -96,10 +91,6 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 		onFetchNewImage(bmp);
 	}
 
-//	private void processVideoPicture(Bitmap bmp) {
-//		onFetchNewImage(bmp);
-//	}
-	
 	@Override
 	public void onFetchNewImage(Bitmap image) {
 		if (fetchListener != null) {
@@ -110,6 +101,7 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 	@Override
 	public void onFetchFailed() {
 		if (fetchListener != null) {
+			username = null;
 			fetchListener.onFetchFailed();
 		}
 	}
@@ -131,6 +123,7 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 	@Override
 	public void onFetchEnd() {
 		if (fetchListener != null) {
+			username = null;
 			fetchListener.onFetchEnd();
 		}
 	}

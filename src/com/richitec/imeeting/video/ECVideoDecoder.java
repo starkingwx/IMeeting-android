@@ -54,6 +54,7 @@ public class ECVideoDecoder {
 		if (executor != null) {
 			executor.setFetchListener(null);
 			executor.cancel();
+			executor = null;
 		}
 	}
 

@@ -50,34 +50,68 @@
                 android:textSize="16dip" />
         </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/phone_status_region"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="3dip"
-            android:layout_marginTop="4dip" >
+            android:orientation="horizontal" >
 
-            <ImageView
-                android:id="@+id/member_phone_status_icon"
-                android:layout_width="12dip"
-                android:layout_height="12dip"
-                android:layout_alignParentLeft="true"
-                android:layout_marginRight="4dip"
-                android:layout_marginTop="4dip"
-                android:contentDescription="phone status"
-                android:scaleType="centerInside"
-                android:src="@drawable/calling" />
-
-            <TextView
-                android:id="@+id/member_phone_status_text"
+            <RelativeLayout
+                android:id="@+id/video_status_region"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/member_phone_status_icon"
-                android:singleLine="true"
-                android:text="Calling"
-                android:textColor="#a3a3a3"
-                android:textSize="14dip" />
-        </RelativeLayout>
+                android:layout_marginLeft="4dip"
+                android:layout_marginTop="4dip" >
+
+                <ImageView
+                    android:id="@+id/member_video_status_icon"
+                    android:layout_width="12dip"
+                    android:layout_height="12dip"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginRight="4dip"
+                    android:layout_marginTop="4dip"
+                    android:contentDescription="video status"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/video_off" />
+
+                <TextView
+                    android:id="@+id/member_video_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/member_video_status_icon"
+                    android:singleLine="true"
+                    android:textColor="#a3a3a3"
+                    android:textSize="14dip" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/phone_status_region"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="3dip"
+                android:layout_marginTop="4dip" >
+
+                <ImageView
+                    android:id="@+id/member_phone_status_icon"
+                    android:layout_width="12dip"
+                    android:layout_height="12dip"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginRight="4dip"
+                    android:layout_marginTop="4dip"
+                    android:contentDescription="phone status"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/calling" />
+
+                <TextView
+                    android:id="@+id/member_phone_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/member_phone_status_icon"
+                    android:singleLine="true"
+                    android:text="Calling"
+                    android:textColor="#a3a3a3"
+                    android:textSize="14dip" />
+            </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

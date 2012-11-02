@@ -81,32 +81,8 @@ int openVideoInputStream(JNIEnv* env, jobject thiz, const char *playPath) {
 	return 0;
 }
 
-static void fill_bitmap(AndroidBitmapInfo* info, void *pixels, AVFrame *pFrame) {
-	uint8_t *frameLine;
-
-	int yy;
-	for (yy = 0; yy < info->height; yy++) {
-		uint8_t* line = (uint8_t*) pixels;
-		frameLine = (uint8_t *) pFrame->data[0] + (yy * pFrame->linesize[0]);
-
-		int xx;
-		for (xx = 0; xx < info->width; xx++) {
-			int out_offset = xx * 4;
-			int in_offset = xx * 3;
-
-			line[out_offset] = frameLine[in_offset];
-			line[out_offset + 1] = frameLine[in_offset + 1];
-			line[out_offset + 2] = frameLine[in_offset + 2];
-			line[out_offset + 3] = 0;
-		}
-
-		pixels = (char*) pixels + info->stride;
-	}
-}
-
 void fillRGBIntBuffer(AVFrame *frame, int width, int height, int *outRGBData) {
 	uint8_t *frameLine;
-//	uint8_t alpha = 0xff;
 	uint8_t r, g, b;
 
 	int yy;
@@ -115,7 +91,6 @@ void fillRGBIntBuffer(AVFrame *frame, int width, int height, int *outRGBData) {
 
 		int xx;
 		for (xx = 0; xx < width; xx++) {
-//			int out_offset = xx * 4;
 			int in_offset = xx * 3;
 
 			r = frameLine[in_offset];
@@ -169,9 +144,6 @@ void readVideoFrame(JNIEnv* env, jobject thiz) {
 	int *rgb_data = (int*) malloc(pic_data_len * sizeof(int));
 	jintArray pic_data = (*env)->NewIntArray(env, pic_data_len);
 
-//	AndroidBitmapInfo info;
-//	void* pixels;
-
 	while (av_read_frame(inputFormatContext, &packet) >= 0) {
 		jfieldID cancelFid = (*env)->GetFieldID(env, thisClass, "cancel", "Z");
 		jboolean cancel = (*env)->GetBooleanField(env, thiz, cancelFid);
@@ -198,41 +170,6 @@ void readVideoFrame(JNIEnv* env, jobject thiz) {
 				sws_scale(img_convert_ctx, (const uint8_t*)videoFrame->data,
 						videoFrame->linesize, 0, videoCodecContext->height,
 						videoPicture->data, videoPicture->linesize);
-
-				// =====
-//				jmethodID generateEmptyBitmapMid = (*env)->GetMethodID(env,
-//						thisClass, "generateEmptyBitmap",
-//						"()Landroid/graphics/Bitmap;");
-//				if (!generateEmptyBitmapMid) {
-//					D("generateEmptyBitmapMid cannot found!");
-//					break;
-//				}
-//				jobject bitmap = (*env)->CallObjectMethod(env, thiz,
-//						generateEmptyBitmapMid);
-//
-//				int ret;
-//				if ((ret = AndroidBitmap_getInfo(env, bitmap, &info)) < 0) {
-//					D("AndroidBitmap_getInfo() failed ! error=%d", ret);
-//					break;
-//				}
-//				D("Checked on the bitmap");
-//
-//				if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
-//					D("AndroidBitmap_lockPixels failed, error=%d", ret);
-//					break;
-//				}
-//				D("Grabbed the pixels");
-//
-//				fill_bitmap(&info, pixels, videoPicture);
-//
-//				jmethodID processVideoPictureMid = (*env)->GetMethodID(env, thisClass, "processVideoPicture", "(Landroid/graphics/Bitmap;)V");
-//				if (processVideoPictureMid != NULL) {
-//					(*env)->CallVoidMethod(env, thiz, processVideoPictureMid, bitmap);
-//				}
-				// ======
-
-//				memset(rgb_data, 0, pic_data_len * sizeof(int));
-
 
 				fillRGBIntBuffer(videoPicture, imgWidth, imgHeight, rgb_data);
 

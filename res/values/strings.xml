@@ -108,6 +108,14 @@
     <string name="cancel">取消</string>
     <string name="do_you_want_to_leave_group">您要离开当前群聊吗？\n点击确定后系统将挂断您的电话，不影响其他人的使用。</string>
     <string name="watch_video">观看视频</string>
+    <string name="no_video_live">此成员尚未打开视频</string>
+    <string name="member_not_online">此成员不在线</string>
+    <string name="video_is_on">视频已开启</string>
+    <string name="tap_here_to_select_video">轻点此处选择成员视频</string>
+    <string name="no_videos_living_now">当前没有成员开启视频</string>
+    <string name="pls_select_video_to_watch">请选择要观看的成员视频</string>
+    <string name="stop_watching_video">停止观看</string>
+    <string name="select_no_one">谁也不选</string>
     <string name="call">呼叫</string>
     <string name="hang_up">挂断</string>
     <string name="kick_out">移出群聊</string>

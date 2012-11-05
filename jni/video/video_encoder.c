@@ -114,6 +114,8 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_setupVideoEncoder(
 	raw_picture->pts = 0;
 
 	is_video_encode_ready = 1;
+	D("video encoder setup ok");
+	call_void_method(env, thiz, "onVideoLiveEstablish");
 }
 
 void Java_com_richitec_imeeting_video_ECVideoEncoder_releaseVideoEncoder(

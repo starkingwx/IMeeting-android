@@ -88,6 +88,7 @@
     <string name="camera_cannot_open">摄像头无法打开！</string>
     <string name="video_live_disconnected">因网络问题，视频连接已断开</string>
     <string name="video_live_cannot_establish">因网络问题，无法建立视频连接！</string>
+    <string name="connecting_video_server">正在建立视频连接…</string>
     <string name="add_member">添加成员</string>
     <string name="sms_invite">短信邀请</string>
 	<string name="dial_all">呼叫全体</string>

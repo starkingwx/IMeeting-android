@@ -1,5 +1,12 @@
 package com.richitec.imeeting.video;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.richitec.imeeting.constants.SystemConstants;
+
+import android.util.Log;
+
 /**
  * encode video frame and upload to RTMP server
  * 
@@ -9,10 +16,14 @@ package com.richitec.imeeting.video;
  * 
  */
 public class ECVideoEncoder implements VideoLiveListener {
-	private VideoLiveListener videoLivelistener;
-	
-	public void setVideoLivelistener(VideoLiveListener videoLivelistener) {
-		this.videoLivelistener = videoLivelistener;
+	private List<VideoLiveListener> listeners;
+
+	public ECVideoEncoder() {
+		listeners = new ArrayList<VideoLiveListener>();
+	}
+
+	public void addVideoLivelistener(VideoLiveListener videoLivelistener) {
+		listeners.add(videoLivelistener);
 	}
 
 	/**
@@ -28,9 +39,10 @@ public class ECVideoEncoder implements VideoLiveListener {
 	 * @param name
 	 */
 	public native void setLiveName(String name);
-	
+
 	/**
 	 * get the name of living video
+	 * 
 	 * @return
 	 */
 	public native String getLiveName();
@@ -75,9 +87,11 @@ public class ECVideoEncoder implements VideoLiveListener {
 	 *            - frame width
 	 * @param height
 	 *            - frame height
-	 * @param rotateDegree - rotation degree
+	 * @param rotateDegree
+	 *            - rotation degree
 	 */
-	public native void processRawFrame(byte[] buffer, int width, int height, int rotateDegree);
+	public native void processRawFrame(byte[] buffer, int width, int height,
+			int rotateDegree);
 
 	static {
 		System.loadLibrary("video");
@@ -85,16 +99,24 @@ public class ECVideoEncoder implements VideoLiveListener {
 
 	@Override
 	public void onVideoLiveDisconnected() {
-		if (videoLivelistener != null) {
-			videoLivelistener.onVideoLiveDisconnected();
+		for (VideoLiveListener lis : listeners) {
+			lis.onVideoLiveDisconnected();
 		}
 	}
 
 	@Override
 	public void onVideoLiveCannotEstablish() {
-		if (videoLivelistener != null) {
-			videoLivelistener.onVideoLiveCannotEstablish();
+		for (VideoLiveListener lis : listeners) {
+			lis.onVideoLiveCannotEstablish();
 		}
-		
+
+	}
+
+	@Override
+	public void onVideoLiveEstablish() {
+		for (VideoLiveListener lis : listeners) {
+			Log.d(SystemConstants.TAG, "send msg to listener: " + lis.toString());
+			lis.onVideoLiveEstablish();
+		}
 	}
 }

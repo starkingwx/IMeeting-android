@@ -25,7 +25,7 @@ import com.richitec.imeeting.constants.SystemConstants;
  * 
  */
 public class VideoManager implements Camera.PreviewCallback,
-		SurfaceHolder.Callback {
+		SurfaceHolder.Callback, VideoLiveListener {
 	// rotation degree
 	private static final int Rotation_0 = 0;
 	private static final int Rotation_90 = 90;
@@ -70,6 +70,7 @@ public class VideoManager implements Camera.PreviewCallback,
 				SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		videoEncoder = new ECVideoEncoder();
 		videoDecoder = new ECVideoDecoder();
+		videoEncoder.addVideoLivelistener(this);
 		videoLiving = false;
 		imageRotationDegree = Rotation_0;
 		resInit = false;
@@ -110,11 +111,11 @@ public class VideoManager implements Camera.PreviewCallback,
 	public void setVideoFetchListener(VideoFetchListener listener) {
 		videoDecoder.setFetchListener(listener);
 	}
-	
+
 	public void setVideoLiveListener(VideoLiveListener listener) {
-		videoEncoder.setVideoLivelistener(listener);
+		videoEncoder.addVideoLivelistener(listener);
 	}
-	
+
 	private void releaseCamera() {
 		if (camera != null) {
 			camera.stopPreview();
@@ -124,8 +125,12 @@ public class VideoManager implements Camera.PreviewCallback,
 		}
 	}
 
-	public boolean isVideoLiving() {
+	public synchronized boolean isVideoLiving() {
 		return videoLiving;
+	}
+
+	public synchronized void setVideoLiving(boolean living) {
+		this.videoLiving = living;
 	}
 
 	public void attachVideoPreview(ViewGroup parentView) {
@@ -175,35 +180,37 @@ public class VideoManager implements Camera.PreviewCallback,
 	 * @throws Exception
 	 */
 	public void startVideoLive() throws Exception {
+		setVideoLiving(true);
 		startVideoCapture();
 
-		new Thread(new Runnable() {
+		// new Thread(new Runnable() {
+		//
+		// @Override
+		// public void run() {
+		if (camera != null) {
+			videoEncoder.setupVideoEncoder();
+		}
+		// }
+		// }).start();
 
-			@Override
-			public void run() {
-				videoEncoder.setupVideoEncoder();
-			}
-		}).start();
-
-		videoLiving = true;
 	}
 
 	private void startVideoCapture() throws Exception {
 		camera = getCamera(currentCameraPostion);
-		if (camera != null) {
+//		if (camera != null) {
 			camera.setPreviewDisplay(previewSurface.getHolder());
 			camera.setPreviewCallback(this);
-			camera.startPreview();
+			// camera.startPreview();
 			Log.d(SystemConstants.TAG, "start to live video");
-		} else {
-			throw new Exception("camera not found!");
-		}
+//		} else {
+//			throw new Exception("camera not found!");
+//		}
 	}
 
 	public void stopVideoLive() {
 		releaseCamera();
 		videoEncoder.releaseVideoEncoder();
-		videoLiving = false;
+		setVideoLiving(false);
 	}
 
 	public void switchCamera() {
@@ -215,17 +222,18 @@ public class VideoManager implements Camera.PreviewCallback,
 		}
 		try {
 			startVideoCapture();
+			camera.startPreview();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	@TargetApi(9)
-	private Camera getCamera(CameraPosition position) {
+	private Camera getCamera(CameraPosition position) throws Exception {
 		Camera camera = null;
 		int sdk = android.os.Build.VERSION.SDK_INT;
 		Log.d(SystemConstants.TAG, "version sdk: " + sdk);
-		try {
+//		try {
 			if (position == CameraPosition.FrontCamera) {
 				if (sdk >= 9) {
 					// android version is equal to or larger than API 9
@@ -261,10 +269,10 @@ public class VideoManager implements Camera.PreviewCallback,
 				imageRotationDegree = Rotation_90;
 				Log.d(SystemConstants.TAG, "open back camera ok!!!");
 			}
-		} catch (Exception e) {
-			Log.d(SystemConstants.TAG, "open camera failed");
-			e.printStackTrace();
-		}
+//		} catch (Exception e) {
+//			Log.d(SystemConstants.TAG, "open camera failed");
+//			e.printStackTrace();
+//		}
 		return camera;
 	}
 
@@ -321,7 +329,7 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	@Override
 	public void onPreviewFrame(byte[] data, Camera camera) {
-//		Log.d(SystemConstants.TAG, "onPreviewFrame");
+		// Log.d(SystemConstants.TAG, "onPreviewFrame");
 		Size size = camera.getParameters().getPreviewSize();
 		if (size != null) {
 			int w = size.width;
@@ -353,7 +361,9 @@ public class VideoManager implements Camera.PreviewCallback,
 	@Override
 	public void surfaceDestroyed(SurfaceHolder arg0) {
 		Log.d(SystemConstants.TAG, "surfaceDestroyed");
-		camera.stopPreview();
+		if (camera != null) {
+			camera.stopPreview();
+		}
 	}
 
 	public void startVideoFetch(String userName) {
@@ -362,6 +372,27 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	public void stopVideoFetch() {
 		videoDecoder.stopFetchVideo();
+	}
+
+	@Override
+	public void onVideoLiveDisconnected() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onVideoLiveCannotEstablish() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onVideoLiveEstablish() {
+		Log.d(SystemConstants.TAG, "VideoManager - onVideoLiveEstablish");
+		if (camera != null) {
+			Log.d(SystemConstants.TAG, "VideoManager - startPreview");
+			camera.startPreview();
+		}
 	}
 
 }

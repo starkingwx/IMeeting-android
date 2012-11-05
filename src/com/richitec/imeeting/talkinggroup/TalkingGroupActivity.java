@@ -520,6 +520,8 @@ public class TalkingGroupActivity extends Activity implements
 
 	private void startVideoLive() {
 		if (!videoManager.isVideoLiving()) {
+			dismissProgressDlg();
+			progressDlg = ProgressDialog.show(TalkingGroupActivity.this, null, getString(R.string.connecting_video_server));
 			new Thread(new Runnable() {
 
 				@Override
@@ -543,6 +545,7 @@ public class TalkingGroupActivity extends Activity implements
 
 							@Override
 							public void run() {
+								dismissProgressDlg();
 								MyToast.show(TalkingGroupActivity.this,
 										R.string.camera_cannot_open,
 										Toast.LENGTH_SHORT);
@@ -1212,6 +1215,7 @@ public class TalkingGroupActivity extends Activity implements
 
 	private void dismissProgressDlg() {
 		if (progressDlg != null) {
+			Log.d(SystemConstants.TAG, "dismiss dialog");
 			progressDlg.dismiss();
 		}
 	}
@@ -1434,10 +1438,25 @@ public class TalkingGroupActivity extends Activity implements
 			
 			@Override
 			public void run() {
+				dismissProgressDlg();
 				MyToast.show(TalkingGroupActivity.this, R.string.video_live_cannot_establish, Toast.LENGTH_SHORT);
 				stopVideoLive();
 			}
 		});
+	}
+
+	@Override
+	public void onVideoLiveEstablish() {
+		Log.d(SystemConstants.TAG, "TalkingGroupActivity - onVideoLiveEstablish");
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				
+				dismissProgressDlg();
+			}
+		});
+		
 	}
 
 }

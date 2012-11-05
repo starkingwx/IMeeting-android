@@ -65,12 +65,13 @@ import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
 import com.richitec.imeeting.talkinggroup.statusfilter.OwnerModeStatusFilter;
 import com.richitec.imeeting.util.AppUtil;
 import com.richitec.imeeting.video.VideoFetchListener;
+import com.richitec.imeeting.video.VideoLiveListener;
 import com.richitec.imeeting.video.VideoManager;
 import com.richitec.websocket.notifier.NotifierCallbackListener;
 import com.richitec.websocket.notifier.WebSocketNotifier;
 
 public class TalkingGroupActivity extends Activity implements
-		OnGestureListener, VideoFetchListener {
+		OnGestureListener, VideoFetchListener, VideoLiveListener {
 	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID = "talking group id";
 	public static final String TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUP_ATTENDEESPHONE = "talking group attendees phone";
 
@@ -136,6 +137,7 @@ public class TalkingGroupActivity extends Activity implements
 		videoManager.setImgWidth(144);
 		videoManager.setImgHeight(192);
 		videoManager.setVideoFetchListener(this);
+		videoManager.setVideoLiveListener(this);
 		videoManager.initResources();
 
 		PowerManager powerMan = (PowerManager) this
@@ -477,31 +479,33 @@ public class TalkingGroupActivity extends Activity implements
 					Toast.LENGTH_SHORT);
 			return;
 		}
-		
-		AlertDialog.Builder videoWatchPopupListView = new AlertDialog.Builder(this);
+
+		AlertDialog.Builder videoWatchPopupListView = new AlertDialog.Builder(
+				this);
 		videoWatchPopupListView.setTitle(R.string.pls_select_video_to_watch);
 		videoWatchPopupListView.setAdapter(videoWatchListAdapter,
 				videoWatchOnClickListener);
 		videoWatchPopupListView.setPositiveButton(R.string.select_no_one, null);
-		
+
 		if (videoManager.getVideoDecoder().getCurrentVideoUserName() != null) {
-			videoWatchPopupListView.setNegativeButton(R.string.stop_watching_video,
+			videoWatchPopupListView.setNegativeButton(
+					R.string.stop_watching_video,
 					new DialogInterface.OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog,
-						int which) {
-					videoManager.stopVideoFetch();
-					handler.post(new Runnable() {
-						
 						@Override
-						public void run() {
-							videoViewTitleButton.setText(R.string.tap_here_to_select_video);
-							friendVideoView.setImageBitmap(null);
+						public void onClick(DialogInterface dialog, int which) {
+							videoManager.stopVideoFetch();
+							handler.post(new Runnable() {
+
+								@Override
+								public void run() {
+									videoViewTitleButton
+											.setText(R.string.tap_here_to_select_video);
+									friendVideoView.setImageBitmap(null);
+								}
+							});
 						}
 					});
-				}
-			});
 		}
 		videoWatchPopupListView.show();
 	}
@@ -1221,6 +1225,7 @@ public class TalkingGroupActivity extends Activity implements
 	}
 
 	class HeartBeatTimerTask extends TimerTask {
+		private int timeoutCount = 0;
 
 		@Override
 		public void run() {
@@ -1230,9 +1235,43 @@ public class TalkingGroupActivity extends Activity implements
 			HttpUtils.postSignatureRequest(getString(R.string.server_url)
 					+ getString(R.string.heart_beat_url),
 					PostRequestFormat.URLENCODED, params, null,
-					HttpRequestType.ASYNCHRONOUS, null);
+					HttpRequestType.ASYNCHRONOUS, onHearBeatReturn);
 		}
 
+		private OnHttpRequestListener onHearBeatReturn = new OnHttpRequestListener() {
+
+			@Override
+			public void onFinished(HttpResponseResult responseResult) {
+				Log.d(SystemConstants.TAG, "onHeartBeatReturn - code: " + responseResult.getStatusCode());
+				timeoutCount--;
+				if (timeoutCount > 0) {
+					refreshMemberList();
+				} else {
+					timeoutCount = 0;
+				}
+				
+			}
+
+			@Override
+			public void onFailed(HttpResponseResult responseResult) {
+				Log.d(SystemConstants.TAG, "onHearBeatReturn: code: "
+						+ responseResult.getStatusCode());
+				if (responseResult.getStatusCode() == -1) {
+					timeoutCount++;
+					if (timeoutCount == 2) {
+						// set all members as offline
+						memberListAdatper.setAllMemberOffline();
+					}
+					if (timeoutCount <= 4 && timeoutCount >= 2) {
+						MyToast.show(TalkingGroupActivity.this,
+								R.string.network_error, Toast.LENGTH_SHORT);
+					}
+					if (timeoutCount > 4) {
+						timeoutCount = 4;
+					}
+				}
+			}
+		};
 	}
 
 	private void switchToVideoView() {
@@ -1373,6 +1412,30 @@ public class TalkingGroupActivity extends Activity implements
 			public void run() {
 				videoViewTitleButton.setText(R.string.tap_here_to_select_video);
 				friendVideoView.setImageBitmap(null);
+			}
+		});
+	}
+
+	@Override
+	public void onVideoLiveDisconnected() {
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				MyToast.show(TalkingGroupActivity.this, R.string.video_live_disconnected, Toast.LENGTH_SHORT);
+				stopVideoLive();
+			}
+		});
+	}
+
+	@Override
+	public void onVideoLiveCannotEstablish() {
+		handler.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				MyToast.show(TalkingGroupActivity.this, R.string.video_live_cannot_establish, Toast.LENGTH_SHORT);
+				stopVideoLive();
 			}
 		});
 	}

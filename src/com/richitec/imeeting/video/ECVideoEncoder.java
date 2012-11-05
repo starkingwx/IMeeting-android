@@ -8,7 +8,12 @@ package com.richitec.imeeting.video;
  * @author star
  * 
  */
-public class ECVideoEncoder {
+public class ECVideoEncoder implements VideoLiveListener {
+	private VideoLiveListener videoLivelistener;
+	
+	public void setVideoLivelistener(VideoLiveListener videoLivelistener) {
+		this.videoLivelistener = videoLivelistener;
+	}
 
 	/**
 	 * set the RTMP server url
@@ -76,5 +81,20 @@ public class ECVideoEncoder {
 
 	static {
 		System.loadLibrary("video");
+	}
+
+	@Override
+	public void onVideoLiveDisconnected() {
+		if (videoLivelistener != null) {
+			videoLivelistener.onVideoLiveDisconnected();
+		}
+	}
+
+	@Override
+	public void onVideoLiveCannotEstablish() {
+		if (videoLivelistener != null) {
+			videoLivelistener.onVideoLiveCannotEstablish();
+		}
+		
 	}
 }

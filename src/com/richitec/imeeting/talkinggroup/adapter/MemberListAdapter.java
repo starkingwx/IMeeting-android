@@ -153,6 +153,14 @@ public class MemberListAdapter extends BaseAdapter {
 		}
 	}
 	
+	public void setAllMemberOffline() {
+		for (Map<String, String> member : memberList) {
+			member.put(Attendee.online_status.name(), Attendee.OnlineStatus.offline.name());
+			member.put(Attendee.video_status.name(), Attendee.VideoStatus.off.name());
+		}
+		notifyDataSetChanged();
+	}
+	
 	public void removeMember(String userName) {
 		for (Map<String, String> member : memberList) {
 			String memberName = member.get(Attendee.username.name());

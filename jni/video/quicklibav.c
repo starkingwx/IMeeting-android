@@ -247,7 +247,7 @@ int write_video_frame(QuickVideoOutput *qvo, AVFrame *raw_picture) {
     
     if (ret != 0) {
         D("error while writing video frame\n");
-        return -1;
+        return -2;
     }
     
     return out_size;

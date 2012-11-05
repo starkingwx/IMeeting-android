@@ -70,7 +70,7 @@ public class VideoFetchExecutor extends Thread implements VideoFetchListener {
 
 	public void handleError() {
 		closeVideoInputStream();
-		onFetchEnd();
+		onFetchFailed();
 	}
 
 	@Override

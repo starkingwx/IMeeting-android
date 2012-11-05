@@ -110,7 +110,11 @@ public class VideoManager implements Camera.PreviewCallback,
 	public void setVideoFetchListener(VideoFetchListener listener) {
 		videoDecoder.setFetchListener(listener);
 	}
-
+	
+	public void setVideoLiveListener(VideoLiveListener listener) {
+		videoEncoder.setVideoLivelistener(listener);
+	}
+	
 	private void releaseCamera() {
 		if (camera != null) {
 			camera.stopPreview();

@@ -102,6 +102,7 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_setupVideoEncoder(
 	if (ret < 0) {
 		D("quick video output initial failed.");
 		release_video_encoder();
+		call_void_method(env, thiz, "onVideoLiveCannotEstablish");
 		return;
 	}
 
@@ -167,4 +168,9 @@ void Java_com_richitec_imeeting_video_ECVideoEncoder_processRawFrame(
 	raw_picture->pts++;
 
 	free(p_rotated_buffer);
+
+	if (out_size == -2) {
+		// network interrupted
+		call_void_method(env, thiz, "onVideoLiveDisconnected");
+	}
 }

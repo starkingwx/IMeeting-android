@@ -50,11 +50,11 @@
         android:textColor="@drawable/gt_video_view_title_bt_fg" />
 
     <Button
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/gt_back_bt_bg"
         android:onClick="onSwitchToMemberListView" />
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@drawable/back_icon_gray" android:state_pressed="true"/>
-    <item android:drawable="@drawable/back_icon"/>
+    <item android:drawable="@drawable/back_light_in_video_view" android:state_pressed="true"/>
+    <item android:drawable="@drawable/back_dark_in_video_view"/>
 
 </selector>

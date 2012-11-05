@@ -9,6 +9,7 @@
     <string name="no_more_item">没有更多</string>
 	<string name="exit_app">确定要退出智会应用吗？</string>
     <string name="exit">退出</string>
+    <string name="network_error">无法连接服务器，可能网络状态不佳或没有网络信号！</string>
     
     <!-- iMeeting application activity -->
     <string name="splash_content_description">iMeeting application splash image</string>
@@ -85,6 +86,8 @@
     <string name="open_camera">打开镜头</string>
     <string name="close_camera">关闭镜头</string>
     <string name="camera_cannot_open">摄像头无法打开！</string>
+    <string name="video_live_disconnected">因网络问题，视频连接已断开</string>
+    <string name="video_live_cannot_establish">因网络问题，无法建立视频连接！</string>
     <string name="add_member">添加成员</string>
     <string name="sms_invite">短信邀请</string>
 	<string name="dial_all">呼叫全体</string>

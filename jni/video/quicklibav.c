@@ -52,28 +52,15 @@ static AVStream * create_video_stream(AVFormatContext *oc, enum CodecID codec_id
     c = st->codec;
     
     /**** set codec parameters ****/
-    /* put sample parameters */
-    //c->bit_rate = 4000;
     /* resolution must be a multiple of two */
     c->width = width;
     c->height = height;
     /* frames per second */
     c->time_base = (AVRational){1, STREAM_FRAME_RATE};
-    c->gop_size = 12; /* emit one intra frame every ten frames */
+    c->gop_size = 12; /* emit one intra frame every 12 frames */
 
-   // c->max_b_frames=0;
-   // c->b_frame_strategy = 0;
-    
     c->pix_fmt = STREAM_PIX_FMT;
-    /*
-    c->me_range = 16;
-    c->max_qdiff = 4;
-    c->qmin = 10;
-    c->qmax = 51;
-    c->qcompress = 0.6; 
-    */
     c->level = 10; //Level 
-    //c->profile = FF_PROFILE_H264_CONSTRAINED_BASELINE; //Baseline
     
     if (oc->oformat->flags & AVFMT_GLOBALHEADER) {
         c->flags |= CODEC_FLAG_GLOBAL_HEADER;

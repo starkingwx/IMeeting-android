@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -325,20 +332,26 @@ public class TalkingGroupActivity extends Activity implements
 	}
 
 	public void onSmsInviteAction(View v) {
-		List<Map<String, String>> memberList = memberListAdatper
-				.getMemberList();
-		String accountName = UserManager.getInstance().getUser().getName();
-		List<String> numbers = new ArrayList<String>();
-		for (Map<String, String> member : memberList) {
-			String memberName = member.get(Attendee.username.name());
-			if (!accountName.equals(memberName)) {
-				numbers.add(memberName);
+		if (getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_TELEPHONY)) {
+			List<Map<String, String>> memberList = memberListAdatper
+					.getMemberList();
+			String accountName = UserManager.getInstance().getUser().getName();
+			List<String> numbers = new ArrayList<String>();
+			for (Map<String, String> member : memberList) {
+				String memberName = member.get(Attendee.username.name());
+				if (!accountName.equals(memberName)) {
+					numbers.add(memberName);
+				}
 			}
-		}
-		if (numbers.size() > 0) {
-			sendSMS(numbers);
+			if (numbers.size() > 0) {
+				sendSMS(numbers);
+			} else {
+				MyToast.show(this, R.string.no_one_to_invite,
+						Toast.LENGTH_SHORT);
+			}
 		} else {
-			MyToast.show(this, R.string.no_one_to_invite, Toast.LENGTH_SHORT);
+			MyToast.show(this, R.string.sms_no_support, Toast.LENGTH_SHORT);
 		}
 
 	}
@@ -518,42 +531,73 @@ public class TalkingGroupActivity extends Activity implements
 		}
 	}
 
+	private Runnable videoLiveStartRunner = new Runnable() {
+
+		@Override
+		public synchronized void run() {
+			try {
+				Log.d(SystemConstants.TAG, "enter video live start thread");
+				if (videoManager.isVideoLiving()) {
+					return;
+				}
+
+				videoManager.startVideoLive();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				messageHandler.post(new Runnable() {
+
+					@Override
+					public void run() {
+						dismissProgressDlg();
+						MyToast.show(TalkingGroupActivity.this,
+								R.string.camera_cannot_open, Toast.LENGTH_SHORT);
+					}
+				});
+			}
+		}
+	};
+
+	private Runnable videoStartTask = new Runnable() {
+
+		@Override
+		public void run() {
+			ExecutorService executor = Executors.newSingleThreadExecutor();
+			Future<Boolean> future = executor.submit(videoLiveStartRunner,
+					Boolean.TRUE);
+			try {
+				System.out.println("videoStartRunner Started..");
+				System.out.println("Execute result: "
+						+ future.get(10, TimeUnit.SECONDS));
+				System.out.println("videoStartRunner Finished!");
+			} catch (Exception e) {
+				System.out.println("videoStartRunner Terminated!");
+				executor.shutdownNow();
+				handler.post(new Runnable() {
+
+					@Override
+					public void run() {
+						if (videoManager.isVideoLiving()) {
+							videoManager.detachVideoPreview();
+							videoManager.stopVideoLive2();
+							onCameraClosed();
+						}
+						dismissProgressDlg();
+					}
+				});
+			}
+		}
+	};
+
 	private void startVideoLive() {
 		if (!videoManager.isVideoLiving()) {
 			dismissProgressDlg();
-			progressDlg = ProgressDialog.show(TalkingGroupActivity.this, null, getString(R.string.connecting_video_server));
-			new Thread(new Runnable() {
+			progressDlg = ProgressDialog.show(TalkingGroupActivity.this, null,
+					getString(R.string.connecting_video_server));
 
-				@Override
-				public void run() {
-					try {
-						videoManager.startVideoLive();
+			ExecutorService executor = Executors.newSingleThreadExecutor();
+			executor.submit(videoStartTask);
 
-						messageHandler.post(new Runnable() {
-
-							@Override
-							public void run() {
-								videoManager
-										.attachVideoPreview(getCurrentMyVideoView());
-								onCameraOpen();
-							}
-						});
-
-					} catch (Exception e) {
-						e.printStackTrace();
-						messageHandler.post(new Runnable() {
-
-							@Override
-							public void run() {
-								dismissProgressDlg();
-								MyToast.show(TalkingGroupActivity.this,
-										R.string.camera_cannot_open,
-										Toast.LENGTH_SHORT);
-							}
-						});
-					}
-				}
-			}).start();
 		}
 	}
 
@@ -906,17 +950,22 @@ public class TalkingGroupActivity extends Activity implements
 	};
 
 	private void sendSMS(List<String> numbers) {
-		if (numbers != null && numbers.size() > 0) {
-			StringBuffer toNumbers = new StringBuffer();
-			for (String number : numbers) {
-				toNumbers.append(number).append(';');
+		if (getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_TELEPHONY)) {
+			if (numbers != null && numbers.size() > 0) {
+				StringBuffer toNumbers = new StringBuffer();
+				for (String number : numbers) {
+					toNumbers.append(number).append(';');
+				}
+				Uri uri = Uri.parse("smsto:" + toNumbers.toString());
+				Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
+				String smsBody = String.format(
+						getString(R.string.invite_sms_body), groupId);
+				intent.putExtra("sms_body", smsBody);
+				startActivity(intent);
 			}
-			Uri uri = Uri.parse("smsto:" + toNumbers.toString());
-			Intent intent = new Intent(Intent.ACTION_SENDTO, uri);
-			String smsBody = String.format(getString(R.string.invite_sms_body),
-					groupId);
-			intent.putExtra("sms_body", smsBody);
-			startActivity(intent);
+		} else {
+			MyToast.show(TalkingGroupActivity.this, R.string.sms_no_support, Toast.LENGTH_SHORT);
 		}
 	}
 
@@ -1246,14 +1295,15 @@ public class TalkingGroupActivity extends Activity implements
 
 			@Override
 			public void onFinished(HttpResponseResult responseResult) {
-				Log.d(SystemConstants.TAG, "onHeartBeatReturn - code: " + responseResult.getStatusCode());
+				Log.d(SystemConstants.TAG, "onHeartBeatReturn - code: "
+						+ responseResult.getStatusCode());
 				timeoutCount--;
 				if (timeoutCount > 0) {
 					refreshMemberList();
 				} else {
 					timeoutCount = 0;
 				}
-				
+
 			}
 
 			@Override
@@ -1423,10 +1473,11 @@ public class TalkingGroupActivity extends Activity implements
 	@Override
 	public void onVideoLiveDisconnected() {
 		handler.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				MyToast.show(TalkingGroupActivity.this, R.string.video_live_disconnected, Toast.LENGTH_SHORT);
+				MyToast.show(TalkingGroupActivity.this,
+						R.string.video_live_disconnected, Toast.LENGTH_SHORT);
 				stopVideoLive();
 			}
 		});
@@ -1435,11 +1486,13 @@ public class TalkingGroupActivity extends Activity implements
 	@Override
 	public void onVideoLiveCannotEstablish() {
 		handler.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				dismissProgressDlg();
-				MyToast.show(TalkingGroupActivity.this, R.string.video_live_cannot_establish, Toast.LENGTH_SHORT);
+				MyToast.show(TalkingGroupActivity.this,
+						R.string.video_live_cannot_establish,
+						Toast.LENGTH_SHORT);
 				stopVideoLive();
 			}
 		});
@@ -1447,16 +1500,18 @@ public class TalkingGroupActivity extends Activity implements
 
 	@Override
 	public void onVideoLiveEstablish() {
-		Log.d(SystemConstants.TAG, "TalkingGroupActivity - onVideoLiveEstablish");
+		Log.d(SystemConstants.TAG,
+				"TalkingGroupActivity - onVideoLiveEstablish");
 		handler.post(new Runnable() {
-			
+
 			@Override
 			public void run() {
-				
 				dismissProgressDlg();
+				videoManager.attachVideoPreview(getCurrentMyVideoView());
+				onCameraOpen();
 			}
 		});
-		
+
 	}
 
 }

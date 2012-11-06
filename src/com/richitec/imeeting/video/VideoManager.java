@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import com.richitec.imeeting.constants.SystemConstants;
 
@@ -135,6 +136,7 @@ public class VideoManager implements Camera.PreviewCallback,
 
 	public void attachVideoPreview(ViewGroup parentView) {
 		previewSurfaceParent = parentView;
+		detachVideoPreview();
 		if (previewSurfaceParent != null) {
 			previewSurface.setLayoutParams(previewSurfaceParent
 					.getLayoutParams());
@@ -143,8 +145,13 @@ public class VideoManager implements Camera.PreviewCallback,
 	}
 
 	public void detachVideoPreview() {
-		if (previewSurfaceParent != null) {
-			previewSurfaceParent.removeView(previewSurface);
+//		if (previewSurfaceParent != null) {
+//			previewSurfaceParent.removeView(previewSurface);
+//		}
+		ViewParent parent = previewSurface.getParent();
+		if (parent != null && parent instanceof ViewGroup) {
+			ViewGroup group = (ViewGroup)parent;
+			group.removeAllViews();
 		}
 	}
 
@@ -183,33 +190,26 @@ public class VideoManager implements Camera.PreviewCallback,
 		setVideoLiving(true);
 		startVideoCapture();
 
-		// new Thread(new Runnable() {
-		//
-		// @Override
-		// public void run() {
 		if (camera != null) {
 			videoEncoder.setupVideoEncoder();
 		}
-		// }
-		// }).start();
-
 	}
 
 	private void startVideoCapture() throws Exception {
 		camera = getCamera(currentCameraPostion);
-//		if (camera != null) {
-			camera.setPreviewDisplay(previewSurface.getHolder());
-			camera.setPreviewCallback(this);
-			// camera.startPreview();
-			Log.d(SystemConstants.TAG, "start to live video");
-//		} else {
-//			throw new Exception("camera not found!");
-//		}
+		camera.setPreviewDisplay(previewSurface.getHolder());
+		camera.setPreviewCallback(this);
+		Log.d(SystemConstants.TAG, "start to live video");
 	}
 
 	public void stopVideoLive() {
 		releaseCamera();
 		videoEncoder.releaseVideoEncoder();
+		setVideoLiving(false);
+	}
+	
+	public void stopVideoLive2() {
+		releaseCamera();
 		setVideoLiving(false);
 	}
 
@@ -233,46 +233,46 @@ public class VideoManager implements Camera.PreviewCallback,
 		Camera camera = null;
 		int sdk = android.os.Build.VERSION.SDK_INT;
 		Log.d(SystemConstants.TAG, "version sdk: " + sdk);
-//		try {
-			if (position == CameraPosition.FrontCamera) {
-				if (sdk >= 9) {
-					// android version is equal to or larger than API 9
-					// we can use the following code
-					int cameraNum = Camera.getNumberOfCameras();
-					if (cameraNum > 1) {
-						CameraInfo cinfo = new CameraInfo();
-						for (int i = 0; i < cameraNum; i++) {
-							Camera.getCameraInfo(i, cinfo);
-							if (cinfo.facing == CameraInfo.CAMERA_FACING_FRONT) {
-								camera = Camera.open(i);
-								setupCamera(camera, i);
-								currentCameraPostion = CameraPosition.FrontCamera;
-								imageRotationDegree = Rotation_270;
-								Log.d(SystemConstants.TAG,
-										"open front camera ok!!!");
-								break;
-							}
+		// try {
+		if (position == CameraPosition.FrontCamera) {
+			if (sdk >= 9) {
+				// android version is equal to or larger than API 9
+				// we can use the following code
+				int cameraNum = Camera.getNumberOfCameras();
+				if (cameraNum > 1) {
+					CameraInfo cinfo = new CameraInfo();
+					for (int i = 0; i < cameraNum; i++) {
+						Camera.getCameraInfo(i, cinfo);
+						if (cinfo.facing == CameraInfo.CAMERA_FACING_FRONT) {
+							camera = Camera.open(i);
+							setupCamera(camera, i);
+							currentCameraPostion = CameraPosition.FrontCamera;
+							imageRotationDegree = Rotation_270;
+							Log.d(SystemConstants.TAG,
+									"open front camera ok!!!");
+							break;
 						}
-					} else {
-						camera = getCamera(CameraPosition.BackCamera);
 					}
 				} else {
-					// there is no way to get front camera below version 2.3
-					// so return back camera
 					camera = getCamera(CameraPosition.BackCamera);
 				}
 			} else {
-				// get back camera
-				camera = Camera.open(); // attempt to get back Camera instance
-				setupCamera(camera, 0);
-				currentCameraPostion = CameraPosition.BackCamera;
-				imageRotationDegree = Rotation_90;
-				Log.d(SystemConstants.TAG, "open back camera ok!!!");
+				// there is no way to get front camera below version 2.3
+				// so return back camera
+				camera = getCamera(CameraPosition.BackCamera);
 			}
-//		} catch (Exception e) {
-//			Log.d(SystemConstants.TAG, "open camera failed");
-//			e.printStackTrace();
-//		}
+		} else {
+			// get back camera
+			camera = Camera.open(); // attempt to get back Camera instance
+			setupCamera(camera, 0);
+			currentCameraPostion = CameraPosition.BackCamera;
+			imageRotationDegree = Rotation_90;
+			Log.d(SystemConstants.TAG, "open back camera ok!!!");
+		}
+		// } catch (Exception e) {
+		// Log.d(SystemConstants.TAG, "open camera failed");
+		// e.printStackTrace();
+		// }
 		return camera;
 	}
 

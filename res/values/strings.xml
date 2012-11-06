@@ -124,6 +124,7 @@
     <string name="hang_up">挂断</string>
     <string name="kick_out">移出群聊</string>
     <string name="send_sms">发送短信</string>
+    <string name="sms_no_support">此设备不支持短信功能！</string>
     <string name="operation_on_sb">选择对 %s 的操作</string>
     <string name="call_is_forbidden_for_sb">不允许呼叫%s</string>
     <string name="hangup_is_forbidden_for_sb">不允许挂断%s</string>

@@ -42,21 +42,23 @@
         android:layout_marginTop="25dp"
         android:background="@drawable/gt_video_view_title_bt_bg"
         android:drawableRight="@drawable/triangle"
-        android:onClick="onVideoViewTitleClickAction"
-        android:paddingRight="5dp"
-        android:paddingLeft="5dp"
-        android:text="@string/tap_here_to_select_video"
         android:gravity="center"
+        android:onClick="onVideoViewTitleClickAction"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:text="@string/tap_here_to_select_video"
         android:textColor="@drawable/gt_video_view_title_bt_fg" />
 
     <Button
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/gt_back_to_memberlist_bt"
         android:background="@drawable/gt_back_bt_bg"
-        android:onClick="onSwitchToMemberListView" />
+        android:onClick="onSwitchToMemberListView" 
+        />
 
     <Button
         android:id="@+id/gt_camera_switch_bt"

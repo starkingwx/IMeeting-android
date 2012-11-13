@@ -1353,10 +1353,10 @@ public class TalkingGroupActivity extends Activity implements
 		currentView = GTViewType.MemberListView;
 	}
 
-	@Override
-	public boolean onTouchEvent(MotionEvent event) {
-		return gestureDetector.onTouchEvent(event);
-	}
+//	@Override
+//	public boolean onTouchEvent(MotionEvent event) {
+//		return gestureDetector.onTouchEvent(event);
+//	}
 
 	@Override
 	public boolean onDown(MotionEvent e) {

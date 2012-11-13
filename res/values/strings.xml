@@ -69,19 +69,19 @@
 
     <!-- talking group history list activity -->
     <string name="menu_refresh_myTalkingGroupList">刷新</string>
-    <string name="myTalkingGroup_history_list_nav_title_text">我的群聊</string>
+    <string name="myTalkingGroup_history_list_nav_title_text">我的会议</string>
     <string name="setting_nav_btn_title">设置</string>
-    <string name="newTalkingGroup_btn_title">新建群聊</string>
-    <string name="error_in_join_group">无法进入当前群聊, 请稍后重试！</string>
-    <string name="error_in_create_group">创建群聊失败</string>
+    <string name="newTalkingGroup_btn_title">新建会议</string>
+    <string name="error_in_join_group">无法进入当前会议, 请稍后重试！</string>
+    <string name="error_in_create_group">创建会议失败</string>
     <string name="payment_required">账户余额不足，请充值后再使用!</string>
-    <string name="join_conf_forbidden">当前您无法进入群聊，可能已被发起人移除。</string>
-    <string name="delete_group">删除群聊</string>
+    <string name="join_conf_forbidden">当前您无法进入会议，可能已被发起人移除。</string>
+    <string name="delete_group">删除会议</string>
     <string name="select_operation">选择操作</string>
-    <string name="error_in_del_group">删除群聊失败</string>
+    <string name="error_in_del_group">删除会议失败</string>
 
     <!-- talking group -->
-    <string name="group_talk_title">群聊号：</string>
+    <string name="group_talk_title">会议号：</string>
     <string name="video">视频</string>
     <string name="open_camera">打开镜头</string>
     <string name="close_camera">关闭镜头</string>
@@ -106,11 +106,11 @@
     <string name="call_failed">呼叫失败</string>
     <string name="hanged_up">通话已断</string>
     <string name="loading">加载中…</string>
-    <string name="sb_is_kicked_out">%s已被移出群聊</string>
-    <string name="you_have_been_kicked_out">您被发起人移出群聊！</string>
+    <string name="sb_is_kicked_out">%s已被移出会议</string>
+    <string name="you_have_been_kicked_out">您被发起人移出会议！</string>
     <string name="ok">确定</string>
     <string name="cancel">取消</string>
-    <string name="do_you_want_to_leave_group">您要离开当前群聊吗？\n点击确定后系统将挂断您的电话，不影响其他人的使用。</string>
+    <string name="do_you_want_to_leave_group">您要离开当前会议吗？\n点击确定后系统将挂断您的电话，不影响其他人的使用。</string>
     <string name="watch_video">观看视频</string>
     <string name="no_video_live">此成员尚未打开视频</string>
     <string name="member_not_online">此成员不在线</string>
@@ -122,7 +122,7 @@
     <string name="select_no_one">谁也不选</string>
     <string name="call">呼叫</string>
     <string name="hang_up">挂断</string>
-    <string name="kick_out">移出群聊</string>
+    <string name="kick_out">移出会议</string>
     <string name="send_sms">发送短信</string>
     <string name="sms_no_support">此设备不支持短信功能！</string>
     <string name="operation_on_sb">选择对 %s 的操作</string>
@@ -137,13 +137,13 @@
     <string name="call_in_failed">语音接入失败！</string>
     <string name="hangup_is_forbidden_for_you">您的结束操作不被允许！</string>
     <string name="hangup_talking_failed">结束操作失败！</string>
-    <string name="do_you_want_to_call_into_group_talking">需要接入语音群聊吗？</string>
-    <string name="do_you_wanna_end_group_talking">要结束当前语音群聊吗？</string>
+    <string name="do_you_want_to_call_into_group_talking">需要接入语音会议吗？</string>
+    <string name="do_you_wanna_end_group_talking">要结束当前语音会议吗？</string>
     <string name="end_group_talking">结束语音</string>
 	<string name="close_talkgroup">挂断全体并离开</string>
 	<string name="only_leave_talkgroup">挂断自己并离开</string>
-	<string name="destroying_talkgroup">正在结束群聊…</string>
-	<string name="talkgroup_has_been_closed">发起人关闭了当前群聊！</string>
+	<string name="destroying_talkgroup">正在结束会议…</string>
+	<string name="talkgroup_has_been_closed">发起人关闭了当前会议！</string>
 	<string name="loading_video">正在加载视频…</string>
 	<string name="video_load_failed">视频加载失败！</string>
     <!-- setting activity -->
@@ -171,7 +171,7 @@
     <string name="add_notExistedInABContact_confirmBtn_title">添加</string>
     <string name="contact_hasNoPhone_alertDialog_title">此人没有号码</string>
     <string name="contact_hasNoPhone_alertDialog_reselectBtn_title">重新选择</string>
-    <string name="contactPhones_selectPopupWindow_titleTextView_text">选择 *** 加入群聊的号码</string>
+    <string name="contactPhones_selectPopupWindow_titleTextView_text">选择 *** 加入会议的号码</string>
     <string name="addPhonesAreaCode_PopupWindow_titleTextView_text">修改号码（固话加拨区号）</string>
     <string name="wrong_phonenumber_format">号码格式有误，请检查（固话加拨区号）</string>
     <string name="wrong_phone_format_inform_titleTextView_text">号码***可能不是电话号码，或者是固定电话但未加区号。\n请选择是否修改:</string>

@@ -42,6 +42,7 @@
                     android:onClick="onSwitchToVideoView"
                     android:text="@string/video"
                     android:textColor="@android:color/white"
+                    android:visibility="gone"
                     android:textSize="16dp" />
             </RelativeLayout>
 

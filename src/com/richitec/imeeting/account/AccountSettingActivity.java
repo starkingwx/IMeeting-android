@@ -72,8 +72,8 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 
 		useSavedPwd = remeberPwdToggle.isChecked();
 
-		AppUpdateManager aum = new AppUpdateManager(this);
-		aum.checkVersion();
+//		AppUpdateManager aum = new AppUpdateManager(this);
+//		aum.checkVersion();
 	}
 
 	private TextWatcher onTextChanged = new TextWatcher() {

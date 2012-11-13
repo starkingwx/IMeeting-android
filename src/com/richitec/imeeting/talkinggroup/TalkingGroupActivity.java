@@ -740,7 +740,7 @@ public class TalkingGroupActivity extends Activity implements
 
 	private void doActionForSelectedMemberInOwnerMode(Map<String, String> member) {
 		final String userName = member.get(Attendee.username.name());
-		String videoStatus = member.get(Attendee.video_status.name());
+//		String videoStatus = member.get(Attendee.video_status.name());
 		String displayName = AppUtil.getDisplayNameFromAttendee(member);
 		String onlineStatus = member.get(Attendee.online_status.name());
 		String phoneStatus = member.get(Attendee.telephone_status.name());
@@ -748,9 +748,9 @@ public class TalkingGroupActivity extends Activity implements
 		String accountName = UserManager.getInstance().getUser().getName();
 
 		List<String> actionList = new ArrayList<String>();
-		if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
-			actionList.add(getString(R.string.watch_video));
-		}
+//		if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+//			actionList.add(getString(R.string.watch_video));
+//		}
 
 		if (!Attendee.OnlineStatus.online.name().equals(onlineStatus)
 				|| accountName.equals(userName)) {
@@ -801,19 +801,19 @@ public class TalkingGroupActivity extends Activity implements
 
 	private void doActionForSelectedMemberInAttendeeMode(
 			Map<String, String> member) {
-		String userName = member.get(Attendee.username.name());
-		String videoStatus = member.get(Attendee.video_status.name());
-		String onlineStatus = member.get(Attendee.online_status.name());
-
-		if (Attendee.OnlineStatus.online.name().equals(onlineStatus)) {
-			if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
-				watchVideo(userName);
-			} else {
-				MyToast.show(this, R.string.no_video_live, Toast.LENGTH_SHORT);
-			}
-		} else {
-			MyToast.show(this, R.string.member_not_online, Toast.LENGTH_SHORT);
-		}
+//		String userName = member.get(Attendee.username.name());
+//		String videoStatus = member.get(Attendee.video_status.name());
+//		String onlineStatus = member.get(Attendee.online_status.name());
+//
+//		if (Attendee.OnlineStatus.online.name().equals(onlineStatus)) {
+//			if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
+//				watchVideo(userName);
+//			} else {
+//				MyToast.show(this, R.string.no_video_live, Toast.LENGTH_SHORT);
+//			}
+//		} else {
+//			MyToast.show(this, R.string.member_not_online, Toast.LENGTH_SHORT);
+//		}
 	}
 
 	private void call(String targetUserName) {

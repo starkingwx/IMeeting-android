@@ -97,8 +97,8 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		listView.setRefreshing();
 		loadData();
 
-		AppUpdateManager aum = new AppUpdateManager(this);
-		aum.checkVersion();
+//		AppUpdateManager aum = new AppUpdateManager(this);
+//		aum.checkVersion();
 	}
 
 	// setting button on click listener

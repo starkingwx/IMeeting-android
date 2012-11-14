@@ -205,7 +205,7 @@ public class TalkingGroupActivity extends Activity implements
 		params.width = isOwner() ? btWidth - 2 : btWidth - 1;
 		dialBt.setLayoutParams(params);
 
-		dialBt.setText(isOwner() ? R.string.dial_all : R.string.dial);
+		dialBt.setText(R.string.dial);
 
 		params = leaveBt.getLayoutParams();
 		params.width = btWidth - 1;
@@ -360,64 +360,41 @@ public class TalkingGroupActivity extends Activity implements
 
 	public void onDialAction(View v) {
 
-		if (isOwner()) {
-			// in owner mode, call all member
-			if (isNeedCallAllMember()) {
-				new AlertDialog.Builder(this)
-						.setTitle(R.string.alert_title)
-						.setMessage(R.string.is_need_call_all_member)
-						.setPositiveButton(R.string.call,
-								new DialogInterface.OnClickListener() {
+		// call myself into conference
+		Button dialButton = (Button) findViewById(R.id.gt_dial_bt);
+		String text = dialButton.getText().toString();
+		if (text.equals(getString(R.string.dial))) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					TalkingGroupActivity.this)
+					.setTitle(R.string.do_you_want_to_call_into_group_talking)
+					.setMessage(String.format(getString(R.string.remember_ur_groupid), groupId))
+					.setPositiveButton(R.string.call_in,
+							new DialogInterface.OnClickListener() {
 
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										callAllMember();
-									}
-								}).setNegativeButton(R.string.cancel, null)
-						.show();
-			} else {
-				new AlertDialog.Builder(this).setTitle(R.string.alert_title)
-						.setMessage(R.string.no_member_need_to_call)
-						.setPositiveButton(R.string.ok, null).show();
-			}
-		} else {
-			// in attendee mode, just call myself into conference
-			Button dialButton = (Button) findViewById(R.id.gt_dial_bt);
-			String text = dialButton.getText().toString();
-			if (text.equals(getString(R.string.dial))) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						TalkingGroupActivity.this)
-						.setMessage(
-								getString(R.string.do_you_want_to_call_into_group_talking))
-						.setPositiveButton(R.string.call_in,
-								new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									callMeIntoGroupTalking();
+								}
+							}).setNegativeButton(R.string.cancel, null);
+			builder.show();
+		} else if (text.equals(getString(R.string.calling_in))) {
 
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										callMeIntoGroupTalking();
-									}
-								}).setNegativeButton(R.string.cancel, null);
-				builder.show();
-			} else if (text.equals(getString(R.string.calling_in))) {
+		} else if (text.equals(getString(R.string.hangup_talking))) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					TalkingGroupActivity.this)
+					.setMessage(
+							getString(R.string.do_you_wanna_end_group_talking))
+					.setPositiveButton(R.string.end_group_talking,
+							new DialogInterface.OnClickListener() {
 
-			} else if (text.equals(getString(R.string.hangup_talking))) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						TalkingGroupActivity.this)
-						.setMessage(
-								getString(R.string.do_you_wanna_end_group_talking))
-						.setPositiveButton(R.string.end_group_talking,
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										hangMeUpFromGroupTalking();
-									}
-								}).setNegativeButton(R.string.cancel, null);
-				builder.show();
-			}
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									hangMeUpFromGroupTalking();
+								}
+							}).setNegativeButton(R.string.cancel, null);
+			builder.show();
 		}
 
 	}
@@ -752,22 +729,26 @@ public class TalkingGroupActivity extends Activity implements
 			actionList.add(getString(R.string.watch_video));
 		}
 
-		if (!Attendee.OnlineStatus.online.name().equals(onlineStatus)
-				|| accountName.equals(userName)) {
-			if (Attendee.PhoneStatus.Terminated.name().equals(phoneStatus)
-					|| Attendee.PhoneStatus.Failed.name().equals(phoneStatus)
-					|| Attendee.PhoneStatus.TermWait.name().equals(phoneStatus)) {
-				actionList.add(getString(R.string.call));
-			} else if (Attendee.PhoneStatus.CallWait.name().equals(phoneStatus)
-					|| Attendee.PhoneStatus.Established.name().equals(
-							phoneStatus)) {
-				actionList.add(getString(R.string.hang_up));
-			}
-		}
+		// if (!Attendee.OnlineStatus.online.name().equals(onlineStatus)
+		// || accountName.equals(userName)) {
+		// if (Attendee.PhoneStatus.Terminated.name().equals(phoneStatus)
+		// || Attendee.PhoneStatus.Failed.name().equals(phoneStatus)
+		// || Attendee.PhoneStatus.TermWait.name().equals(phoneStatus)) {
+		// actionList.add(getString(R.string.call));
+		// } else if (Attendee.PhoneStatus.CallWait.name().equals(phoneStatus)
+		// || Attendee.PhoneStatus.Established.name().equals(
+		// phoneStatus)) {
+		// actionList.add(getString(R.string.hang_up));
+		// }
+		// }
 
 		if (!accountName.equals(userName)) {
 			actionList.add(getString(R.string.send_sms));
 			actionList.add(getString(R.string.kick_out));
+		}
+
+		if (actionList.size() == 0) {
+			return;
 		}
 
 		actionList.add(getString(R.string.cancel));
@@ -967,7 +948,8 @@ public class TalkingGroupActivity extends Activity implements
 				startActivity(intent);
 			}
 		} else {
-			MyToast.show(TalkingGroupActivity.this, R.string.sms_no_support, Toast.LENGTH_SHORT);
+			MyToast.show(TalkingGroupActivity.this, R.string.sms_no_support,
+					Toast.LENGTH_SHORT);
 		}
 	}
 
@@ -1033,9 +1015,7 @@ public class TalkingGroupActivity extends Activity implements
 			if (Notify.Action.update_status.name().equals(action)) {
 				JSONObject attendee = notice.getJSONObject(Attendee.attendee
 						.name());
-				if (!isOwner()) {
-					updateDialButtonStatus(attendee);
-				}
+				updateDialButtonStatus(attendee);
 				memberListAdatper.updateMember(attendee);
 			} else if (Notify.Action.update_attendee_list.name().equals(action)) {
 				refreshMemberList();
@@ -1092,34 +1072,6 @@ public class TalkingGroupActivity extends Activity implements
 		}
 	}
 
-	private void callAllMember() {
-		progressDlg = ProgressDialog.show(TalkingGroupActivity.this, null,
-				getString(R.string.sending_request));
-		HashMap<String, String> param = new HashMap<String, String>();
-		param.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.postSignatureRequest(getString(R.string.server_url)
-				+ getString(R.string.call_all_url),
-				PostRequestFormat.URLENCODED, param, null,
-				HttpRequestType.ASYNCHRONOUS, onFinishedCallAllMember);
-	}
-
-	private OnHttpRequestListener onFinishedCallAllMember = new OnHttpRequestListener() {
-
-		@Override
-		public void onFinished(HttpResponseResult responseResult) {
-			dismissProgressDlg();
-			MyToast.show(TalkingGroupActivity.this, R.string.calling_all,
-					Toast.LENGTH_SHORT);
-		}
-
-		@Override
-		public void onFailed(HttpResponseResult responseResult) {
-			dismissProgressDlg();
-			MyToast.show(TalkingGroupActivity.this, R.string.call_all_failed,
-					Toast.LENGTH_SHORT);
-		}
-	};
-
 	private void updateDialButtonStatus(JSONObject attendee) {
 		try {
 			Button dialButton = (Button) findViewById(R.id.gt_dial_bt);
@@ -1169,45 +1121,17 @@ public class TalkingGroupActivity extends Activity implements
 	}
 
 	private void callMeIntoGroupTalking() {
-		progressDlg = ProgressDialog.show(this, null,
-				getString(R.string.sending_request));
-		String accountName = UserManager.getInstance().getUser().getName();
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("dstUserName", accountName);
-		params.put(TalkGroup.conferenceId.name(), groupId);
-		HttpUtils.postSignatureRequest(getString(R.string.server_url)
-				+ getString(R.string.call_url), PostRequestFormat.URLENCODED,
-				params, null, HttpRequestType.ASYNCHRONOUS, onFinishedCallMeIn);
+		if (this.getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_TELEPHONY)) {
+			String phone = getString(R.string.call_center);
+			Uri uri = Uri.parse("tel:" + phone);
+			Intent intent = new Intent(Intent.ACTION_CALL, uri);
+			startActivity(intent);
+		} else {
+			MyToast.show(this, getString(R.string.phone_not_supported),
+					Toast.LENGTH_LONG);
+		}
 	}
-
-	private OnHttpRequestListener onFinishedCallMeIn = new OnHttpRequestListener() {
-
-		@Override
-		public void onFinished(HttpResponseResult responseResult) {
-			dismissProgressDlg();
-			String accountName = UserManager.getInstance().getUser().getName();
-			Map<String, String> attendee = new HashMap<String, String>();
-			attendee.put(Attendee.username.name(), accountName);
-			attendee.put(Attendee.telephone_status.name(),
-					Attendee.PhoneStatus.CallWait.name());
-			memberListAdatper.updateMember(attendee);
-			setDialButtonAsCalling();
-		}
-
-		@Override
-		public void onForbidden(HttpResponseResult responseResult) {
-			dismissProgressDlg();
-			MyToast.show(TalkingGroupActivity.this,
-					R.string.call_is_forbidden_for_you, Toast.LENGTH_SHORT);
-		}
-
-		@Override
-		public void onFailed(HttpResponseResult responseResult) {
-			dismissProgressDlg();
-			MyToast.show(TalkingGroupActivity.this, R.string.call_in_failed,
-					Toast.LENGTH_SHORT);
-		}
-	};
 
 	private void hangMeUpFromGroupTalking() {
 		progressDlg = ProgressDialog.show(this, null,

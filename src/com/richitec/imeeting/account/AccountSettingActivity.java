@@ -12,6 +12,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -59,18 +60,18 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		phoneET.addTextChangedListener(onTextChanged);
 		EditText pwdET = (EditText) findViewById(R.id.login_pwd_editText);
 		pwdET.addTextChangedListener(onTextChanged);
-		ToggleButton remeberPwdToggle = (ToggleButton) findViewById(R.id.remember_pwd_toggleBtn);
+		CheckBox rememberPwdCB = (CheckBox) findViewById(R.id.account_remember_psw_cbtn);
 		UserBean user = UserManager.getInstance().getUser();
 		phoneET.setText(user.getName());
 
 		if (user.getPassword() != null && !user.getPassword().equals("")) {
 			pwdET.setText(PWD_MASK);
-			remeberPwdToggle.setChecked(true);
+			rememberPwdCB.setChecked(true);
 		} else {
-			remeberPwdToggle.setChecked(false);
+			rememberPwdCB.setChecked(false);
 		}
 
-		useSavedPwd = remeberPwdToggle.isChecked();
+		useSavedPwd = rememberPwdCB.isChecked();
 
 		AppUpdateManager aum = new AppUpdateManager(this);
 		aum.checkVersion();
@@ -105,8 +106,8 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 	public void onLogin(View v) {
 		EditText phoneET = (EditText) findViewById(R.id.login_name_editText);
 		EditText pwdET = (EditText) findViewById(R.id.login_pwd_editText);
-		ToggleButton remeberPwdToggle = (ToggleButton) findViewById(R.id.remember_pwd_toggleBtn);
-		boolean rememberPwd = remeberPwdToggle.isChecked();
+		CheckBox remeberPwdCB = (CheckBox) findViewById(R.id.account_remember_psw_cbtn);
+		boolean rememberPwd = remeberPwdCB.isChecked();
 		String userName = phoneET.getText().toString().trim();
 		String password = pwdET.getText().toString().trim();
 
@@ -135,6 +136,10 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		paramMap.put("loginPwd", user.getPassword());
 		HttpUtils.postRequest(loginUrl, PostRequestFormat.URLENCODED, paramMap,
 				null, HttpRequestType.ASYNCHRONOUS, onFinishedLogin);
+	}
+	
+	public void onForgetPSWBtnClick(View v) {
+		
 	}
 
 	private OnHttpRequestListener onFinishedLogin = new OnHttpRequestListener() {

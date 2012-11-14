@@ -45,28 +45,63 @@
             android:inputType="textPassword"
             android:textColor="@android:color/black" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="10dp" >
 
-            <TextView
-                android:id="@+id/remember_pwd_textView"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/remember_pwd_textView_text"
-                android:textColor="@color/dim_gray" />
+                android:layout_alignParentLeft="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
 
-            <ToggleButton
-                android:id="@+id/remember_pwd_toggleBtn"
+                <CheckBox
+                    android:id="@+id/account_remember_psw_cbtn"
+                    android:layout_width="23dp"
+                    android:layout_height="23dp"
+                    android:background="@drawable/checkbox_bg"
+                    android:button="@null" />
+
+                <TextView
+                    android:id="@+id/remember_pwd_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3dp"
+                    android:textSize="14sp"
+                    android:text="@string/remember_pwd_textView_text"
+                    android:textColor="@color/dim_gray" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="60dp"
-                android:textOff="@string/remeber_pwd_toggleBtn_off"
-                android:textOn="@string/remeber_pwd_toggleBtn_on" />
-        </LinearLayout>
+                android:layout_alignParentRight="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="23dp"
+                    android:layout_height="23dp"
+                    android:clickable="true"
+                    android:onClick="onForgetPSWBtnClick"
+                    android:src="@drawable/r_box_2" />
+
+                <TextView
+                    android:id="@+id/account_forget_psw_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="3dp"
+                    android:clickable="true"
+                    android:gravity="center"
+                    android:textSize="14sp"
+                    android:onClick="onForgetPSWBtnClick"
+                    android:text="@string/forget_psw"
+                    android:textColor="@color/dim_gray" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <Button
             android:id="@+id/login_confirm_btn"
@@ -79,8 +114,8 @@
             android:text="@string/login_confirm_btn_title"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/white" />
-        
-          <Button
+
+        <Button
             android:id="@+id/register_btn"
             android:layout_width="fill_parent"
             android:layout_height="46dp"
@@ -91,7 +126,6 @@
             android:text="@string/register_btn_title"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/white" />
-        
     </LinearLayout>
 
 </LinearLayout>

@@ -399,27 +399,6 @@ public class TalkingGroupActivity extends Activity implements
 
 	}
 
-	/**
-	 * check if need to call al member
-	 * 
-	 * @return true: need call, false: don't need
-	 */
-	private boolean isNeedCallAllMember() {
-		List<Map<String, String>> memberList = memberListAdatper
-				.getMemberList();
-		boolean need = false;
-		for (Map<String, String> member : memberList) {
-			String phoneStatus = member.get(Attendee.telephone_status.name());
-			if (Attendee.PhoneStatus.Failed.name().equals(phoneStatus)
-					|| Attendee.PhoneStatus.Terminated.name().equals(
-							phoneStatus)) {
-				need = true;
-				break;
-			}
-		}
-		return need;
-	}
-
 	public void onLeaveAction(View v) {
 		if (isOwner()) {
 			// owner mode
@@ -719,8 +698,6 @@ public class TalkingGroupActivity extends Activity implements
 		final String userName = member.get(Attendee.username.name());
 		String videoStatus = member.get(Attendee.video_status.name());
 		String displayName = AppUtil.getDisplayNameFromAttendee(member);
-		String onlineStatus = member.get(Attendee.online_status.name());
-		String phoneStatus = member.get(Attendee.telephone_status.name());
 
 		String accountName = UserManager.getInstance().getUser().getName();
 
@@ -728,19 +705,6 @@ public class TalkingGroupActivity extends Activity implements
 		if (Attendee.VideoStatus.on.name().equals(videoStatus)) {
 			actionList.add(getString(R.string.watch_video));
 		}
-
-		// if (!Attendee.OnlineStatus.online.name().equals(onlineStatus)
-		// || accountName.equals(userName)) {
-		// if (Attendee.PhoneStatus.Terminated.name().equals(phoneStatus)
-		// || Attendee.PhoneStatus.Failed.name().equals(phoneStatus)
-		// || Attendee.PhoneStatus.TermWait.name().equals(phoneStatus)) {
-		// actionList.add(getString(R.string.call));
-		// } else if (Attendee.PhoneStatus.CallWait.name().equals(phoneStatus)
-		// || Attendee.PhoneStatus.Established.name().equals(
-		// phoneStatus)) {
-		// actionList.add(getString(R.string.hang_up));
-		// }
-		// }
 
 		if (!accountName.equals(userName)) {
 			actionList.add(getString(R.string.send_sms));

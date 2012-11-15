@@ -78,6 +78,7 @@
             android:theme="@style/WithBgImg7NoTitleActivityTheme" >
         </activity>
         <service android:name=".service.ContactSyncService"></service>
+        <activity android:name=".account.AccountGetPasswordActivity" android:theme="@style/WithBgImg7NoTitleActivityTheme" android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

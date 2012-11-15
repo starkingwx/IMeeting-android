@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
@@ -41,10 +40,15 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 	private boolean useSavedPwd;
 	private String PWD_MASK = "#@1d~`*)";
 
+	private boolean firstLogin = true;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		Intent intent = getIntent();
+		firstLogin = intent.getBooleanExtra("first_login", true);
+		
 		// set content view
 		setContentView(R.layout.account_setting_activity_layout);
 
@@ -139,7 +143,7 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 	}
 	
 	public void onForgetPSWBtnClick(View v) {
-		
+		pushActivity(AccountGetPasswordActivity.class);
 	}
 
 	private OnHttpRequestListener onFinishedLogin = new OnHttpRequestListener() {
@@ -195,7 +199,6 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 			String userKey = data.getString("userkey");
 			UserManager.getInstance().setUserKey(userKey);
 			saveUserAccount();
-//			pushActivity(TalkingGroupHistoryListActivity.class);
 			Intent intent = new Intent(AccountSettingActivity.this, TalkingGroupHistoryListActivity.class);
 			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			startActivity(intent);
@@ -222,4 +225,18 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 			user.setPassword("");
 		}
 	}
+
+	@Override
+	public void onBackPressed() {
+		if (firstLogin) {
+			Intent i= new Intent(Intent.ACTION_MAIN); 
+		    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK); 
+		    i.addCategory(Intent.CATEGORY_HOME); 
+		    startActivity(i); 
+		} else {
+			finish();
+		}
+	}
+	
+	
 }

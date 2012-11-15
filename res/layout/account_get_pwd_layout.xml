@@ -1,0 +1,41 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp" >
+
+
+    <EditText
+        android:id="@+id/get_pwd_phone_number_input"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:ellipsize="end"
+        android:hint="@string/verificationCode_editText_hint"
+        android:background="@drawable/edit_text_bg"
+        android:inputType="phone"
+        android:textColor="@android:color/black" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/get_pwd_btn"
+        android:layout_width="fill_parent"
+        android:layout_height="46dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
+        android:onClick="onGetPwdAction"
+        android:text="@string/get_password"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@android:color/white" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/register_step1_comment"
+        android:textColor="@color/light_dim_gray" />
+
+</LinearLayout>

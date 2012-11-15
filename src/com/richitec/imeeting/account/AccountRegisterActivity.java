@@ -2,10 +2,6 @@ package com.richitec.imeeting.account;
 
 import java.util.HashMap;
 
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
@@ -19,11 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.richitec.commontoolkit.utils.HttpUtils;
-import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 

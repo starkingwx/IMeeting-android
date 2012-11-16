@@ -61,6 +61,10 @@ public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 		userBean.setName(userName);
 		userBean.setUserKey(userkey);
 		userBean.setPassword(password);
+		if (password != null && !password.equals("") && userkey != null && !userkey.equals("")) {
+			userBean.setRememberPwd(true);
+		}
+		
 		UserManager.getInstance().setUser(userBean);
 		Log.d(SystemConstants.TAG, "load account: " + userBean.toString());
 	}

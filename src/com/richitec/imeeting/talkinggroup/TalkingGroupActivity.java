@@ -364,20 +364,34 @@ public class TalkingGroupActivity extends Activity implements
 		Button dialButton = (Button) findViewById(R.id.gt_dial_bt);
 		String text = dialButton.getText().toString();
 		if (text.equals(getString(R.string.dial))) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(
-					TalkingGroupActivity.this)
-					.setTitle(R.string.do_you_want_to_call_into_group_talking)
-					.setMessage(String.format(getString(R.string.remember_ur_groupid), groupId))
-					.setPositiveButton(R.string.call_in,
-							new DialogInterface.OnClickListener() {
+			if (getPackageManager().hasSystemFeature(
+					PackageManager.FEATURE_TELEPHONY)) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						TalkingGroupActivity.this)
+						.setTitle(
+								R.string.do_you_want_to_call_into_group_talking)
+						.setMessage(
+								String.format(
+										getString(R.string.remember_ur_groupid),
+										groupId))
+						.setPositiveButton(R.string.call_in,
+								new DialogInterface.OnClickListener() {
 
-								@Override
-								public void onClick(DialogInterface dialog,
-										int which) {
-									callMeIntoGroupTalking();
-								}
-							}).setNegativeButton(R.string.cancel, null);
-			builder.show();
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										callMeIntoGroupTalking();
+									}
+								}).setNegativeButton(R.string.cancel, null);
+				builder.show();
+			} else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						TalkingGroupActivity.this)
+						.setTitle(R.string.alert_title)
+						.setMessage(R.string.phone_not_supported)
+						.setPositiveButton(R.string.ok, null);
+				builder.show();
+			}
 		} else if (text.equals(getString(R.string.calling_in))) {
 
 		} else if (text.equals(getString(R.string.hangup_talking))) {

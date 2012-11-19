@@ -14,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -383,11 +384,17 @@ public class SettingActivity extends IMeetingNavigationActivity {
 			}
 		}
 	};
-	
+
 	public void onSMSShareAction(View v) {
-		Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:"));
-		String smsBody = getString(R.string.app_share_content);
-		intent.putExtra("sms_body", smsBody);
-		startActivity(intent);
+		if (getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_TELEPHONY)) {
+			Intent intent = new Intent(Intent.ACTION_SENDTO,
+					Uri.parse("smsto:"));
+			String smsBody = getString(R.string.app_share_content);
+			intent.putExtra("sms_body", smsBody);
+			startActivity(intent);
+		} else {
+			MyToast.show(this, R.string.sms_no_support, Toast.LENGTH_SHORT);
+		}
 	}
 }

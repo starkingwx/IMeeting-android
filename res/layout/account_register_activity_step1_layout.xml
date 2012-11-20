@@ -34,9 +34,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:background="@drawable/edit_text_bg"
         android:ellipsize="end"
         android:hint="@string/verificationCode_editText_hint"
-        android:background="@drawable/edit_text_bg"
         android:inputType="phone"
         android:textColor="@android:color/black" >
 
@@ -51,8 +51,8 @@
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:onClick="onGetAuthCodeAction"
         android:text="@string/get_verificationCode_btn_title"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textSize="13sp" />
 
     <TextView
         android:layout_width="wrap_content"

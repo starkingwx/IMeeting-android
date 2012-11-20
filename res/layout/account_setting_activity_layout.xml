@@ -70,9 +70,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="3dp"
-                    android:textSize="14sp"
                     android:text="@string/remember_pwd_textView_text"
-                    android:textColor="@color/dim_gray" />
+                    android:textColor="@color/dim_gray"
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -96,10 +96,10 @@
                     android:layout_marginLeft="3dp"
                     android:clickable="true"
                     android:gravity="center"
-                    android:textSize="14sp"
                     android:onClick="onForgetPSWBtnClick"
                     android:text="@string/forget_psw"
-                    android:textColor="@color/dim_gray" />
+                    android:textColor="@color/dim_gray"
+                    android:textSize="14sp" />
             </LinearLayout>
         </RelativeLayout>
 
@@ -112,8 +112,8 @@
             android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
             android:onClick="onLogin"
             android:text="@string/login_confirm_btn_title"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textSize="13sp" />
 
         <Button
             android:id="@+id/register_btn"
@@ -124,8 +124,8 @@
             android:background="@drawable/register_btn_bg"
             android:onClick="onRegister"
             android:text="@string/register_btn_title"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textSize="13sp" />
     </LinearLayout>
 
 </LinearLayout>

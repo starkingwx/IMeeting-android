@@ -74,7 +74,7 @@
         android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
         android:onClick="onRegisterWithPwdAction"
         android:text="@string/register_finish_btn_title"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textSize="13sp" />
 
 </LinearLayout>

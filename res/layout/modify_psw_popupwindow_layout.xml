@@ -129,7 +129,6 @@
                 android:background="@drawable/register_btn_bg"
                 android:paddingBottom="18dp"
                 android:text="@string/cancel"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/white"
                 android:textSize="13sp" />
 
@@ -141,7 +140,6 @@
                 android:background="@drawable/accountsetting7register7newtalkinggroup_btn_bg"
                 android:paddingBottom="16dp"
                 android:text="@string/modify_btn_title"
-                android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@android:color/white"
                 android:textSize="13sp" />
         </LinearLayout>

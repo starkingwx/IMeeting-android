@@ -27,6 +27,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshBase.OnLastItemVisibleLis
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemStyle;
+import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
@@ -35,6 +36,7 @@ import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.imeeting.R;
+import com.richitec.imeeting.account.AccountSettingActivity;
 import com.richitec.imeeting.assistant.SettingActivity;
 import com.richitec.imeeting.constants.Attendee;
 import com.richitec.imeeting.constants.SystemConstants;
@@ -184,7 +186,14 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		@Override
 		public void onFailed(HttpResponseResult responseResult) {
 			listView.onRefreshComplete();
+			switch (responseResult.getStatusCode()) {
+			case 401:
+				accountExpire();
+				break;
 
+			default:
+				break;
+			}
 		}
 	};
 
@@ -229,7 +238,14 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		public void onFailed(HttpResponseResult responseResult) {
 			listView.getRefreshableView().removeFooterView(footerView);
 			footerView = null;
+			switch (responseResult.getStatusCode()) {
+			case 401:
+				accountExpire();
+				break;
 
+			default:
+				break;
+			}
 		}
 	};
 
@@ -374,6 +390,15 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 			dismissProgressDlg();
 			MyToast.show(TalkingGroupHistoryListActivity.this,
 					R.string.error_in_join_group, Toast.LENGTH_SHORT);
+
+			switch (responseResult.getStatusCode()) {
+			case 401:
+				accountExpire();
+				break;
+
+			default:
+				break;
+			}
 		}
 
 	};
@@ -406,6 +431,10 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		public void onFailed(HttpResponseResult responseResult) {
 			dismissProgressDlg();
 			switch (responseResult.getStatusCode()) {
+			case 401:
+				accountExpire();
+				break;
+
 			case 402:
 				MyToast.show(TalkingGroupHistoryListActivity.this,
 						R.string.payment_required, Toast.LENGTH_SHORT);
@@ -444,6 +473,15 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 			dismissProgressDlg();
 			MyToast.show(TalkingGroupHistoryListActivity.this,
 					R.string.error_in_del_group, Toast.LENGTH_SHORT);
+
+			switch (responseResult.getStatusCode()) {
+			case 401:
+				accountExpire();
+				break;
+
+			default:
+				break;
+			}
 		}
 	};
 
@@ -451,6 +489,31 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 		if (progressDialog != null) {
 			progressDialog.dismiss();
 		}
+	}
+
+	private void accountExpire() {
+		new AlertDialog.Builder(TalkingGroupHistoryListActivity.this)
+				.setTitle(R.string.alert_title)
+				.setMessage(R.string.your_account_expired)
+				.setPositiveButton(R.string.ok,
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								UserBean user = UserManager.getInstance()
+										.getUser();
+								user.setRememberPwd(false);
+								user.setPassword("");
+								Intent intent = new Intent(
+										TalkingGroupHistoryListActivity.this,
+										AccountSettingActivity.class);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+										| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								startActivity(intent);
+								finish();
+							}
+						}).show();
 	}
 
 	@Override

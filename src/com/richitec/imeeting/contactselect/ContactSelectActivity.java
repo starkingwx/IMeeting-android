@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -49,6 +50,7 @@ import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemSty
 import com.richitec.commontoolkit.customcomponent.CommonPopupWindow;
 import com.richitec.commontoolkit.customcomponent.ListViewQuickAlphabetBar;
 import com.richitec.commontoolkit.customcomponent.ListViewQuickAlphabetBar.OnTouchListener;
+import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
@@ -58,12 +60,14 @@ import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
 import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.StringUtils;
 import com.richitec.imeeting.R;
+import com.richitec.imeeting.account.AccountSettingActivity;
 import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.service.ContactSyncService;
 import com.richitec.imeeting.talkinggroup.TalkingGroupActivity;
+import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
 
 public class ContactSelectActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDialog;
@@ -113,14 +117,14 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	private final ContactPhoneNumbersSelectPopupWindow _mContactPhoneNumbersSelectPopupWindow = new ContactPhoneNumbersSelectPopupWindow(
 			R.layout.contact_phonenumbers_select_layout,
 			LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
-	
+
 	private final AddAreaCodePopupWindow _mAddAreaCodePopupWindow = new AddAreaCodePopupWindow(
 			R.layout.add_phone_areacode_contact_popupwindow_layout,
-			LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);
-	
+			LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
+
 	private final WrongPhoneFormatInformPopupWindow _mWrongPhoneFormatInformPopupWindow = new WrongPhoneFormatInformPopupWindow(
 			R.layout.wrong_phone_format_popupwindow_layout,
-			LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);
+			LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT);
 
 	// in and prein talking group contacts list view
 	private ListView _mIn7PreinTalkingGroupContactsListView;
@@ -134,9 +138,11 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		//change contact DB observer handler to custom handler for update the Listview UI 
-		//AddressBookManager.getInstance().registContactObserverOrChangeHandler(new UpdateABListHandler());
+
+		// change contact DB observer handler to custom handler for update the
+		// Listview UI
+		// AddressBookManager.getInstance().registContactObserverOrChangeHandler(new
+		// UpdateABListHandler());
 		ContactSyncService.setHandler(new UpdateABListHandler());
 
 		// get the intent parameter data
@@ -258,7 +264,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	// generate in address book contact adapter
 	private ListAdapter generateInABContactAdapter(
 			List<ContactBean> presentContactsInAB) {
-		
+
 		// in address book contacts adapter data keys
 		final String PRESENT_CONTACT_NAME = "present_contact_name";
 		final String PRESENT_CONTACT_PHONES = "contact_phones";
@@ -471,12 +477,13 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 			return;
 		}
-		
-		//selectedPhone = checkPhoneFormatAndChange(selectedPhone,true,_selectedContact);
+
+		// selectedPhone =
+		// checkPhoneFormatAndChange(selectedPhone,true,_selectedContact);
 
 		// set selected contact the selected phone
 		Log.d("debug mark selected phone ", selectedPhone);
-		
+
 		_selectedContact.getExtension().put(SELECTED_CONTACT_SELECTEDPHONE,
 				selectedPhone);
 
@@ -575,21 +582,21 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			progressDialog.dismiss();
 		}
 	}
-	
-	private boolean checkPhoneFormat(String phone){
+
+	private boolean checkPhoneFormat(String phone) {
 		return phone.matches("(^[0]\\d{2,3}\\d{7,8})|(^[1][\\d]{10})");
 	}
-	
-	private void checkPhoneFormatAndChange(String phone,int position){
-		if(checkPhoneFormat(phone)){
+
+	private void checkPhoneFormatAndChange(String phone, int position) {
+		if (checkPhoneFormat(phone)) {
 			Log.d("debug : format right ", "formatRight");
 			markContactSelected(phone, position, true);
-		}
-		else{
-			//if format is wrong, a popwindow will show up
+		} else {
+			// if format is wrong, a popwindow will show up
 			Log.d("debug : format wrong ", "formatWrong");
-			_mWrongPhoneFormatInformPopupWindow.setInformation(position,phone);
-			_mWrongPhoneFormatInformPopupWindow.showAtLocation(_mABContactsListView, Gravity.CENTER, 0, 0);
+			_mWrongPhoneFormatInformPopupWindow.setInformation(position, phone);
+			_mWrongPhoneFormatInformPopupWindow.showAtLocation(
+					_mABContactsListView, Gravity.CENTER, 0, 0);
 		}
 	}
 
@@ -597,8 +604,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	public void onBackPressed() {
 		// reset selected contacts selected flag
 		resetSelectedContacts();
-		//remove the handler for update UI
-		//AddressBookManager.getInstance().removeContactObserverHandler();
+		// remove the handler for update UI
+		// AddressBookManager.getInstance().removeContactObserverHandler();
 		ContactSyncService.removeHandler();
 		super.onBackPressed();
 	}
@@ -690,6 +697,10 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			public void onFailed(HttpResponseResult responseResult) {
 				dismissProgressDlg();
 				switch (responseResult.getStatusCode()) {
+				case 401:
+					accountExpire();
+					break;
+					
 				case 402:
 					MyToast.show(ContactSelectActivity.this,
 							R.string.payment_required, Toast.LENGTH_SHORT);
@@ -704,6 +715,31 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 		};
 	}
 
+	private void accountExpire() {
+		new AlertDialog.Builder(ContactSelectActivity.this)
+				.setTitle(R.string.alert_title)
+				.setMessage(R.string.your_account_expired)
+				.setPositiveButton(R.string.ok,
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								UserBean user = UserManager.getInstance()
+										.getUser();
+								user.setRememberPwd(false);
+								user.setPassword("");
+								Intent intent = new Intent(
+										ContactSelectActivity.this,
+										AccountSettingActivity.class);
+								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+										| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+								startActivity(intent);
+								finish();
+							}
+						}).show();
+	}
+	
 	// confirm add new contacts to talking group button on click listener
 	class ConfirmAddNewContacts2TalkingGroupBtnOnClickListener implements
 			OnClickListener {
@@ -807,141 +843,161 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 		}
 
 	}
-	
-	class WrongPhoneFormatInformPopupWindow extends CommonPopupWindow{
+
+	class WrongPhoneFormatInformPopupWindow extends CommonPopupWindow {
 		private int position = 0;
 		private String originPhone;
-		public WrongPhoneFormatInformPopupWindow(int resource,int width,int height, boolean focusable, boolean isBindDefListener){
-			super(resource,width,height,focusable,isBindDefListener);
+
+		public WrongPhoneFormatInformPopupWindow(int resource, int width,
+				int height, boolean focusable, boolean isBindDefListener) {
+			super(resource, width, height, focusable, isBindDefListener);
 		}
-		
-		public WrongPhoneFormatInformPopupWindow(int resource,int width,int height){
-			super(resource,width,height);
+
+		public WrongPhoneFormatInformPopupWindow(int resource, int width,
+				int height) {
+			super(resource, width, height);
 		}
-		
-		
+
 		@Override
 		protected void bindPopupWindowComponentsListener() {
 			// TODO Auto-generated method stub
-			((Button)getContentView().findViewById(R.id.wrong_phoneFormat_popupWindow_confirmBtn))
-				.setOnClickListener(new WrongPhoneFormatConfirmBtnOnClickListener());
-			((Button)getContentView().findViewById(R.id.wrong_phoneFormat_popupWindow_cancelBtn))
-				.setOnClickListener(new WrongPhoneFormatCancelBtnOnClickListener());
+			((Button) getContentView().findViewById(
+					R.id.wrong_phoneFormat_popupWindow_confirmBtn))
+					.setOnClickListener(new WrongPhoneFormatConfirmBtnOnClickListener());
+			((Button) getContentView().findViewById(
+					R.id.wrong_phoneFormat_popupWindow_cancelBtn))
+					.setOnClickListener(new WrongPhoneFormatCancelBtnOnClickListener());
 		}
 
 		@Override
 		protected void resetPopupWindow() {
 			// TODO Auto-generated method stub
-			
+
 		}
-		
-		public void setInformation(int p,String originPhone){
+
+		public void setInformation(int p, String originPhone) {
 			position = p;
 			this.originPhone = originPhone;
-			((TextView)getContentView().findViewById(R.id.wrong_phoneFormat_popupWindow_titleTextView)).setText(
-					AppLaunchActivity.getAppContext().getResources().getString(R.string.wrong_phone_format_inform_titleTextView_text)
-					.replace("***", this.originPhone));
+			((TextView) getContentView().findViewById(
+					R.id.wrong_phoneFormat_popupWindow_titleTextView))
+					.setText(AppLaunchActivity
+							.getAppContext()
+							.getResources()
+							.getString(
+									R.string.wrong_phone_format_inform_titleTextView_text)
+							.replace("***", this.originPhone));
 		}
-		
-		class WrongPhoneFormatConfirmBtnOnClickListener implements OnClickListener{
+
+		class WrongPhoneFormatConfirmBtnOnClickListener implements
+				OnClickListener {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				dismiss();
-				_mAddAreaCodePopupWindow.setInformationForChange(position,originPhone);
-				_mAddAreaCodePopupWindow.showAtLocation(_mABContactsListView, Gravity.CENTER, 0, 0);
+				_mAddAreaCodePopupWindow.setInformationForChange(position,
+						originPhone);
+				_mAddAreaCodePopupWindow.showAtLocation(_mABContactsListView,
+						Gravity.CENTER, 0, 0);
 			}
-			
+
 		}
-		
-		class WrongPhoneFormatCancelBtnOnClickListener implements OnClickListener{
+
+		class WrongPhoneFormatCancelBtnOnClickListener implements
+				OnClickListener {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				dismiss();
 			}
-			
+
 		}
-		
+
 	}
-	
-	class AddAreaCodePopupWindow extends CommonPopupWindow{
+
+	class AddAreaCodePopupWindow extends CommonPopupWindow {
 		private int position = 0;
 		private String originPhone;
-		
-		public AddAreaCodePopupWindow(int resource,int width,int height, boolean focusable, boolean isBindDefListener){
-			super(resource,width,height,focusable,isBindDefListener);
+
+		public AddAreaCodePopupWindow(int resource, int width, int height,
+				boolean focusable, boolean isBindDefListener) {
+			super(resource, width, height, focusable, isBindDefListener);
 		}
-		
-		public AddAreaCodePopupWindow(int resource,int width,int height){
-			super(resource,width,height);
+
+		public AddAreaCodePopupWindow(int resource, int width, int height) {
+			super(resource, width, height);
 		}
 
 		@Override
 		protected void bindPopupWindowComponentsListener() {
 			// TODO Auto-generated method stub
-			((Button)getContentView().findViewById(R.id.add_phoneAreaCode_popupWindow_dismiss_btn)).setOnClickListener(
-					new AddAreaCodePopupWindowDismissBtnOnClickListener());
-			((Button)getContentView().findViewById(R.id.add_phoneAreaCode_popupWindow_confirmBtn)).setOnClickListener(
-					new AddAreaCodePopupWindowConfirmBtnOnClickListener());
+			((Button) getContentView().findViewById(
+					R.id.add_phoneAreaCode_popupWindow_dismiss_btn))
+					.setOnClickListener(new AddAreaCodePopupWindowDismissBtnOnClickListener());
+			((Button) getContentView().findViewById(
+					R.id.add_phoneAreaCode_popupWindow_confirmBtn))
+					.setOnClickListener(new AddAreaCodePopupWindowConfirmBtnOnClickListener());
 		}
 
 		@Override
 		protected void resetPopupWindow() {
 			// TODO Auto-generated method stub
-			((EditText)getContentView().findViewById(R.id.add_phoneAreaCode_popupWindow_editText))
-				.setText("");
+			((EditText) getContentView().findViewById(
+					R.id.add_phoneAreaCode_popupWindow_editText)).setText("");
 		}
-		
-		class AddAreaCodePopupWindowDismissBtnOnClickListener implements OnClickListener{
+
+		class AddAreaCodePopupWindowDismissBtnOnClickListener implements
+				OnClickListener {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				dismiss();
 			}
-			
+
 		}
-		
-		class AddAreaCodePopupWindowConfirmBtnOnClickListener implements OnClickListener{
+
+		class AddAreaCodePopupWindowConfirmBtnOnClickListener implements
+				OnClickListener {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				String newPhone = ((EditText)getContentView().findViewById(
-						R.id.add_phoneAreaCode_popupWindow_editText)).getText().toString();
-				if(checkPhoneFormat(newPhone)){
+				String newPhone = ((EditText) getContentView().findViewById(
+						R.id.add_phoneAreaCode_popupWindow_editText)).getText()
+						.toString();
+				if (checkPhoneFormat(newPhone)) {
 					dismiss();
-					//Log.d("new phone number!!", newPhone);
-					//get update ID
-					ContactBean selectedContact = _mPresentContactsInABInfoArray.get(position);
-					long contactId = selectedContact.getId();	
-					markContactSelected(newPhone,position,true); 
-					//update to db
-					( AddressBookManager.getInstance()).updateContactPhone(contactId,originPhone,newPhone); 
-				}
-				else{
+					// Log.d("new phone number!!", newPhone);
+					// get update ID
+					ContactBean selectedContact = _mPresentContactsInABInfoArray
+							.get(position);
+					long contactId = selectedContact.getId();
+					markContactSelected(newPhone, position, true);
+					// update to db
+					(AddressBookManager.getInstance()).updateContactPhone(
+							contactId, originPhone, newPhone);
+				} else {
 					MyToast.show(
 							ContactSelectActivity.this,
-							ContactSelectActivity.this
-											.getResources()
-											.getString(
-													R.string.wrong_phonenumber_format),
+							ContactSelectActivity.this.getResources()
+									.getString(
+											R.string.wrong_phonenumber_format),
 							Toast.LENGTH_SHORT);
-				}	
+				}
 			}
-			
+
 		}
-		
-		public void setInformationForChange(int p,String originPhone){
+
+		public void setInformationForChange(int p, String originPhone) {
 			position = p;
 			this.originPhone = originPhone;
-			((EditText)getContentView().findViewById(
-					R.id.add_phoneAreaCode_popupWindow_editText)).setText(originPhone);
+			((EditText) getContentView().findViewById(
+					R.id.add_phoneAreaCode_popupWindow_editText))
+					.setText(originPhone);
 		}
-		
+
 	}
 
 	// add manual input contact popup window
@@ -1001,7 +1057,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				String _addedManualInputContactPhoneNumber = ((EditText) getContentView()
 						.findViewById(R.id.add_manualInputContact_editText))
 						.getText().toString();
-				
+
 				// check added manual input contact phone number
 				if (null == _addedManualInputContactPhoneNumber
 						|| _addedManualInputContactPhoneNumber
@@ -1021,31 +1077,32 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 							Toast.LENGTH_SHORT);
 					return;
 				}
-				
-				if(!checkPhoneFormat(_addedManualInputContactPhoneNumber)){
+
+				if (!checkPhoneFormat(_addedManualInputContactPhoneNumber)) {
 					MyToast.show(
 							ContactSelectActivity.this,
-							ContactSelectActivity.this
-											.getResources()
-											.getString(
-													R.string.wrong_phonenumber_format),
+							ContactSelectActivity.this.getResources()
+									.getString(
+											R.string.wrong_phonenumber_format),
 							Toast.LENGTH_SHORT);
 				}
-				
-				else{
+
+				else {
 					// dismiss add manual input contact popup window
 					dismiss();
-	
+
 					// get address book manager
 					AddressBookManager _addressBookManager = AddressBookManager
 							.getInstance();
-	
-					// check the added manual input contact with phone number is in
+
+					// check the added manual input contact with phone number is
+					// in
 					// address book
 					Long _manualInputContactId = _addressBookManager
 							.isContactWithPhoneInAddressBook(_addedManualInputContactPhoneNumber);
 					if (null == _manualInputContactId) {
-						// check the new added contact is in talking group attendees
+						// check the new added contact is in talking group
+						// attendees
 						if (_mTalkingGroupContactsPhoneArray
 								.contains(_addedManualInputContactPhoneNumber)) {
 							MyToast.show(
@@ -1060,7 +1117,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 													.getString(
 															R.string.toast_selectedContact_existedInTalkingGroup_attendees),
 									Toast.LENGTH_SHORT);
-	
+
 							return;
 						}
 						// check the new added contact is in prein talking group
@@ -1068,24 +1125,25 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 						for (ContactBean _preinTalkingGroupContact : _mPreinTalkingGroupContactsInfoArray) {
 							if (_addedManualInputContactPhoneNumber
 									.equalsIgnoreCase((String) _preinTalkingGroupContact
-											.getExtension().get(
-													SELECTED_CONTACT_SELECTEDPHONE))) {
+											.getExtension()
+											.get(SELECTED_CONTACT_SELECTEDPHONE))) {
 								MyToast.show(
 										ContactSelectActivity.this,
-										_preinTalkingGroupContact.getDisplayName()
+										_preinTalkingGroupContact
+												.getDisplayName()
 												+ ContactSelectActivity.this
 														.getResources()
 														.getString(
 																R.string.toast_selectedContact_useTheSelectedPhone_existedInPreinTalkingGroup_contacts),
 										Toast.LENGTH_SHORT);
-	
+
 								return;
 							}
 						}
-	
+
 						// generate new added contact
 						ContactBean _newAddedContact = new ContactBean();
-	
+
 						// init new added contact
 						// set aggregated id
 						_newAddedContact.setId(-1L);
@@ -1094,29 +1152,32 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 								.setDisplayName(_addedManualInputContactPhoneNumber);
 						// set phone numbers
 						List<String> _phoneNumbersList = new ArrayList<String>();
-						_phoneNumbersList.add(_addedManualInputContactPhoneNumber);
+						_phoneNumbersList
+								.add(_addedManualInputContactPhoneNumber);
 						_newAddedContact.setPhoneNumbers(_phoneNumbersList);
 						// set selected contact the selected phone
 						_newAddedContact.getExtension().put(
 								SELECTED_CONTACT_SELECTEDPHONE,
 								_addedManualInputContactPhoneNumber);
 						// set contact is selected flag
-						_newAddedContact.getExtension().put(CONTACT_IS_SELECTED,
-								true);
-	
+						_newAddedContact.getExtension().put(
+								CONTACT_IS_SELECTED, true);
+
 						// add new added contact to in and prein talking group
 						// contacts adapter data list and notify adapter changed
-						_mPreinTalkingGroupContactsInfoArray.add(_newAddedContact);
+						_mPreinTalkingGroupContactsInfoArray
+								.add(_newAddedContact);
 						_mIn7PreinTalkingGroupContactsAdapterDataList
 								.add(generateIn6PreinTalkingGroupAdapterData(
-										_addedManualInputContactPhoneNumber, false));
+										_addedManualInputContactPhoneNumber,
+										false));
 						((InAB6In7PreinTalkingGroupContactAdapter) _mIn7PreinTalkingGroupContactsListView
 								.getAdapter()).notifyDataSetChanged();
 					} else {
 						// get the matched contact
 						ContactBean _matchedContact = _addressBookManager
 								.getContactByAggregatedId(_manualInputContactId);
-	
+
 						// check the matched contact is selected flag
 						if ((Boolean) _matchedContact.getExtension().get(
 								CONTACT_IS_SELECTED)) {
@@ -1132,10 +1193,10 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 																			.get(SELECTED_CONTACT_SELECTEDPHONE)) ? R.string.toast_selectedContact_useTheSelectedPhone_existedInPreinTalkingGroup_contacts
 																	: R.string.toast_selectedContact_useAnotherPhone_existedInPreinTalkingGroup_contacts),
 									Toast.LENGTH_SHORT);
-	
+
 							return;
 						}
-	
+
 						// check the matched contact in address book listView
 						// present contacts list
 						if (_mPresentContactsInABInfoArray
@@ -1171,91 +1232,95 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 		}
 
 	}
-	
-	
-	class UpdateABListHandler extends Handler{
-		
-		public UpdateABListHandler(){
+
+	class UpdateABListHandler extends Handler {
+
+		public UpdateABListHandler() {
 			super();
 		}
-		
-		 public void handleMessage(Message msg) {			 
-			 int type = msg.what;
-//			 Log.d("Contact", "getMessage : " + type);
-			 
-			 if(type==1){
-				 //contacts have been create or delete
-				 AddressBookManager.getInstance().copyAllContactsInfo(allNamePhoneticSortedContactsInfoArray);
-			 }
-			 
-			 String searchString = ((EditText)ContactSelectActivity.this.findViewById(R.id.contact_search_editText)).getText().toString();
-//			 Log.d("ContactSelectActivity", "searchString ：" + searchString);
-//			 Log.d("ContactSelectActivity", "searchStatus ：" + _mContactSearchStatus);
-			 switch (_mContactSearchStatus) {
-				case SEARCHBYNAME:
-					_mPresentContactsInABInfoArray = AddressBookManager
-							.getInstance().getContactsByName(searchString.toString());
-					break;
 
-				case SEARCHBYCHINESENAME:
-					_mPresentContactsInABInfoArray = AddressBookManager
-							.getInstance().getContactsByChineseName(searchString.toString());
-					break;
+		public void handleMessage(Message msg) {
+			int type = msg.what;
+			// Log.d("Contact", "getMessage : " + type);
 
-				case SEARCHBYPHONE:
-					_mPresentContactsInABInfoArray = AddressBookManager
-							.getInstance().getContactsByPhone(searchString.toString());
-					break;
+			if (type == 1) {
+				// contacts have been create or delete
+				AddressBookManager.getInstance().copyAllContactsInfo(
+						allNamePhoneticSortedContactsInfoArray);
+			}
 
-				case NONESEARCH:
-				default:
-					_mPresentContactsInABInfoArray = allNamePhoneticSortedContactsInfoArray;
-					break;
-				}
+			String searchString = ((EditText) ContactSelectActivity.this
+					.findViewById(R.id.contact_search_editText)).getText()
+					.toString();
+			// Log.d("ContactSelectActivity", "searchString ：" + searchString);
+			// Log.d("ContactSelectActivity", "searchStatus ：" +
+			// _mContactSearchStatus);
+			switch (_mContactSearchStatus) {
+			case SEARCHBYNAME:
+				_mPresentContactsInABInfoArray = AddressBookManager
+						.getInstance().getContactsByName(
+								searchString.toString());
+				break;
+
+			case SEARCHBYCHINESENAME:
+				_mPresentContactsInABInfoArray = AddressBookManager
+						.getInstance().getContactsByChineseName(
+								searchString.toString());
+				break;
+
+			case SEARCHBYPHONE:
+				_mPresentContactsInABInfoArray = AddressBookManager
+						.getInstance().getContactsByPhone(
+								searchString.toString());
+				break;
+
+			case NONESEARCH:
+			default:
+				_mPresentContactsInABInfoArray = allNamePhoneticSortedContactsInfoArray;
+				break;
+			}
 			// update contacts in address book listView adapter
-			 //Log.d("ContactSelectActivity", "search result : " + _mPresentContactsInABInfoArray.size());
+			// Log.d("ContactSelectActivity", "search result : " +
+			// _mPresentContactsInABInfoArray.size());
 			_mABContactsListView
 					.setAdapter(generateInABContactAdapter(_mPresentContactsInABInfoArray));
-			 
-			 /*if(type==1){
-				 String searchString = ((EditText)ContactSelectActivity.this.findViewById(R.id.contact_search_editText)).getText().toString();
-//				 Log.d("ContactSelectActivity", "searchString ：" + searchString);
-//				 Log.d("ContactSelectActivity", "searchStatus ：" + _mContactSearchStatus);
-				 switch (_mContactSearchStatus) {
-					case SEARCHBYNAME:
-						_mPresentContactsInABInfoArray = AddressBookManager
-								.getInstance().getContactsByName(searchString.toString());
-						break;
-	
-					case SEARCHBYCHINESENAME:
-						_mPresentContactsInABInfoArray = AddressBookManager
-								.getInstance().getContactsByChineseName(searchString.toString());
-						break;
-	
-					case SEARCHBYPHONE:
-						_mPresentContactsInABInfoArray = AddressBookManager
-								.getInstance().getContactsByPhone(searchString.toString());
-						break;
-	
-					case NONESEARCH:
-					default:
-						_mPresentContactsInABInfoArray = allNamePhoneticSortedContactsInfoArray;
-						break;
-					}
-				// update contacts in address book listView adapter
-				 Log.d("ContactSelectActivity", "search result : " + _mPresentContactsInABInfoArray.size());
-				_mABContactsListView
-						.setAdapter(generateInABContactAdapter(_mPresentContactsInABInfoArray));
-			 }
-			 else if(type ==2){
-				 //delelte the contact 
-				 ContactBean deleteContact = (ContactBean) msg.obj;
-				 allNamePhoneticSortedContactsInfoArray.remove(deleteContact);
-			 }
-			 else if(type==3){
-				 AddressBookManager.getInstance().copyAllContactsInfo(allNamePhoneticSortedContactsInfoArray);
-			 }*/
-		 }
+
+			/*
+			 * if(type==1){ String searchString =
+			 * ((EditText)ContactSelectActivity
+			 * .this.findViewById(R.id.contact_search_editText
+			 * )).getText().toString(); // Log.d("ContactSelectActivity",
+			 * "searchString ：" + searchString); //
+			 * Log.d("ContactSelectActivity", "searchStatus ：" +
+			 * _mContactSearchStatus); switch (_mContactSearchStatus) { case
+			 * SEARCHBYNAME: _mPresentContactsInABInfoArray = AddressBookManager
+			 * .getInstance().getContactsByName(searchString.toString()); break;
+			 * 
+			 * case SEARCHBYCHINESENAME: _mPresentContactsInABInfoArray =
+			 * AddressBookManager
+			 * .getInstance().getContactsByChineseName(searchString.toString());
+			 * break;
+			 * 
+			 * case SEARCHBYPHONE: _mPresentContactsInABInfoArray =
+			 * AddressBookManager
+			 * .getInstance().getContactsByPhone(searchString.toString());
+			 * break;
+			 * 
+			 * case NONESEARCH: default: _mPresentContactsInABInfoArray =
+			 * allNamePhoneticSortedContactsInfoArray; break; } // update
+			 * contacts in address book listView adapter
+			 * Log.d("ContactSelectActivity", "search result : " +
+			 * _mPresentContactsInABInfoArray.size()); _mABContactsListView
+			 * .setAdapter
+			 * (generateInABContactAdapter(_mPresentContactsInABInfoArray)); }
+			 * else if(type ==2){ //delelte the contact ContactBean
+			 * deleteContact = (ContactBean) msg.obj;
+			 * allNamePhoneticSortedContactsInfoArray.remove(deleteContact); }
+			 * else if(type==3){
+			 * AddressBookManager.getInstance().copyAllContactsInfo
+			 * (allNamePhoneticSortedContactsInfoArray); }
+			 */
+		}
 	}
 
 	// contact phone numbers select popup window
@@ -1386,8 +1451,10 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				// dismiss contact phone select popup window
 				dismiss();
 
-				//check phone format, if format is not right then change and  mark contact selected
-				checkPhoneFormatAndChange(_selectedPhone,_mSelectContactPosition);
+				// check phone format, if format is not right then change and
+				// mark contact selected
+				checkPhoneFormatAndChange(_selectedPhone,
+						_mSelectContactPosition);
 			}
 
 		}
@@ -1405,8 +1472,10 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				// dismiss contact phone select popup window
 				dismiss();
 
-				////check phone format, if format is not right then change and  mark contact selected
-				checkPhoneFormatAndChange(_selectedPhone,_mSelectContactPosition);
+				// //check phone format, if format is not right then change and
+				// mark contact selected
+				checkPhoneFormatAndChange(_selectedPhone,
+						_mSelectContactPosition);
 			}
 
 		}
@@ -1458,8 +1527,9 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				} else {
 					switch (_clickItemViewData.getPhoneNumbers().size()) {
 					case 1:
-						//check phone format and  mark contact selected
-						checkPhoneFormatAndChange(_clickItemViewData.getPhoneNumbers().get(0),position);					
+						// check phone format and mark contact selected
+						checkPhoneFormatAndChange(_clickItemViewData
+								.getPhoneNumbers().get(0), position);
 						break;
 
 					default:

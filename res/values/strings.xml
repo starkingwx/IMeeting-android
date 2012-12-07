@@ -9,6 +9,7 @@
     <string name="no_more_item">没有更多</string>
     <string name="exit_app">确定要退出智会应用吗？</string>
     <string name="exit">退出</string>
+    <string name="your_account_expired">您的登录已失效，请重新登录！</string>
     <string name="network_error">无法连接服务器，可能网络状态不佳或没有网络信号！</string>
 
     <!-- iMeeting application activity -->
@@ -137,7 +138,7 @@
     <string name="kickout_is_forbidden_for_sb">不允许移出%s</string>
     <string name="hangup_failed">挂断失败</string>
     <string name="kickout_failed">移出失败</string>
-    <string name="invite_sms_body">请拨打0551–2379997加入多方通话，会议号：%s</string>
+    <string name="invite_sms_body">请拨打055162379997加入多方通话，会议号：%s</string>
     <string name="no_one_to_invite">没有需要邀请的成员！</string>
     <string name="call_is_forbidden_for_you">您的语音接入操作不被允许</string>
     <string name="call_in_failed">语音接入失败！</string>
@@ -247,7 +248,7 @@
     <string name="charge_failed">充值失败，请重试！</string>
 
     <!-- version upgrade -->
-    <string name="detect_new_version" formatted="false">发现新版本【%s】，\n是否升级？\n本次更新内容：\n%s</string>
+    <string name="detect_new_version" formatted="false">发现新版本%s，\n是否升级？\n本次更新说明：\n%s</string>
     <string name="upgrade">升级</string>
 
 </resources>

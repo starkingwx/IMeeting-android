@@ -1447,7 +1447,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			public void onClick(View v) {
 				// get phone button text
 				String _selectedPhone = (String) ((Button) v).getText();
-
+				_selectedPhone = AddressBookManager.filterNumber(_selectedPhone);
 				// dismiss contact phone select popup window
 				dismiss();
 
@@ -1468,7 +1468,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 					int position, long id) {
 				// get phone listView item data
 				String _selectedPhone = (String) ((TextView) view).getText();
-
+				_selectedPhone = AddressBookManager.filterNumber(_selectedPhone);
 				// dismiss contact phone select popup window
 				dismiss();
 

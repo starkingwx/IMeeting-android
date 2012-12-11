@@ -2,20 +2,18 @@ package com.richitec.imeeting;
 
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
+
 import com.richitec.commontoolkit.activityextension.AppLaunchActivity;
 import com.richitec.commontoolkit.addressbook.AddressBookManager;
+import com.richitec.commontoolkit.addressbook.ContactSyncService;
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.DataStorageUtils;
 import com.richitec.imeeting.account.AccountSettingActivity;
 import com.richitec.imeeting.constants.SystemConstants;
-import com.richitec.imeeting.service.ContactSyncService;
 import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
-import com.richitec.imeeting.video.ECVideoEncoder;
 
 public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 	// main activity class name storage key
@@ -48,6 +46,7 @@ public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 	@Override
 	public void didFinishLaunching() {
 		// traversal address book
+		AddressBookManager.setFilterMode(AddressBookManager.FILTER_IP_AND_CODE_PREFIX);
 		AddressBookManager.getInstance().traversalAddressBook();
 		//Looper.prepare();
 		//AddressBookManager.getInstance().registContactOberver();

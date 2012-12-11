@@ -42,9 +42,11 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.richitec.commontoolkit.activityextension.AppLaunchActivity;
 import com.richitec.commontoolkit.addressbook.AddressBookManager;
 import com.richitec.commontoolkit.addressbook.ContactBean;
+import com.richitec.commontoolkit.addressbook.ContactSyncService;
 import com.richitec.commontoolkit.customadapter.CommonListAdapter;
 import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemStyle;
 import com.richitec.commontoolkit.customcomponent.CommonPopupWindow;
@@ -65,9 +67,7 @@ import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
-import com.richitec.imeeting.service.ContactSyncService;
 import com.richitec.imeeting.talkinggroup.TalkingGroupActivity;
-import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
 
 public class ContactSelectActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDialog;

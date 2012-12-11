@@ -226,7 +226,7 @@ public class TalkingGroupActivity extends Activity implements
 				refreshMemberList();
 			}
 		});
-
+		
 		if (isOwner()) {
 			memberListAdatper.setStatusFilter(new OwnerModeStatusFilter());
 		} else {

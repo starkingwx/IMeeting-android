@@ -79,7 +79,7 @@
             android:screenOrientation="portrait"
             android:theme="@style/WithBgImg7NoTitleActivityTheme" >
         </activity>
-        <service android:name=".service.ContactSyncService"></service>
+        <service android:name="com.richitec.commontoolkit.addressbook.ContactSyncService"></service>
         <activity android:name=".account.AccountGetPasswordActivity" android:theme="@style/WithBgImg7NoTitleActivityTheme" android:screenOrientation="portrait"></activity>
     </application>
 

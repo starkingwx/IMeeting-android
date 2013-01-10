@@ -24,6 +24,7 @@ import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -43,6 +44,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.richitec.commontoolkit.CommonToolkitApplication;
 import com.richitec.commontoolkit.activityextension.AppLaunchActivity;
 import com.richitec.commontoolkit.addressbook.AddressBookManager;
 import com.richitec.commontoolkit.addressbook.ContactBean;
@@ -276,8 +278,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			HashMap<String, Object> _dataMap = new HashMap<String, Object>();
 
 			// get contact name and phone matching indexes
-			@SuppressWarnings("unchecked")
-			SparseArray<Integer> _nameMatchingIndexes = (SparseArray<Integer>) _contact
+			SparseIntArray _nameMatchingIndexes = (SparseIntArray) _contact
 					.getExtension().get(
 							AddressBookManager.NAME_MATCHING_INDEXES);
 			@SuppressWarnings("unchecked")
@@ -880,8 +881,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			this.originPhone = originPhone;
 			((TextView) getContentView().findViewById(
 					R.id.wrong_phoneFormat_popupWindow_titleTextView))
-					.setText(AppLaunchActivity
-							.getAppContext()
+					.setText(CommonToolkitApplication.getContext()
 							.getResources()
 							.getString(
 									R.string.wrong_phone_format_inform_titleTextView_text)
@@ -1395,8 +1395,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			// set contact phones select title textView text
 			((TextView) getContentView().findViewById(
 					R.id.contactPhones_select_titleTextView))
-					.setText(AppLaunchActivity
-							.getAppContext()
+					.setText(CommonToolkitApplication.getContext()
 							.getResources()
 							.getString(
 									R.string.contactPhones_selectPopupWindow_titleTextView_text)
@@ -1429,7 +1428,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				// set phone list view adapter
 				_phoneListView
 						.setAdapter(new ArrayAdapter<String>(
-								AppLaunchActivity.getAppContext(),
+								CommonToolkitApplication.getContext(),
 								R.layout.contact_phonenumbers_select_phoneslist_item_layout,
 								phoneNumbers));
 

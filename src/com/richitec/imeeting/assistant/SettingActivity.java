@@ -46,6 +46,7 @@ import com.richitec.imeeting.R;
 import com.richitec.imeeting.account.AccountSettingActivity;
 import com.richitec.imeeting.constants.CloudAddressBookConstants;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
+import com.richitec.imeeting.util.AppDataSaveRestoreUtil;
 
 public class SettingActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDlg;
@@ -396,5 +397,17 @@ public class SettingActivity extends IMeetingNavigationActivity {
 		} else {
 			MyToast.show(this, R.string.sms_no_support, Toast.LENGTH_SHORT);
 		}
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		AppDataSaveRestoreUtil.onSaveInstanceState(outState);
+		super.onSaveInstanceState(outState);
 	}
 }

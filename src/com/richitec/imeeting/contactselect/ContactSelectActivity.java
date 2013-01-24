@@ -23,7 +23,6 @@ import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.Display;
 import android.view.Gravity;
@@ -45,7 +44,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.richitec.commontoolkit.CommonToolkitApplication;
-import com.richitec.commontoolkit.activityextension.AppLaunchActivity;
 import com.richitec.commontoolkit.addressbook.AddressBookManager;
 import com.richitec.commontoolkit.addressbook.ContactBean;
 import com.richitec.commontoolkit.addressbook.ContactSyncService;
@@ -70,6 +68,7 @@ import com.richitec.imeeting.constants.TalkGroup;
 import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupActivity;
+import com.richitec.imeeting.util.AppDataSaveRestoreUtil;
 
 public class ContactSelectActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDialog;
@@ -96,14 +95,13 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	// talking group id
 	private String _mTalkingGroupId;
 	// talking group attendees phone list
-	private List<String> _mTalkingGroupContactsPhoneArray = new ArrayList<String>();
+	private ArrayList<String> _mTalkingGroupContactsPhoneArray = new ArrayList<String>();
 
 	// address book contacts list view
 	private ListView _mABContactsListView;
 
 	// all address book name phonetic sorted contacts detail info list
-	private final List<ContactBean> allNamePhoneticSortedContactsInfoArray = AddressBookManager
-			.getInstance().getAllNamePhoneticSortedContactsInfoArray();
+	private List<ContactBean> allNamePhoneticSortedContactsInfoArray;
 	// present contacts in address book detail info list
 	private List<ContactBean> _mPresentContactsInABInfoArray;
 
@@ -137,18 +135,24 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	// in and prein talking group contacts adapter data list
 	private final List<Map<String, ?>> _mIn7PreinTalkingGroupContactsAdapterDataList = new ArrayList<Map<String, ?>>();
 
+	private UpdateABListHandler listUpdateHandler;
+
+	// init all name phonetic sorted contacts info array
+	private void initNamePhoneticSortedContactsInfoArray() {
+		allNamePhoneticSortedContactsInfoArray = AddressBookManager
+				.getInstance().getAllNamePhoneticSortedContactsInfoArray();
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+		}
+		
 		super.onCreate(savedInstanceState);
 
-		// change contact DB observer handler to custom handler for update the
-		// Listview UI
-		// AddressBookManager.getInstance().registContactObserverOrChangeHandler(new
-		// UpdateABListHandler());
-		ContactSyncService.setHandler(new UpdateABListHandler());
-
 		// get the intent parameter data
-		Bundle _data = getIntent().getExtras();
+		Bundle _data = savedInstanceState != null ? savedInstanceState : getIntent().getExtras();
 
 		// check the data bundle
 		if (null != _data) {
@@ -167,6 +171,12 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			if (null != _attendeesPhoneList) {
 				_mTalkingGroupContactsPhoneArray.addAll(_attendeesPhoneList);
 			}
+		}
+		
+		if (savedInstanceState == null) {
+			// add moderator to talking group attendees list as header
+			_mTalkingGroupContactsPhoneArray.add(0, UserManager.getInstance()
+					.getUser().getName());
 		}
 
 		// set content view
@@ -199,13 +209,84 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 					new OpenTalkingGroupBtnOnClickListener()));
 		}
 
+		initListUI();
+		
+//		// init present contacts in address book detail info array
+//		_mPresentContactsInABInfoArray = allNamePhoneticSortedContactsInfoArray;
+//
+//		// add moderator to talking group attendees list as header
+//		_mTalkingGroupContactsPhoneArray.add(0, UserManager.getInstance()
+//				.getUser().getName());
+//
+//		// init contacts in address book list view
+//		_mABContactsListView = (ListView) findViewById(R.id.contactInAB_listView);
+//
+//		// set contacts in address book listView adapter
+//		_mABContactsListView
+//				.setAdapter(generateInABContactAdapter(_mPresentContactsInABInfoArray));
+//		// init address book contacts listView quick alphabet bar and add on
+//		// touch listener
+//		new ListViewQuickAlphabetBar(_mABContactsListView)
+//				.setOnTouchListener(new ContactsInABListViewQuickAlphabetBarOnTouchListener());
+//
+//		// bind contacts in address book listView item click listener
+//		_mABContactsListView
+//				.setOnItemClickListener(new ContactsInABListViewOnItemClickListener());
+
+		// bind contact search editText text watcher
+		((EditText) findViewById(R.id.contact_search_editText))
+				.addTextChangedListener(new ContactSearchEditTextTextWatcher());
+
+		// bind add manual input contact button on click listener
+		((Button) findViewById(R.id.add_manualInputContact_btn))
+				.setOnClickListener(new AddManualInputContactBtnOnClickListener());
+
+//		// init contacts in address book list view
+//		_mIn7PreinTalkingGroupContactsListView = (ListView) findViewById(R.id.contactIn7PreinTalkingGroup_listView);
+//		LayoutParams params = _mIn7PreinTalkingGroupContactsListView
+//				.getLayoutParams();
+//		Display display = getWindowManager().getDefaultDisplay();
+//		params.width = (int) (display.getWidth() * 0.33);
+//		_mIn7PreinTalkingGroupContactsListView.setLayoutParams(params);
+//		// generate in and prein talking group contact adapter
+//		// process in talking group attendees phone list, then set in and prein
+//		// talking group contacts list view present data list
+//		for (int i = 0; i < _mTalkingGroupContactsPhoneArray.size(); i++) {
+//			// add data to list
+//			_mIn7PreinTalkingGroupContactsAdapterDataList
+//					.add(generateIn6PreinTalkingGroupAdapterData(
+//							_mTalkingGroupContactsPhoneArray.get(i), true));
+//		}
+//
+//		// set contacts in and prein talking group listView adapter
+//		_mIn7PreinTalkingGroupContactsListView
+//				.setAdapter(new InAB6In7PreinTalkingGroupContactAdapter(
+//						this,
+//						_mIn7PreinTalkingGroupContactsAdapterDataList,
+//						R.layout.in7prein_talking_group_contact_layout,
+//						new String[] { SELECTED_CONTACT_DISPLAYNAME,
+//								SELECTED_CONTACT_IS_IN_TALKINGGROUP },
+//						new int[] {
+//								R.id.in7preinTalkingGroup_contact_displayName_textView,
+//								R.id.in7preinTalkingGroup_contactInTalkingGroup_imageView }));
+//
+//		// bind contacts in and prein talking group listView item click listener
+//		_mIn7PreinTalkingGroupContactsListView
+//				.setOnItemClickListener(new ContactsIn7PreinTalkingGroupListViewOnItemClickListener());
+
+		listUpdateHandler = new UpdateABListHandler();
+		AddressBookManager.getInstance().addContactObserverhandler(
+				listUpdateHandler);
+	}
+
+	private void initListUI() {
+		if (allNamePhoneticSortedContactsInfoArray == null) {
+			initNamePhoneticSortedContactsInfoArray();
+		}
+		
 		// init present contacts in address book detail info array
 		_mPresentContactsInABInfoArray = allNamePhoneticSortedContactsInfoArray;
-
-		// add moderator to talking group attendees list as header
-		_mTalkingGroupContactsPhoneArray.add(0, UserManager.getInstance()
-				.getUser().getName());
-
+		
 		// init contacts in address book list view
 		_mABContactsListView = (ListView) findViewById(R.id.contactInAB_listView);
 
@@ -220,14 +301,6 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 		// bind contacts in address book listView item click listener
 		_mABContactsListView
 				.setOnItemClickListener(new ContactsInABListViewOnItemClickListener());
-
-		// bind contact search editText text watcher
-		((EditText) findViewById(R.id.contact_search_editText))
-				.addTextChangedListener(new ContactSearchEditTextTextWatcher());
-
-		// bind add manual input contact button on click listener
-		((Button) findViewById(R.id.add_manualInputContact_btn))
-				.setOnClickListener(new AddManualInputContactBtnOnClickListener());
 
 		// init contacts in address book list view
 		_mIn7PreinTalkingGroupContactsListView = (ListView) findViewById(R.id.contactIn7PreinTalkingGroup_listView);
@@ -261,6 +334,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 		// bind contacts in and prein talking group listView item click listener
 		_mIn7PreinTalkingGroupContactsListView
 				.setOnItemClickListener(new ContactsIn7PreinTalkingGroupListViewOnItemClickListener());
+		
 	}
 
 	// generate in address book contact adapter
@@ -701,7 +775,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				case 401:
 					accountExpire();
 					break;
-					
+
 				case 402:
 					MyToast.show(ContactSelectActivity.this,
 							R.string.payment_required, Toast.LENGTH_SHORT);
@@ -740,7 +814,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 							}
 						}).show();
 	}
-	
+
 	// confirm add new contacts to talking group button on click listener
 	class ConfirmAddNewContacts2TalkingGroupBtnOnClickListener implements
 			OnClickListener {
@@ -881,7 +955,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			this.originPhone = originPhone;
 			((TextView) getContentView().findViewById(
 					R.id.wrong_phoneFormat_popupWindow_titleTextView))
-					.setText(CommonToolkitApplication.getContext()
+					.setText(CommonToolkitApplication
+							.getContext()
 							.getResources()
 							.getString(
 									R.string.wrong_phone_format_inform_titleTextView_text)
@@ -1395,7 +1470,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			// set contact phones select title textView text
 			((TextView) getContentView().findViewById(
 					R.id.contactPhones_select_titleTextView))
-					.setText(CommonToolkitApplication.getContext()
+					.setText(CommonToolkitApplication
+							.getContext()
 							.getResources()
 							.getString(
 									R.string.contactPhones_selectPopupWindow_titleTextView_text)
@@ -1446,7 +1522,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			public void onClick(View v) {
 				// get phone button text
 				String _selectedPhone = (String) ((Button) v).getText();
-				_selectedPhone = AddressBookManager.filterNumber(_selectedPhone);
+				_selectedPhone = AddressBookManager
+						.filterNumber(_selectedPhone);
 				// dismiss contact phone select popup window
 				dismiss();
 
@@ -1467,7 +1544,8 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 					int position, long id) {
 				// get phone listView item data
 				String _selectedPhone = (String) ((TextView) view).getText();
-				_selectedPhone = AddressBookManager.filterNumber(_selectedPhone);
+				_selectedPhone = AddressBookManager
+						.filterNumber(_selectedPhone);
 				// dismiss contact phone select popup window
 				dismiss();
 
@@ -1612,5 +1690,14 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			}
 		}
 
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		AppDataSaveRestoreUtil.onSaveInstanceState(outState);
+		outState.putSerializable(CONTACT_SELECT_ACTIVITY_PARAM_TALKINGGROUPSTATUS, _mTalkingGroupStatus);
+		outState.putString(TalkingGroupActivity.TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUPID, _mTalkingGroupId);
+		outState.putStringArrayList(TalkingGroupActivity.TALKINGGROUP_ACTIVITY_PARAM_TALKINGGROUP_ATTENDEESPHONE, _mTalkingGroupContactsPhoneArray);
+		super.onSaveInstanceState(outState);
 	}
 }

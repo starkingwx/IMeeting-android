@@ -30,6 +30,7 @@ import com.richitec.imeeting.R;
 import com.richitec.imeeting.constants.SystemConstants;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
+import com.richitec.imeeting.util.AppDataSaveRestoreUtil;
 import com.richitec.imeeting.util.AppUpdateManager;
 
 public class AccountSettingActivity extends IMeetingNavigationActivity {
@@ -216,10 +217,10 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		UserBean user = UserManager.getInstance().getUser();
 		Log.d(SystemConstants.TAG, "user: " + user.toString());
 		DataStorageUtils.putObject(User.username.name(), user.getName());
+		DataStorageUtils.putObject(User.userkey.name(), user.getUserKey());
 		if (user.isRememberPwd()) {
 			DataStorageUtils
 					.putObject(User.password.name(), user.getPassword());
-			DataStorageUtils.putObject(User.userkey.name(), user.getUserKey());
 		} else {
 			DataStorageUtils.putObject(User.password.name(), "");
 			user.setPassword("");
@@ -238,5 +239,16 @@ public class AccountSettingActivity extends IMeetingNavigationActivity {
 		}
 	}
 	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		AppDataSaveRestoreUtil.onSaveInstanceState(outState);
+		super.onSaveInstanceState(outState);
+	}
 	
 }

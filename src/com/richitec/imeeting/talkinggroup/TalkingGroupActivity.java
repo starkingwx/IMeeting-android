@@ -68,6 +68,7 @@ import com.richitec.imeeting.talkinggroup.adapter.MemberListAdapter;
 import com.richitec.imeeting.talkinggroup.adapter.VideoWatchListAdapter;
 import com.richitec.imeeting.talkinggroup.statusfilter.AttendeeModeStatusFilter;
 import com.richitec.imeeting.talkinggroup.statusfilter.OwnerModeStatusFilter;
+import com.richitec.imeeting.util.AppDataSaveRestoreUtil;
 import com.richitec.imeeting.util.AppUtil;
 import com.richitec.imeeting.video.VideoFetchListener;
 import com.richitec.imeeting.video.VideoLiveListener;
@@ -123,13 +124,24 @@ public class TalkingGroupActivity extends Activity implements
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+			groupId = savedInstanceState.getString(TalkGroup.conferenceId
+					.name());
+			owner = savedInstanceState.getString(TalkGroup.owner.name());
+		}
+
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_talking_group);
 		handler = new Handler(Looper.myLooper());
 
 		Intent intent = getIntent();
-		groupId = intent.getStringExtra(TalkGroup.conferenceId.name());
-		owner = intent.getStringExtra(TalkGroup.owner.name());
+		if (groupId == null) {
+			groupId = intent.getStringExtra(TalkGroup.conferenceId.name());
+		}
+		if (owner == null) {
+			owner = intent.getStringExtra(TalkGroup.owner.name());
+		}
 
 		gestureDetector = new GestureDetector(this);
 		flipper = (ViewFlipper) findViewById(R.id.gt_view_flipper);
@@ -222,7 +234,7 @@ public class TalkingGroupActivity extends Activity implements
 				refreshMemberList();
 			}
 		});
-		
+
 		if (isOwner()) {
 			memberListAdatper.setStatusFilter(new OwnerModeStatusFilter());
 		} else {
@@ -1412,6 +1424,20 @@ public class TalkingGroupActivity extends Activity implements
 			}
 		});
 
+	}
+
+	// @Override
+	// protected void onRestoreInstanceState(Bundle savedInstanceState) {
+	// AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+	// super.onRestoreInstanceState(savedInstanceState);
+	// }
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		AppDataSaveRestoreUtil.onSaveInstanceState(outState);
+		outState.putString(TalkGroup.conferenceId.name(), groupId);
+		outState.putString(TalkGroup.owner.name(), owner);
+		super.onSaveInstanceState(outState);
 	}
 
 }

@@ -15,14 +15,14 @@ import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
 import com.richitec.commontoolkit.utils.HttpUtils;
-import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpRequestType;
 import com.richitec.commontoolkit.utils.HttpUtils.HttpResponseResult;
 import com.richitec.commontoolkit.utils.HttpUtils.OnHttpRequestListener;
 import com.richitec.commontoolkit.utils.HttpUtils.PostRequestFormat;
+import com.richitec.commontoolkit.utils.MyToast;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
-import com.richitec.imeeting.talkinggroup.TalkingGroupHistoryListActivity;
+import com.richitec.imeeting.util.AppDataSaveRestoreUtil;
 
 public class AccountGetPasswordActivity extends IMeetingNavigationActivity {
 	private ProgressDialog progressDlg;
@@ -102,4 +102,16 @@ public class AccountGetPasswordActivity extends IMeetingNavigationActivity {
 			}
 		}
 	};
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		AppDataSaveRestoreUtil.onSaveInstanceState(outState);
+		super.onSaveInstanceState(outState);
+	}
 }

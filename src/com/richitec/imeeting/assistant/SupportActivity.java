@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
+import com.richitec.imeeting.util.AppDataSaveRestoreUtil;
 
 public class SupportActivity extends IMeetingNavigationActivity {
 
@@ -58,6 +59,18 @@ public class SupportActivity extends IMeetingNavigationActivity {
 			}
 
 		});
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		AppDataSaveRestoreUtil.onSaveInstanceState(outState);
+		super.onSaveInstanceState(outState);
 	}
 
 }

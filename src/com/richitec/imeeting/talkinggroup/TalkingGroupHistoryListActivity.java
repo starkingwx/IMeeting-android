@@ -45,6 +45,7 @@ import com.richitec.imeeting.contactselect.ContactSelectActivity;
 import com.richitec.imeeting.customcomponent.IMeetingBarButtonItem;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
 import com.richitec.imeeting.talkinggroup.adapter.TalkingGroupListAdapter;
+import com.richitec.imeeting.util.AppDataSaveRestoreUtil;
 import com.richitec.imeeting.util.AppUpdateManager;
 
 public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity {
@@ -536,5 +537,18 @@ public class TalkingGroupHistoryListActivity extends IMeetingNavigationActivity 
 								System.exit(0);
 							}
 						}).show();
+	}
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+		loadData();
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		AppDataSaveRestoreUtil.onSaveInstanceState(outState);
+		super.onSaveInstanceState(outState);
 	}
 }

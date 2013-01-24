@@ -6,6 +6,7 @@ import android.widget.TextView;
 import com.richitec.commontoolkit.utils.VersionUtils;
 import com.richitec.imeeting.R;
 import com.richitec.imeeting.customcomponent.IMeetingNavigationActivity;
+import com.richitec.imeeting.util.AppDataSaveRestoreUtil;
 
 public class AboutActivity extends IMeetingNavigationActivity {
 
@@ -24,4 +25,16 @@ public class AboutActivity extends IMeetingNavigationActivity {
 				.setText(VersionUtils.currentVersionName(this));
 	}
 
+	
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		AppDataSaveRestoreUtil.onRestoreInstanceState(savedInstanceState);
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		AppDataSaveRestoreUtil.onSaveInstanceState(outState);
+		super.onSaveInstanceState(outState);
+	}
 }

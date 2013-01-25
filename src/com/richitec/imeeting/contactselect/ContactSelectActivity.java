@@ -43,13 +43,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.richitec.commontoolkit.CommonToolkitApplication;
+import com.richitec.commontoolkit.CTApplication;
 import com.richitec.commontoolkit.addressbook.AddressBookManager;
 import com.richitec.commontoolkit.addressbook.ContactBean;
 import com.richitec.commontoolkit.addressbook.ContactSyncService;
-import com.richitec.commontoolkit.customadapter.CommonListAdapter;
+import com.richitec.commontoolkit.customadapter.CTListAdapter;
 import com.richitec.commontoolkit.customcomponent.BarButtonItem.BarButtonItemStyle;
-import com.richitec.commontoolkit.customcomponent.CommonPopupWindow;
+import com.richitec.commontoolkit.customcomponent.CTPopupWindow;
 import com.richitec.commontoolkit.customcomponent.ListViewQuickAlphabetBar;
 import com.richitec.commontoolkit.customcomponent.ListViewQuickAlphabetBar.OnTouchListener;
 import com.richitec.commontoolkit.user.UserBean;
@@ -427,7 +427,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			}
 
 			// put alphabet index
-			_dataMap.put(CommonListAdapter.ALPHABET_INDEX,
+			_dataMap.put(CTListAdapter.ALPHABET_INDEX,
 					_contact.getNamePhoneticsString());
 
 			// get in address book contact is selected flag saved in contact
@@ -919,7 +919,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 	}
 
-	class WrongPhoneFormatInformPopupWindow extends CommonPopupWindow {
+	class WrongPhoneFormatInformPopupWindow extends CTPopupWindow {
 		private int position = 0;
 		private String originPhone;
 
@@ -955,7 +955,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			this.originPhone = originPhone;
 			((TextView) getContentView().findViewById(
 					R.id.wrong_phoneFormat_popupWindow_titleTextView))
-					.setText(CommonToolkitApplication
+					.setText(CTApplication
 							.getContext()
 							.getResources()
 							.getString(
@@ -991,7 +991,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 
 	}
 
-	class AddAreaCodePopupWindow extends CommonPopupWindow {
+	class AddAreaCodePopupWindow extends CTPopupWindow {
 		private int position = 0;
 		private String originPhone;
 
@@ -1076,7 +1076,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	}
 
 	// add manual input contact popup window
-	class AddManualInputContactPopupWindow extends CommonPopupWindow {
+	class AddManualInputContactPopupWindow extends CTPopupWindow {
 
 		public AddManualInputContactPopupWindow(int resource, int width,
 				int height, boolean focusable, boolean isBindDefListener) {
@@ -1399,7 +1399,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 	}
 
 	// contact phone numbers select popup window
-	class ContactPhoneNumbersSelectPopupWindow extends CommonPopupWindow {
+	class ContactPhoneNumbersSelectPopupWindow extends CTPopupWindow {
 
 		// select contact position
 		private int _mSelectContactPosition;
@@ -1470,7 +1470,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 			// set contact phones select title textView text
 			((TextView) getContentView().findViewById(
 					R.id.contactPhones_select_titleTextView))
-					.setText(CommonToolkitApplication
+					.setText(CTApplication
 							.getContext()
 							.getResources()
 							.getString(
@@ -1504,7 +1504,7 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				// set phone list view adapter
 				_phoneListView
 						.setAdapter(new ArrayAdapter<String>(
-								CommonToolkitApplication.getContext(),
+								CTApplication.getContext(),
 								R.layout.contact_phonenumbers_select_phoneslist_item_layout,
 								phoneNumbers));
 
@@ -1644,16 +1644,16 @@ public class ContactSelectActivity extends IMeetingNavigationActivity {
 				ListView dependentListView, MotionEvent event,
 				Character alphabeticalCharacter) {
 			// get scroll position
-			if (dependentListView.getAdapter() instanceof CommonListAdapter) {
+			if (dependentListView.getAdapter() instanceof CTListAdapter) {
 				// get dependent listView adapter
-				CommonListAdapter _commonListAdapter = (CommonListAdapter) dependentListView
+				CTListAdapter _commonListAdapter = (CTListAdapter) dependentListView
 						.getAdapter();
 
 				for (int i = 0; i < _commonListAdapter.getCount(); i++) {
 					// get alphabet index
 					@SuppressWarnings("unchecked")
 					String _alphabetIndex = (String) ((Map<String, ?>) _commonListAdapter
-							.getItem(i)).get(CommonListAdapter.ALPHABET_INDEX);
+							.getItem(i)).get(CTListAdapter.ALPHABET_INDEX);
 
 					// check alphabet index
 					if (null == _alphabetIndex

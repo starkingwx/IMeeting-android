@@ -30,7 +30,7 @@ import android.widget.Toast;
 
 import com.richitec.commontoolkit.addressbook.AddressBookManager;
 import com.richitec.commontoolkit.addressbook.ContactBean;
-import com.richitec.commontoolkit.customcomponent.CommonPopupWindow;
+import com.richitec.commontoolkit.customcomponent.CTPopupWindow;
 import com.richitec.commontoolkit.user.User;
 import com.richitec.commontoolkit.user.UserBean;
 import com.richitec.commontoolkit.user.UserManager;
@@ -224,7 +224,7 @@ public class SettingActivity extends IMeetingNavigationActivity {
 		modifyPSWPopupWindow.showAtLocation(v, Gravity.CENTER, 0, 0);
 	}
 
-	class ModifyPSWPopupWindow extends CommonPopupWindow {
+	class ModifyPSWPopupWindow extends CTPopupWindow {
 
 		public ModifyPSWPopupWindow(int resource, int width, int height,
 				boolean focusable, boolean isBindDefListener) {

@@ -22,7 +22,7 @@ public class AboutActivity extends IMeetingNavigationActivity {
 
 		// set product version name
 		((TextView) findViewById(R.id.product_versionName_textView))
-				.setText(VersionUtils.currentVersionName(this));
+				.setText(VersionUtils.versionName());
 	}
 
 	

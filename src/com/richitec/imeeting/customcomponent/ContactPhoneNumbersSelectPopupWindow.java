@@ -12,13 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.richitec.commontoolkit.CommonToolkitApplication;
-import com.richitec.commontoolkit.activityextension.AppLaunchActivity;
-import com.richitec.commontoolkit.customcomponent.CommonPopupWindow;
+import com.richitec.commontoolkit.CTApplication;
+import com.richitec.commontoolkit.customcomponent.CTPopupWindow;
 import com.richitec.imeeting.R;
 
 public abstract class ContactPhoneNumbersSelectPopupWindow extends
-		CommonPopupWindow {
+		CTPopupWindow {
 
 	// select contact position
 	private int _mSelectContactPosition;
@@ -87,7 +86,7 @@ public abstract class ContactPhoneNumbersSelectPopupWindow extends
 		// set contact phones select title textView text
 		((TextView) getContentView().findViewById(
 				R.id.contactPhones_select_titleTextView))
-				.setText(CommonToolkitApplication.getContext()
+				.setText(CTApplication.getContext()
 						.getResources()
 						.getString(
 								R.string.contactPhones_selectPopupWindow_titleTextView_text)
@@ -120,7 +119,7 @@ public abstract class ContactPhoneNumbersSelectPopupWindow extends
 			// set phone list view adapter
 			_phoneListView
 					.setAdapter(new ArrayAdapter<String>(
-							CommonToolkitApplication.getContext(),
+							CTApplication.getContext(),
 							R.layout.contact_phonenumbers_select_phoneslist_item_layout,
 							phoneNumbers));
 

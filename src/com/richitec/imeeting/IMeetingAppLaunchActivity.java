@@ -42,10 +42,11 @@ public class IMeetingAppLaunchActivity extends AppLaunchActivity {
 	}
 
 	@Override
-	public void didFinishLaunching() {
+	public boolean didFinishLaunching() {
 		// traversal address book
 		AddressBookManager.setFilterMode(AddressBookManager.FILTER_IP_AND_CODE_PREFIX);
 		AddressBookManager.getInstance().traversalAddressBook();
+		return false;
 	}
 
 	@Override
